@@ -96,6 +96,7 @@ open class Cryptr(
                 while (br.readLine().also { responseLine = it } != null) {
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
+                println(response.toString())
                 return JSONObject(response.toString())
             }
         } catch (e: Exception) {

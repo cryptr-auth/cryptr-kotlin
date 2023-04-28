@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.enums.Environment
 import cryptr.kotlin.models.Organization
+import cryptr.kotlin.models.User
 import cryptr.kotlin.objects.Constants
 import org.json.JSONObject
 
@@ -28,6 +29,21 @@ class CryptrAPI(
         return buildApiPath(Organization.apiResourceName, resourceId)
     }
 
+    private fun buildOrganizationResourcePath(
+        organizationDomain: String,
+        resourceName: String,
+        resourceId: String?
+    ): String {
+        val baseApiOrgResourcePath =
+            Constants.API_BASE_BATH + "/" + Constants.API_VERSION + "/org/" + organizationDomain + "/" + resourceName
+        return if (resourceId !== null && resourceId.isNotEmpty()) "$baseApiOrgResourcePath/$resourceId" else baseApiOrgResourcePath
+    }
+
+    private fun buildUserPath(organizationDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(organizationDomain, User.apiResourceName, resourceId)
+    }
+
+
     /**
      * List all [Organization] records according toused API Key
      */
@@ -46,12 +62,12 @@ class CryptrAPI(
     /**
      * Get Organization from it's id
      *
-     * @param id The id reference of requested Organization
+     * @param domain The id reference of requested Organization
      *
      * @return the requested [Organization]
      */
-    fun getOrganization(id: String): Organization? {
-        val resp = makeRequest(buildOrganizationPath(id), apiKeyToken = retrieveApiKeyToken())
+    fun getOrganization(domain: String): Organization? {
+        val resp = makeRequest(buildOrganizationPath(domain), apiKeyToken = retrieveApiKeyToken())
         return resp?.let { Organization(it) }
     }
 
@@ -66,5 +82,49 @@ class CryptrAPI(
         var params = organization.creationMap()
         val resp = makeRequest(buildOrganizationPath(), params, retrieveApiKeyToken())
         return resp?.let { Organization(it) }
+    }
+
+    /**
+     * List all [User] according to consumed API Key
+     *
+     * @re
+     */
+    fun listUsers(organizationDomain: String): ArrayList<User> {
+        val resp = makeRequest(buildUserPath(organizationDomain), apiKeyToken = retrieveApiKeyToken())
+        val users: ArrayList<User> = ArrayList()
+        if (resp !== null) {
+            println("resp list Users")
+            for (i in resp.getJSONArray("data")) {
+                try {
+                    val user = User(i as JSONObject)
+                    users.add(user)
+                } catch (e: Exception) {
+                    println("error")
+                    println(e.message)
+                }
+            }
+        }
+        println(users.size)
+        return users
+    }
+
+    /**
+     * Return the requested [User]
+     *
+     * @param userId The User resource ID
+     *
+     * @return The requested [User]
+     */
+    fun getUser(organizationDomain: String, userId: String): User? {
+        val resp = makeRequest(buildUserPath(organizationDomain, userId), apiKeyToken = retrieveApiKeyToken())
+        return resp?.let { User(it) }
+    }
+
+    // Need createUser fun
+    fun createUser(organizationDomain: String, userEmail: String): User? {
+        val params = mapOf("profile[email]" to userEmail)
+        println(params)
+        val resp = makeRequest(buildUserPath(organizationDomain), params, apiKeyToken = retrieveApiKeyToken())
+        return resp?.let { User(it) }
     }
 }
