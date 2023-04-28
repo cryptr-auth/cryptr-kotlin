@@ -1,6 +1,7 @@
 package cryptr.kotlin
 
 import cryptr.kotlin.enums.Environment
+import cryptr.kotlin.models.Application
 import cryptr.kotlin.models.Organization
 import cryptr.kotlin.models.User
 import cryptr.kotlin.objects.Constants
@@ -41,6 +42,10 @@ class CryptrAPI(
 
     private fun buildUserPath(organizationDomain: String, resourceId: String? = null): String {
         return buildOrganizationResourcePath(organizationDomain, User.apiResourceName, resourceId)
+    }
+
+    private fun buildApplicationPath(organizationDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(organizationDomain, Application.apiResourceName, resourceId)
     }
 
 
@@ -93,7 +98,6 @@ class CryptrAPI(
         val resp = makeRequest(buildUserPath(organizationDomain), apiKeyToken = retrieveApiKeyToken())
         val users: ArrayList<User> = ArrayList()
         if (resp !== null) {
-            println("resp list Users")
             for (i in resp.getJSONArray("data")) {
                 try {
                     val user = User(i as JSONObject)
@@ -104,7 +108,6 @@ class CryptrAPI(
                 }
             }
         }
-        println(users.size)
         return users
     }
 
@@ -127,4 +130,34 @@ class CryptrAPI(
         val resp = makeRequest(buildUserPath(organizationDomain), params, apiKeyToken = retrieveApiKeyToken())
         return resp?.let { User(it) }
     }
+
+    /**
+     * Applications
+     */
+    fun listApplications(organizationDomain: String): ArrayList<Application> {
+        val path = buildApplicationPath(organizationDomain)
+        println(path)
+        val resp = makeRequest(path, apiKeyToken = retrieveApiKeyToken())
+        val applications: ArrayList<Application> = ArrayList()
+        if (resp !== null) {
+            println(resp)
+            for (i in resp.getJSONArray("data")) {
+                try {
+                    val application = Application(i as JSONObject)
+                    applications.add(application)
+                } catch (e: Exception) {
+                    println(e.message)
+                }
+            }
+        }
+        println(applications.size)
+        return applications
+    }
+
+    fun getApplication(organizationDomain: String, applicationId: String): Application? {
+        val resp =
+            makeRequest(buildApplicationPath(organizationDomain, applicationId), apiKeyToken = retrieveApiKeyToken())
+        return resp?.let { Application(it) }
+    }
+
 }
