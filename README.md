@@ -41,17 +41,24 @@ dependencies {
 
 ```kotlin
 
-import cryptr.kotlin.Library
+import cryptr.kotlin.Cryptr
 
 // if you use system properties you call just init like this
-val cryptr = Library()
+val cryptr = Cryptr()
 
-val cryptr = Library(
-    "my-saas-company",
-    "https://my-saas-company.authent.me",
-    "https://saas-company.app.com/callback",
-    "api-key-id",
-    "api-key-secret"
+// If you prefer to define them manually
+val cryptr = Cryptr(
+    tenantDomain = "my-saas-company",
+    apiKeyClientId = "api-key-id",
+    apiKeyClientSecret = "api-key-secret"
+)
+
+// You can also specify your cryptr service url
+val cryptr = Cryptr(
+    tenantDomain = "my-saas-company",
+    baseUrl = "https://my-saas-company.authent.me",
+    apiKeyClientId = "api-key-id",
+    apiKeyClientSecret = "api-key-secret"
 )
 ```
 
@@ -82,10 +89,10 @@ val endUserAccessToken = callbackResp.get("access_token")
 
 ## System property keys
 
-| key                              | sample value                      | purpose                                                      |
-|----------------------------------|-----------------------------------|--------------------------------------------------------------|
-| **CRYPTR_TENANT_DOMAIN**         | `your-tenant-domain`              | Your Account domain                                          |
-| **CRYPTR_BASE_URL**              | `https://company;authent.me`      | Your Cryptr service URL                                      |
-| **CRYPTR_DEFAULT_REDIRECT_URL**  | `https://localhost:8080/callback` | The URL where to redirect end-user after SSO authent process |
-| **CRYPTR_API_KEY_CLIENT_ID**     | `xxx`                             | Your API Key client ID                                       |
-| **CRYPTR_API_KEY_CLIENT_SECRET** | `xxx`                             | Your API Key client Secret                                   |
+| key                              | Required | Default value          | sample value                      | purpose                                                      |
+|----------------------------------|----------|------------------------|-----------------------------------|--------------------------------------------------------------|
+| **CRYPTR_TENANT_DOMAIN**         | true     | None                   | `your-tenant-domain`              | Your Account domain                                          |
+| **CRYPTR_BASE_URL**              | false    | https://auth.cryptr.eu | `https://company.authent.me`      | Your Cryptr service URL                                      |
+| **CRYPTR_DEFAULT_REDIRECT_URL**  |          |                        | `https://localhost:8080/callback` | The URL where to redirect end-user after SSO authent process |
+| **CRYPTR_API_KEY_CLIENT_ID**     | true     | None                   | `xxx`                             | Your API Key client ID                                       |
+| **CRYPTR_API_KEY_CLIENT_SECRET** | true     | None                   | `xxx`                             | Your API Key client Secret                                   |
