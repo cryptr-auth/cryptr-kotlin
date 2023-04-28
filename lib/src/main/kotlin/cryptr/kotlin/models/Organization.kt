@@ -15,6 +15,10 @@ data class Organization(
     val insertedAt: String? = null,
     val locality: String? = "Lille"
 ) {
+    companion object {
+        const val apiResourceName: String = "organizations"
+    }
+
     constructor(jsonObject: JSONObject) : this(
         jsonObject.getString("id"),
         jsonObject.getString("domain"),

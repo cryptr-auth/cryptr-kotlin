@@ -1,5 +1,7 @@
 package cryptr.kotlin
 
+import cryptr.kotlin.enums.ChallengeType
+import cryptr.kotlin.enums.Environment
 import org.json.JSONObject
 
 /**
@@ -21,7 +23,7 @@ class CryptrHeadless(
     Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret) {
 
     /**
-     * Generate a SSO SAMl Challenge according to authentication and given parameters
+     * Generate a SSO SAMl Challenge according to dev.cryptr.eu and given parameters
      * orgDomain or userEmail value is required
      *
      * @param redirectUri The endpoint where you will consume after successfull authnetication
@@ -34,12 +36,49 @@ class CryptrHeadless(
         orgDomain: String? = null,
         userEmail: String? = null
     ): JSONObject? {
+        return createSSOChallenge(redirectUri, orgDomain, userEmail)
+    }
+
+    /**
+     * Generate a SSO Oauth Challenge according to dev.cryptr.eu and given parameters
+     * orgDomain or userEmail value is required
+     *
+     * @param redirectUri The endpoint where you will consume after successfull authnetication
+     * @param orgDomain Organization domain linked to the targeted SSO Connection
+     * @param userEmail End-User email linked to the SSO Connection
+     * @return a JSONObject with `authorization_url`that end-user has to open to do his authententication process
+     */
+    fun createSSOOauthChallenge(
+        redirectUri: String = defaultRedirectUrl,
+        orgDomain: String? = null,
+        userEmail: String? = null
+    ): JSONObject? {
+        return createSSOChallenge(redirectUri, orgDomain, userEmail, ChallengeType.OAUTH)
+    }
+
+    /**
+     * Generate a SSO Challenge according to dev.cryptr.eu and given parameters
+     * orgDomain or userEmail value is required
+     *
+     * @param redirectUri The endpoint where you will consume after successfull authnetication
+     * @param orgDomain Organization domain linked to the targeted SSO Connection
+     * @param userEmail End-User email linked to the SSO Connection
+     * @param authType (Optional, Default: SAML)
+     * @return a JSONObject with `authorization_url`that end-user has to open to do his authententication process
+     */
+    fun createSSOChallenge(
+        redirectUri: String = defaultRedirectUrl,
+        orgDomain: String? = null,
+        userEmail: String? = null,
+        authType: ChallengeType? = ChallengeType.SAML
+    ): JSONObject? {
         if (orgDomain != null || userEmail != null) {
+            val path = "api/v2/sso-${authType?.value}-challenges"
             val params = if (orgDomain !== null) mapOf(
                 "redirect_uri" to redirectUri,
                 "org_domain" to orgDomain
             ) else mapOf("redirect_uri" to redirectUri, "user_email" to userEmail)
-            return makeRequest("api/v2/sso-saml-challenges", params, retrieveApiKeyToken())
+            return makeRequest(path, params, retrieveApiKeyToken())
         } else {
             throw Exception("requires either orgDomain or endUser value")
         }

@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
+import cryptr.kotlin.enums.ChallengeType
 import cryptr.kotlin.models.SSOChallenge
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,6 +28,58 @@ class CryptrHeadlessTest {
             CryptrHeadless(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
     }
 
+    @Test
+    fun createSSOChallengeForauth() {
+        stubFor(
+            post("/api/v2/sso-oauth-challenges")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok(
+                        "{\n" +
+                                "    \"api_key_id\": \"some-api-key-id\",\n" +
+                                "    \"authorization_url\": \"https://dev.cryptr.eu/org/acme-company/oauth2/saml?request_id=request-id\",\n" +
+                                "    \"database\": \"sandbox\",\n" +
+                                "    \"expired_at\": 1682672619,\n" +
+                                "    \"redirect_uri\": \"http://dev.cryptr.eu:8080/callback\",\n" +
+                                "    \"request_id\": \"request-id\",\n" +
+                                "    \"saml_idp_id\": \"acme_company_BS8RohkywSxjoDnE2SEygL\"\n" +
+                                "}"
+                    )
+                )
+        )
+
+        val challengeResponse =
+            cryptrHeadless?.createSSOChallenge(orgDomain = "acme-company", authType = ChallengeType.OAUTH)
+        assertNotNull(challengeResponse)
+        val challenge = SSOChallenge(challengeResponse)
+        assertEquals("request-id", challenge.requestId)
+    }
+
+    @Test
+    fun createSSOOauthChallengeForauth() {
+        stubFor(
+            post("/api/v2/sso-oauth-challenges")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok(
+                        "{\n" +
+                                "    \"api_key_id\": \"some-api-key-id\",\n" +
+                                "    \"authorization_url\": \"https://dev.cryptr.eu/org/acme-company/oauth2/saml?request_id=request-id\",\n" +
+                                "    \"database\": \"sandbox\",\n" +
+                                "    \"expired_at\": 1682672619,\n" +
+                                "    \"redirect_uri\": \"http://dev.cryptr.eu:8080/callback\",\n" +
+                                "    \"request_id\": \"request-id\",\n" +
+                                "    \"saml_idp_id\": \"acme_company_BS8RohkywSxjoDnE2SEygL\"\n" +
+                                "}"
+                    )
+                )
+        )
+
+        val challengeResponse = cryptrHeadless?.createSSOOauthChallenge(orgDomain = "acme-company")
+        assertNotNull(challengeResponse)
+        val challenge = SSOChallenge(challengeResponse)
+        assertEquals("request-id", challenge.requestId)
+    }
 
     @Test
     fun createSSOSamlChallengeShouldReturnAuthorizationUrlIfRightOrga() {

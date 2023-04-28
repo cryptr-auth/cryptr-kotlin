@@ -1,5 +1,8 @@
 package cryptr.kotlin
 
+import cryptr.kotlin.enums.CryptrApiPath
+import cryptr.kotlin.enums.Environment
+import cryptr.kotlin.objects.Constants
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -17,7 +20,7 @@ const val DEFAULT_REDIRECT_URL = "http://localhost:8080/callback"
  *
  * @param tenantDomain Your account value `domain`
  * @param baseUrl The URL of your Cryptr Service
- * @param defaultRedirectUrl Where you want to redirect te end-user after authentication process
+ * @param defaultRedirectUrl Where you want to redirect te end-user after dev.cryptr.eu process
  * @param apiKeyClientId The ID of your API KEY
  * @param apiKeyClientSecret The secret of your API KEY
  */
@@ -113,7 +116,12 @@ open class Cryptr(
                 "tenant_domain" to tenantDomain,
                 "grant_type" to "client_credentials"
             )
-            val apiKeyTokenResponse = makeRequest("api/v2/oauth/token", params)
+            Constants.API_BASE_BATH
+            val apiKeyTokenResponse =
+                makeRequest(
+                    "${Constants.API_BASE_BATH}/${Constants.API_VERSION}${CryptrApiPath.API_KEY_TOKEN.pathValue}",
+                    params
+                )
             val apiKeyToken = apiKeyTokenResponse?.getString("access_token")
             if (apiKeyToken !== null) {
                 System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
