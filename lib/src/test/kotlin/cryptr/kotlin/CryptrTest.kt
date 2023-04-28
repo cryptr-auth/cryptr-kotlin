@@ -19,8 +19,8 @@ class CryptrTest {
         val tenantDomain = "shark-academy"
         val baseUrl = "http://dev.cryptr.eu"
         val defaultRedirectUrl = "http://localhost:8080/callback"
-        val apiKeyClientId = "62847327-2101-4a36-a51c-e7016098ee18"
-        val apiKeyClientSecret = "qO0vCgXyUk7OjCZIswZ6Tmhjfu8Gqnz7v0bQLztCFsGMZ+nCzyBwdJtgibK8ST+X"
+        val apiKeyClientId = "my-api-key-client-id"
+        val apiKeyClientSecret = "my-api-key-client-secret"
         cryptr = Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
     }
 

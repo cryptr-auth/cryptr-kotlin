@@ -38,15 +38,15 @@ open class Cryptr(
     }
 
     init {
-        logger.info(
-            """Cryptr intialized with:
-            |- tenantDomain: $tenantDomain
-            |- baseUrl: $baseUrl
-            |- defaultRedirection: $defaultRedirectUrl
-            |- apiKeyClientId: $apiKeyClientId
-            |- apiKeyClientSecret: $apiKeyClientSecret
-        """.trimMargin()
-        )
+//        logger.info(
+//            """Cryptr intialized with:
+//            |- tenantDomain: $tenantDomain
+//            |- baseUrl: $baseUrl
+//            |- defaultRedirection: $defaultRedirectUrl
+//            |- apiKeyClientId: $apiKeyClientId
+//            |- apiKeyClientSecret: $apiKeyClientSecret
+//        """.trimMargin()
+//        )
     }
 
     private fun buildCryptrUrl(path: String): String {
@@ -76,7 +76,7 @@ open class Cryptr(
             conn.useCaches = false
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
             conn.setRequestProperty("Accept", "application/json")
-            if (apiKeyToken !== "") {
+            if (apiKeyToken !== "" && apiKeyToken !== null) {
                 conn.setRequestProperty("Authorization", "Bearer $apiKeyToken")
             }
             if (params != null) {
@@ -96,33 +96,26 @@ open class Cryptr(
                 return JSONObject(response.toString())
             }
         } catch (e: Exception) {
-            logger.warning(e.message)
+//            logger.warning(e.message)
         }
         return null
     }
 
     fun retrieveApiKeyToken(): String? {
-        println("retrieve token")
         if (System.getProperty("CRYPTR_API_KEY_TOKEN", "null") !== "null") {
-            println("token present in db")
             return System.getProperty("CRYPTR_API_KEY_TOKEN")
         } else if (System.getProperty("CRYPTR_CURRENT_API_TOKEN", "null") !== "null") {
-            println("current token present in db")
             return System.getProperty("CRYPTR_CURRENT_API_TOKEN")
         } else {
-            println("need to call endpoint")
             val params = mapOf(
                 "client_id" to apiKeyClientId,
                 "client_secret" to apiKeyClientSecret,
                 "tenant_domain" to tenantDomain,
                 "grant_type" to "client_credentials"
             )
-            println(params.toString())
             val apiKeyTokenResponse = makeRequest("api/v2/oauth/token", params)
-            println(apiKeyTokenResponse)
             val apiKeyToken = apiKeyTokenResponse?.getString("access_token")
             if (apiKeyToken !== null) {
-                println(apiKeyToken)
                 System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
             }
             return apiKeyToken

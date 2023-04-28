@@ -39,8 +39,6 @@ class CryptrHeadless(
                 "redirect_uri" to redirectUri,
                 "org_domain" to orgDomain
             ) else mapOf("redirect_uri" to redirectUri, "user_email" to userEmail)
-            logger.info("createSSOSamlChallenge")
-            logger.info(params.toString())
             return makeRequest("api/v2/sso-saml-challenges", params, retrieveApiKeyToken())
         } else {
             throw Exception("requires either orgDomain or endUser value")
