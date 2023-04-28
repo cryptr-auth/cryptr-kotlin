@@ -169,4 +169,16 @@ class CryptrAPITest {
         val createdOrga = cryptrApi?.createOrganization(org)
         //assertEquals(Organization(id = "", name = ""), createdOrga)
     }
+
+    @Test
+    fun listUsers() {
+    }
+
+    @Test
+    fun getUser() {
+    }
+
+    @Test
+    fun createUser() {
+    }
 }
