@@ -3,6 +3,7 @@ package cryptr.kotlin
 import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.Environment
 import cryptr.kotlin.objects.Constants
+import org.json.JSONException
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.DataOutputStream
@@ -60,8 +61,13 @@ open class Cryptr(
         return params
             .entries
             .stream()
-            .map { p -> p.key + "=" + URLEncoder.encode(p.value.toString(), "utf-8") }
-            .reduce { p1, p2 -> p1.toString() + "&" + p2.toString() }
+            .map { p ->
+//                println(p.key)
+//                println(p.value?.javaClass)
+//                println(p.value?.javaClass?.let { println(it.declaredFields.map { f -> f.type.isArray }) })
+                p.key + "=" + URLEncoder.encode(p.value.toString(), "utf-8")
+            }
+            .reduce { p1, p2 -> "$p1&$p2" }
             .map { s -> "$s" }
             .orElse("")
     }
@@ -70,9 +76,10 @@ open class Cryptr(
         path: String,
         params: Map<String, Any?>? = null,
         apiKeyToken: String? = ""
-    ): JSONObject? {
+    ): JSONObject {
         try {
             val url = URL(buildCryptrUrl(path))
+//            println(url)
             val conn = url.openConnection() as HttpURLConnection
 
             conn.doOutput = true
@@ -89,19 +96,23 @@ open class Cryptr(
             }
 
             BufferedReader(
-                InputStreamReader(conn.inputStream, "utf-8")
+                InputStreamReader(if (conn.responseCode > 299) conn.errorStream else conn.inputStream, "utf-8")
             ).use { br ->
                 val response = StringBuilder()
                 var responseLine: String?
                 while (br.readLine().also { responseLine = it } != null) {
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
-                return JSONObject(response.toString())
+                try {
+                    return JSONObject(response.toString())
+                } catch (ej: JSONException) {
+                    return JSONObject().put("error", response.toString())
+                }
+
             }
         } catch (e: Exception) {
-//            logger.warning(e.message)
+            return JSONObject().put("error", e.message)
         }
-        return null
     }
 
     fun retrieveApiKeyToken(): String? {
@@ -122,7 +133,7 @@ open class Cryptr(
                     "${Constants.API_BASE_BATH}/${Constants.API_VERSION}${CryptrApiPath.API_KEY_TOKEN.pathValue}",
                     params
                 )
-            val apiKeyToken = apiKeyTokenResponse?.getString("access_token")
+            val apiKeyToken = apiKeyTokenResponse.getString("access_token")
             if (apiKeyToken !== null) {
                 System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
             }

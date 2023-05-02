@@ -1,36 +1,3 @@
-Skip to content
-Search or jump to…
-Pull requests
-Issues
-Codespaces
-Marketplace
-Explore
- 
-@tuxtux59 
-JetBrains
-/
-kotlin
-Public
-Fork your own copy of JetBrains/kotlin
-Code
-Pull requests
-147
-Actions
-Zenhub
-Security
-Insights
-Beta Try the new code view
-kotlin/.gitignore
-@demiurg906
-demiurg906 [Build] Run only FIR PSI tests in predefined [JPS] Fast FIR tests c…
-…
-Latest commit 1cac3b4 on Feb 28
- History
- 37 contributors
-@4u7@snrostov@ilgonmic@demiurg906@yanex@shafirov@shalupov@nikitabobko@ilya-g@ligee@bashor@skuzmich
-79 lines (79 sloc)  1.93 KB
- 
-
 .DS_Store
 .idea/shelf
 /confluence/target
@@ -112,17 +79,3 @@ outTmp/
 /test.output
 /kotlin-native/dist
 kotlin-ide/
-Footer
-© 2023 GitHub, Inc.
-Footer navigation
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About

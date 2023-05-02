@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test
 import java.net.URL
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 @WireMockTest(proxyMode = true)
@@ -26,6 +25,7 @@ class CryptrHeadlessTest {
         val apiKeyClientSecret = "my-api-key-client-secret"
         cryptrHeadless =
             CryptrHeadless(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
+        System.setProperty("CRYPTR_API_KEY_TOKEN", "stored-api-key")
     }
 
     @Test
@@ -136,7 +136,7 @@ class CryptrHeadlessTest {
     }
 
     @Test
-    fun createSSOSamlChallengeShouldFaillIfUnmatchingInput() {
+    fun createSSOSamlChallengeShouldFailIfUnmatchingInput() {
         stubFor(
             post("/api/v2/sso-saml-challenges")
                 .withHost(equalTo("dev.cryptr.eu"))
@@ -145,7 +145,7 @@ class CryptrHeadlessTest {
                 )
         )
         val challengeResponse = cryptrHeadless?.createSSOSamlChallenge(orgDomain = "azerty")
-        assertNull(challengeResponse, "should return object")
+        assertEquals("{\"error\":\"Not Found\"}", challengeResponse.toString())
     }
 
     @Test
