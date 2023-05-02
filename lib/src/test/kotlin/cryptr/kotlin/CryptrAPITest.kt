@@ -10,6 +10,7 @@ import java.text.Normalizer
 import java.util.regex.Pattern
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
+import kotlin.test.assertNull
 
 @WireMockTest(proxyMode = true)
 class CryptrAPITest {
@@ -202,13 +203,229 @@ class CryptrAPITest {
 
     @Test
     fun listUsers() {
+        stubFor(
+            get("/api/v2/org/acme-company/users")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok(
+                        "{\n" +
+                                "    \"__type__\": \"List\",\n" +
+                                "    \"data\": [\n" +
+                                "        {\n" +
+                                "            \"__access__\": \"limited_to:acme-company\",\n" +
+                                "            \"__domain__\": \"acme-company\",\n" +
+                                "            \"__environment__\": \"sandbox\",\n" +
+                                "            \"__managed_by__\": \"shark-academy\",\n" +
+                                "            \"__type__\": \"User\",\n" +
+                                "            \"id\": \"d5f20c7c-c151-4177-8ee8-071d32317ea8\",\n" +
+                                "            \"inserted_at\": \"2023-04-28T15:24:55\",\n" +
+                                "            \"metadata\": [],\n" +
+                                "            \"profile\": {\n" +
+                                "                \"__access__\": \"limited_to:acme-company\",\n" +
+                                "                \"__domain__\": \"acme-company\",\n" +
+                                "                \"__environment__\": \"sandbox\",\n" +
+                                "                \"__managed_by__\": \"shark-academy\",\n" +
+                                "                \"__type__\": \"Profile\",\n" +
+                                "                \"address\": null,\n" +
+                                "                \"birthdate\": null,\n" +
+                                "                \"email\": \"omvold7jx62g@acme-company.io\",\n" +
+                                "                \"family_name\": null,\n" +
+                                "                \"gender\": null,\n" +
+                                "                \"given_name\": null,\n" +
+                                "                \"locale\": null,\n" +
+                                "                \"name\": \" \",\n" +
+                                "                \"nickname\": null,\n" +
+                                "                \"phone_number\": null,\n" +
+                                "                \"picture\": null,\n" +
+                                "                \"profile\": null,\n" +
+                                "                \"website\": null,\n" +
+                                "                \"zoneinfo\": null\n" +
+                                "            },\n" +
+                                "            \"updated_at\": \"2023-04-28T15:24:55\"\n" +
+                                "        },\n" +
+                                "        {\n" +
+                                "            \"__access__\": \"limited_to:acme-company\",\n" +
+                                "            \"__domain__\": \"acme-company\",\n" +
+                                "            \"__environment__\": \"sandbox\",\n" +
+                                "            \"__managed_by__\": \"shark-academy\",\n" +
+                                "            \"__type__\": \"User\",\n" +
+                                "            \"id\": \"3279619a-f826-4f86-bd86-6a1a8ae719d4\",\n" +
+                                "            \"inserted_at\": \"2023-04-28T15:21:44\",\n" +
+                                "            \"metadata\": [],\n" +
+                                "            \"profile\": {\n" +
+                                "                \"__access__\": \"limited_to:acme-company\",\n" +
+                                "                \"__domain__\": \"acme-company\",\n" +
+                                "                \"__environment__\": \"sandbox\",\n" +
+                                "                \"__managed_by__\": \"shark-academy\",\n" +
+                                "                \"__type__\": \"Profile\",\n" +
+                                "                \"address\": null,\n" +
+                                "                \"birthdate\": null,\n" +
+                                "                \"email\": \"12345@acme-company.co\",\n" +
+                                "                \"family_name\": null,\n" +
+                                "                \"gender\": null,\n" +
+                                "                \"given_name\": null,\n" +
+                                "                \"locale\": null,\n" +
+                                "                \"name\": \" \",\n" +
+                                "                \"nickname\": null,\n" +
+                                "                \"phone_number\": null,\n" +
+                                "                \"picture\": null,\n" +
+                                "                \"profile\": null,\n" +
+                                "                \"website\": null,\n" +
+                                "                \"zoneinfo\": null\n" +
+                                "            },\n" +
+                                "            \"updated_at\": \"2023-04-28T15:21:44\"\n" +
+                                "        },\n" +
+                                "    ],\n" +
+                                "    \"paginate\": {\n" +
+                                "        \"current_page\": 1,\n" +
+                                "        \"next_page\": 2,\n" +
+                                "        \"per_page\": 8,\n" +
+                                "        \"prev_page\": null,\n" +
+                                "        \"total_pages\": 2\n" +
+                                "    },\n" +
+                                "    \"total_count\": 9\n" +
+                                "}"
+                    )
+                )
+        )
+        val resp = cryptrApi?.listUsers("acme-company")
+        assertEquals(2, resp?.size)
+
+        if (resp !== null) {
+            assertContains(resp.map { u -> u.profile.email }, "omvold7jx62g@acme-company.io")
+            assertContains(resp.map { u -> u.profile.email }, "12345@acme-company.co")
+            assertContains(resp.map { u -> u.profile.address }, null)
+        }
     }
 
     @Test
-    fun getUser() {
+    fun getUserShouldReturnUser() {
+        stubFor(
+            get("/api/v2/org/acme-company/users/d5f20c7c-c151-4177-8ee8-071d32317ea8")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok(
+                        "{\n" +
+                                "    \"__access__\": \"limited_to:acme-company\",\n" +
+                                "    \"__domain__\": \"acme-company\",\n" +
+                                "    \"__environment__\": \"sandbox\",\n" +
+                                "    \"__managed_by__\": \"shark-academy\",\n" +
+                                "    \"__type__\": \"User\",\n" +
+                                "    \"id\": \"d5f20c7c-c151-4177-8ee8-071d32317ea8\",\n" +
+                                "    \"inserted_at\": \"2023-04-28T15:24:55\",\n" +
+                                "    \"metadata\": [],\n" +
+                                "    \"profile\": {\n" +
+                                "        \"__access__\": \"limited_to:acme-company\",\n" +
+                                "        \"__domain__\": \"acme-company\",\n" +
+                                "        \"__environment__\": \"sandbox\",\n" +
+                                "        \"__managed_by__\": \"shark-academy\",\n" +
+                                "        \"__type__\": \"Profile\",\n" +
+                                "        \"address\": null,\n" +
+                                "        \"birthdate\": null,\n" +
+                                "        \"email\": \"omvold7jx62g@acme-company.io\",\n" +
+                                "        \"family_name\": null,\n" +
+                                "        \"gender\": null,\n" +
+                                "        \"given_name\": null,\n" +
+                                "        \"locale\": null,\n" +
+                                "        \"name\": \" \",\n" +
+                                "        \"nickname\": null,\n" +
+                                "        \"phone_number\": null,\n" +
+                                "        \"picture\": null,\n" +
+                                "        \"profile\": null,\n" +
+                                "        \"website\": null,\n" +
+                                "        \"zoneinfo\": null\n" +
+                                "    },\n" +
+                                "    \"updated_at\": \"2023-04-28T15:24:55\"\n" +
+                                "}"
+                    )
+                )
+        )
+
+        val resp = cryptrApi?.getUser("acme-company", "d5f20c7c-c151-4177-8ee8-071d32317ea8")
+        assertNotNull(resp)
+        if (resp != null) {
+            assertEquals(resp.profile.email, "omvold7jx62g@acme-company.io")
+            assertNull(resp.profile.address)
+        }
     }
 
     @Test
     fun createUser() {
+        stubFor(
+            post("/api/v2/org/acme-company/users")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok(
+                        "{\n" +
+                                "    \"__access__\": \"limited_to:acme-company\",\n" +
+                                "    \"__domain__\": \"acme-company\",\n" +
+                                "    \"__environment__\": \"sandbox\",\n" +
+                                "    \"__managed_by__\": \"shark-academy\",\n" +
+                                "    \"__type__\": \"User\",\n" +
+                                "    \"id\": \"61254d31-3a33-4b10-bc22-f410f4927d42\",\n" +
+                                "    \"inserted_at\": \"2023-05-02T12:09:41\",\n" +
+                                "    \"metadata\": [],\n" +
+                                "    \"profile\": {\n" +
+                                "        \"__access__\": \"limited_to:acme-company\",\n" +
+                                "        \"__domain__\": \"acme-company\",\n" +
+                                "        \"__environment__\": \"sandbox\",\n" +
+                                "        \"__managed_by__\": \"shark-academy\",\n" +
+                                "        \"__type__\": \"Profile\",\n" +
+                                "        \"address\": {\n" +
+                                "            \"__access__\": \"limited_to:acme-company\",\n" +
+                                "            \"__domain__\": \"acme-company\",\n" +
+                                "            \"__managed_by__\": \"shark-academy\",\n" +
+                                "            \"__type__\": \"Address\",\n" +
+                                "            \"country\": \"FR\",\n" +
+                                "            \"formatted\": \"165 avenue de Bretagne\\n59000, France\",\n" +
+                                "            \"id\": \"d5095077-4d7c-4379-9924-cac9d13bced9\",\n" +
+                                "            \"postal_code\": \"59000\",\n" +
+                                "            \"region\": \"Nord\",\n" +
+                                "            \"street_address\": \"165 avenue de Bretagne\"\n" +
+                                "        },\n" +
+                                "        \"birthdate\": \"1943-01-19\",\n" +
+                                "        \"email\": \"nedra_boehm@hotmail.com\",\n" +
+                                "        \"family_name\": \"Joplin\",\n" +
+                                "        \"gender\": \"female\",\n" +
+                                "        \"given_name\": \"Janis\",\n" +
+                                "        \"locale\": \"fr\",\n" +
+                                "        \"name\": \"Janis Joplin\",\n" +
+                                "        \"nickname\": \"Jany\",\n" +
+                                "        \"phone_number\": \"+1 555-415-1337\",\n" +
+                                "        \"picture\": \"http://www.example.com/avatar.jpeg\",\n" +
+                                "        \"profile\": \"http://www.example.com/profile\",\n" +
+                                "        \"website\": \"http://www.example.com\",\n" +
+                                "        \"zoneinfo\": \"America/Los_Angeles\"\n" +
+                                "    },\n" +
+                                "    \"updated_at\": \"2023-05-02T12:09:41\"\n" +
+                                "}"
+                    )
+                )
+        )
+
+        val resp = cryptrApi?.createUser("acme-company", "nedra_boehm@hotmail.com")
+        assertNotNull(resp)
+        if (resp != null) {
+            assertEquals("nedra_boehm@hotmail.com", resp.profile.email)
+            assertEquals("1943-01-19", resp.profile.birthdate)
+            assertEquals("Joplin", resp.profile.familyName)
+            assertEquals("female", resp.profile.gender)
+            assertEquals("Janis", resp.profile.givenName)
+            assertEquals("fr", resp.profile.locale)
+            assertEquals("Janis Joplin", resp.profile.name)
+            assertEquals("Jany", resp.profile.nickname)
+            assertEquals("+1 555-415-1337", resp.profile.phoneNumber)
+            assertEquals("http://www.example.com/avatar.jpeg", resp.profile.picture)
+            assertEquals("http://www.example.com/profile", resp.profile.profile)
+            assertEquals("http://www.example.com", resp.profile.website)
+            assertEquals("America/Los_Angeles", resp.profile.zoneinfo)
+
+            assertEquals("d5095077-4d7c-4379-9924-cac9d13bced9", resp.profile.address?.id)
+            assertEquals("FR", resp.profile.address?.country)
+            assertEquals("165 avenue de Bretagne", resp.profile.address?.streetAddress)
+            assertEquals("165 avenue de Bretagne\n59000, France", resp.profile.address?.formatted)
+            assertEquals("59000", resp.profile.address?.postalCode)
+            assertEquals("Nord", resp.profile.address?.region)
+        }
     }
 }

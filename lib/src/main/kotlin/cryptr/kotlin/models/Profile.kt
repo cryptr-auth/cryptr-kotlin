@@ -4,7 +4,7 @@ import org.json.JSONObject
 
 data class Profile(
     val email: String,
-    val address: Any? = null,
+    val address: Address? = null,
     val birthdate: String? = null,
     val gender: String? = null,
     val profile: Any? = null,
@@ -24,7 +24,7 @@ data class Profile(
 
     constructor(jsonObject: JSONObject) : this(
         jsonObject.getString("email"),
-        jsonObject.opt("address"),
+        if (jsonObject.isNull("address")) null else Address(jsonObject.optJSONObject("address")),
         jsonObject.optString("birthdate"),
         jsonObject.optString("gender"),
         jsonObject.opt("profile"),
