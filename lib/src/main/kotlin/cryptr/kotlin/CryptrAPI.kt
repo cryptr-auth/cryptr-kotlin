@@ -116,7 +116,7 @@ class CryptrAPI(
      */
     fun getUser(organizationDomain: String, userId: String): User? {
         val resp = makeRequest(buildUserPath(organizationDomain, userId), apiKeyToken = retrieveApiKeyToken())
-        return resp.let { User(it) }
+        return User(resp)
     }
 
     // Need createUser fun
@@ -124,7 +124,7 @@ class CryptrAPI(
         val params = mapOf("profile[email]" to userEmail)
 //        println(params)
         val resp = makeRequest(buildUserPath(organizationDomain), params, apiKeyToken = retrieveApiKeyToken())
-        return resp.let { User(it) }
+        return User(resp)
     }
 
     /**
@@ -151,19 +151,13 @@ class CryptrAPI(
     fun getApplication(organizationDomain: String, applicationId: String): Application? {
         val resp =
             makeRequest(buildApplicationPath(organizationDomain, applicationId), apiKeyToken = retrieveApiKeyToken())
-        return resp.let { r ->
-            Application(r)
-        }
+        return Application(resp)
     }
 
-    fun createApplication(organizationDomain: String, application: Application): Any {
+    fun createApplication(organizationDomain: String, application: Application): Application? {
         var params = application.toJSONObject().toMap()
         val resp = makeRequest(buildApplicationPath(organizationDomain), params, retrieveApiKeyToken())
-        try {
-            return Application(resp)
-        } catch (e: Exception) {
-            return resp
-        }
+        return Application(resp)
     }
 
 }

@@ -1,6 +1,7 @@
 package cryptr.kotlin.models
 
 import cryptr.kotlin.enums.ApplicationType
+import org.json.JSONArray
 import org.json.JSONObject
 
 data class Application(
@@ -12,9 +13,9 @@ data class Application(
     val defaultRedirectUriAfterLogout: String? = null,
     val defaultRedirectUriAfterLogin: String? = null,
     val description: String? = null,
-    val allowedOriginsCors: Any? = null,
-    val allowedRedirectUrls: Any? = null,
-    val allowedLogoutUrls: Any? = null,
+    val allowedOriginsCors: JSONArray? = null,
+    val allowedRedirectUrls: JSONArray? = null,
+    val allowedLogoutUrls: JSONArray? = null,
     val updatedAt: String? = null,
     val insertedAt: String? = null
 ) {
@@ -31,9 +32,9 @@ data class Application(
         jsonObject.optString("default_redirect_uri_after_logout"),
         jsonObject.optString("default_redirect_uri_after_login"),
         jsonObject.optString("description"),
-        jsonObject.opt("allowed_origins_cors"),
-        jsonObject.opt("allowed_redirect_urls"),
-        jsonObject.opt("allowed_logout_urls"),
+        jsonObject.optJSONArray("allowed_origins_cors"),
+        jsonObject.optJSONArray("allowed_redirect_urls"),
+        jsonObject.optJSONArray("allowed_logout_urls"),
         jsonObject.optString("updated_at"),
         jsonObject.optString("inserted_at")
     )

@@ -91,7 +91,6 @@ open class Cryptr(
             }
             if (params != null) {
                 val formData = mapToFormData(params)
-//                println(formData)
                 conn.setRequestProperty("Content-Length", formData?.length.toString())
                 DataOutputStream(conn.outputStream).use { it.writeBytes(formData) }
             }
