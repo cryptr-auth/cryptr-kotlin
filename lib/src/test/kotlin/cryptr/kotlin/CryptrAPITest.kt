@@ -6,12 +6,17 @@ import cryptr.kotlin.models.Organization
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import java.text.Normalizer
+import java.util.regex.Pattern
 import kotlin.test.assertContains
 import kotlin.test.assertEquals
 
 @WireMockTest(proxyMode = true)
 class CryptrAPITest {
     var cryptrApi: CryptrAPI? = null
+    private val NONLATIN: Pattern = Pattern.compile("[^\\w-]")
+    private val WHITESPACE: Pattern = Pattern.compile("[\\s]")
+
 
     @BeforeEach
     fun init() {
@@ -21,6 +26,7 @@ class CryptrAPITest {
         val apiKeyClientId = "my-api-key-client-id"
         val apiKeyClientSecret = "my-api-key-client-secret"
         cryptrApi = CryptrAPI(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
+        System.setProperty("CRYPTR_API_KEY_TOKEN", "stored-api-key")
     }
 
 
@@ -162,12 +168,36 @@ class CryptrAPITest {
     fun createOrganization() {
         stubFor(
             post("/api/v2/organizations")
-                .withHost(equalTo("dev.cryptreu"))
-                .willReturn(ok("{}"))
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok(
+                        "{\n" +
+                                "    \"id\": \"some-api-key-id\",\n" +
+                                "    \"domain\": \"thibaud-paco\",\n" +
+                                "    \"name\": \"Thibaud Paco\",\n" +
+                                "    \"country_name\": \"FR\",\n" +
+                                "    \"state\": \"Hauts-de-France\",\n" +
+                                "    \"locality\": \"Lille\",\n" +
+                                "    \"updated_at\": \"2023-01-04T10:00:20\",\n" +
+                                "    \"inserted_at\": \"2023-01-04T10:00:20\"\n" +
+                                "}"
+                    )
+                )
         )
         val org = Organization(name = "Thibaud Paco")
         val createdOrga = cryptrApi?.createOrganization(org)
-        //assertEquals(Organization(id = "", name = ""), createdOrga)
+        assertNotNull(createdOrga)
+        if (createdOrga != null) {
+            assertEquals(org.name, createdOrga.name)
+
+            val domain = Normalizer
+                .normalize(org.name, Normalizer.Form.NFD)
+                .replace("[^\\p{ASCII}]".toRegex(), "")
+                .replace("[^a-zA-Z0-9\\s]+".toRegex(), "")
+                .trim().replace("\\s+".toRegex(), "-")
+                .lowercase()
+            assertEquals(domain, createdOrga.domain)
+        }
     }
 
     @Test

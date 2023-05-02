@@ -44,6 +44,7 @@ class CryptrTest {
 
     @Test
     fun retrieveApiKeyTokenWithoutSystemShouldRequestEndpoint() {
+        System.clearProperty("CRYPTR_API_KEY_TOKEN")
         stubFor(
             post("/api/v2/oauth/token")
                 .withHost(equalTo("dev.cryptr.eu"))

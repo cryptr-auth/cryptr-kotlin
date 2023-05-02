@@ -56,10 +56,8 @@ class CryptrAPI(
     fun listOrganizations(): ArrayList<Organization> {
         val resp = makeRequest(buildOrganizationPath(), apiKeyToken = retrieveApiKeyToken())
         val organizations: ArrayList<Organization> = ArrayList()
-        if (resp !== null) {
-            for (i in resp.getJSONArray("data")) {
-                organizations.add(Organization(i as JSONObject))
-            }
+        for (i in resp.getJSONArray("data")) {
+            organizations.add(Organization(i as JSONObject))
         }
         return organizations
     }
@@ -73,7 +71,7 @@ class CryptrAPI(
      */
     fun getOrganization(domain: String): Organization? {
         val resp = makeRequest(buildOrganizationPath(domain), apiKeyToken = retrieveApiKeyToken())
-        return resp?.let { Organization(it) }
+        return resp.let { Organization(it) }
     }
 
     /**
@@ -86,7 +84,7 @@ class CryptrAPI(
     fun createOrganization(organization: Organization): Organization? {
         var params = organization.creationMap()
         val resp = makeRequest(buildOrganizationPath(), params, retrieveApiKeyToken())
-        return resp?.let { Organization(it) }
+        return Organization(resp)
     }
 
     /**
@@ -97,15 +95,13 @@ class CryptrAPI(
     fun listUsers(organizationDomain: String): ArrayList<User> {
         val resp = makeRequest(buildUserPath(organizationDomain), apiKeyToken = retrieveApiKeyToken())
         val users: ArrayList<User> = ArrayList()
-        if (resp !== null) {
-            for (i in resp.getJSONArray("data")) {
-                try {
-                    val user = User(i as JSONObject)
-                    users.add(user)
-                } catch (e: Exception) {
-                    println("error")
-                    println(e.message)
-                }
+        for (i in resp.getJSONArray("data")) {
+            try {
+                val user = User(i as JSONObject)
+                users.add(user)
+            } catch (e: Exception) {
+                println("error")
+                println(e.message)
             }
         }
         return users
@@ -120,15 +116,15 @@ class CryptrAPI(
      */
     fun getUser(organizationDomain: String, userId: String): User? {
         val resp = makeRequest(buildUserPath(organizationDomain, userId), apiKeyToken = retrieveApiKeyToken())
-        return resp?.let { User(it) }
+        return resp.let { User(it) }
     }
 
     // Need createUser fun
     fun createUser(organizationDomain: String, userEmail: String): User? {
         val params = mapOf("profile[email]" to userEmail)
-        println(params)
+//        println(params)
         val resp = makeRequest(buildUserPath(organizationDomain), params, apiKeyToken = retrieveApiKeyToken())
-        return resp?.let { User(it) }
+        return resp.let { User(it) }
     }
 
     /**
@@ -136,28 +132,38 @@ class CryptrAPI(
      */
     fun listApplications(organizationDomain: String): ArrayList<Application> {
         val path = buildApplicationPath(organizationDomain)
-        println(path)
+//        println(path)
         val resp = makeRequest(path, apiKeyToken = retrieveApiKeyToken())
         val applications: ArrayList<Application> = ArrayList()
-        if (resp !== null) {
-            println(resp)
-            for (i in resp.getJSONArray("data")) {
-                try {
-                    val application = Application(i as JSONObject)
-                    applications.add(application)
-                } catch (e: Exception) {
-                    println(e.message)
-                }
+//            println(resp)
+        for (i in resp.getJSONArray("data")) {
+            try {
+                val application = Application(i as JSONObject)
+                applications.add(application)
+            } catch (e: Exception) {
+                println(e.message)
             }
         }
-        println(applications.size)
+//        println(applications.size)
         return applications
     }
 
     fun getApplication(organizationDomain: String, applicationId: String): Application? {
         val resp =
             makeRequest(buildApplicationPath(organizationDomain, applicationId), apiKeyToken = retrieveApiKeyToken())
-        return resp?.let { Application(it) }
+        return resp.let { r ->
+            Application(r)
+        }
+    }
+
+    fun createApplication(organizationDomain: String, application: Application): Any {
+        var params = application.toJSONObject().toMap()
+        val resp = makeRequest(buildApplicationPath(organizationDomain), params, retrieveApiKeyToken())
+        try {
+            return Application(resp)
+        } catch (e: Exception) {
+            return resp
+        }
     }
 
 }
