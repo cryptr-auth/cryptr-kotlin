@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.models.Application
 import cryptr.kotlin.models.Organization
-import cryptr.kotlin.models.Profile
 import cryptr.kotlin.models.User
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -212,78 +211,80 @@ class CryptrAPITest {
                                 "    \"__type__\": \"List\",\n" +
                                 "    \"data\": [\n" +
                                 "        {\n" +
-                                "            \"__access__\": \"limited_to:acme-company\",\n" +
                                 "            \"__domain__\": \"acme-company\",\n" +
                                 "            \"__environment__\": \"sandbox\",\n" +
-                                "            \"__managed_by__\": \"shark-academy\",\n" +
                                 "            \"__type__\": \"User\",\n" +
+                                "            \"address\": {\n" +
+                                "                \"country\": \"FR\",\n" +
+                                "                \"formatted\": \"165 avenue de Bretagne\\n59000, France\",\n" +
+                                "                \"locality\": null,\n" +
+                                "                \"postal_code\": \"59000\",\n" +
+                                "                \"region\": \"Nord\",\n" +
+                                "                \"street_address\": \"165 avenue de Bretagne\"\n" +
+                                "            },\n" +
+                                "            \"email\": \"nedra_boehm@hotmail.com\",\n" +
+                                "            \"email_verified\": false,\n" +
+                                "            \"id\": \"61254d31-3a33-4b10-bc22-f410f4927d42\",\n" +
+                                "            \"inserted_at\": \"2023-05-02T12:09:41\",\n" +
+                                "            \"meta_data\": [],\n" +
+                                "            \"phone_number\": \"+1 555-415-1337\",\n" +
+                                "            \"phone_number_verified\": false,\n" +
+                                "            \"profile\": {\n" +
+                                "                \"birthdate\": \"1943-01-19\",\n" +
+                                "                \"family_name\": \"Joplin\",\n" +
+                                "                \"gender\": \"female\",\n" +
+                                "                \"given_name\": \"Janis\",\n" +
+                                "                \"locale\": \"fr\",\n" +
+                                "                \"nickname\": \"Jany\",\n" +
+                                "                \"picture\": \"http://www.example.com/avatar.jpeg\",\n" +
+                                "                \"preferred_username\": null,\n" +
+                                "                \"website\": \"http://www.example.com\",\n" +
+                                "                \"zoneinfo\": \"America/Los_Angeles\"\n" +
+                                "            },\n" +
+                                "            \"updated_at\": \"2023-05-02T12:09:41\"\n" +
+                                "        },\n" +
+                                "        {\n" +
+                                "            \"__domain__\": \"acme-company\",\n" +
+                                "            \"__environment__\": \"sandbox\",\n" +
+                                "            \"__type__\": \"User\",\n" +
+                                "            \"address\": null,\n" +
+                                "            \"email\": \"omvold7jx62g@acme-company.io\",\n" +
+                                "            \"email_verified\": false,\n" +
                                 "            \"id\": \"d5f20c7c-c151-4177-8ee8-071d32317ea8\",\n" +
                                 "            \"inserted_at\": \"2023-04-28T15:24:55\",\n" +
-                                "            \"metadata\": [],\n" +
+                                "            \"meta_data\": [],\n" +
+                                "            \"phone_number\": null,\n" +
+                                "            \"phone_number_verified\": false,\n" +
                                 "            \"profile\": {\n" +
-                                "                \"__access__\": \"limited_to:acme-company\",\n" +
-                                "                \"__domain__\": \"acme-company\",\n" +
-                                "                \"__environment__\": \"sandbox\",\n" +
-                                "                \"__managed_by__\": \"shark-academy\",\n" +
-                                "                \"__type__\": \"Profile\",\n" +
-                                "                \"address\": null,\n" +
                                 "                \"birthdate\": null,\n" +
-                                "                \"email\": \"omvold7jx62g@acme-company.io\",\n" +
                                 "                \"family_name\": null,\n" +
                                 "                \"gender\": null,\n" +
                                 "                \"given_name\": null,\n" +
                                 "                \"locale\": null,\n" +
-                                "                \"name\": \" \",\n" +
                                 "                \"nickname\": null,\n" +
-                                "                \"phone_number\": null,\n" +
                                 "                \"picture\": null,\n" +
-                                "                \"profile\": null,\n" +
+                                "                \"preferred_username\": null,\n" +
                                 "                \"website\": null,\n" +
                                 "                \"zoneinfo\": null\n" +
                                 "            },\n" +
                                 "            \"updated_at\": \"2023-04-28T15:24:55\"\n" +
-                                "        },\n" +
-                                "        {\n" +
-                                "            \"__access__\": \"limited_to:acme-company\",\n" +
-                                "            \"__domain__\": \"acme-company\",\n" +
-                                "            \"__environment__\": \"sandbox\",\n" +
-                                "            \"__managed_by__\": \"shark-academy\",\n" +
-                                "            \"__type__\": \"User\",\n" +
-                                "            \"id\": \"3279619a-f826-4f86-bd86-6a1a8ae719d4\",\n" +
-                                "            \"inserted_at\": \"2023-04-28T15:21:44\",\n" +
-                                "            \"metadata\": [],\n" +
-                                "            \"profile\": {\n" +
-                                "                \"__access__\": \"limited_to:acme-company\",\n" +
-                                "                \"__domain__\": \"acme-company\",\n" +
-                                "                \"__environment__\": \"sandbox\",\n" +
-                                "                \"__managed_by__\": \"shark-academy\",\n" +
-                                "                \"__type__\": \"Profile\",\n" +
-                                "                \"address\": null,\n" +
-                                "                \"birthdate\": null,\n" +
-                                "                \"email\": \"12345@acme-company.co\",\n" +
-                                "                \"family_name\": null,\n" +
-                                "                \"gender\": null,\n" +
-                                "                \"given_name\": null,\n" +
-                                "                \"locale\": null,\n" +
-                                "                \"name\": \" \",\n" +
-                                "                \"nickname\": null,\n" +
-                                "                \"phone_number\": null,\n" +
-                                "                \"picture\": null,\n" +
-                                "                \"profile\": null,\n" +
-                                "                \"website\": null,\n" +
-                                "                \"zoneinfo\": null\n" +
-                                "            },\n" +
-                                "            \"updated_at\": \"2023-04-28T15:21:44\"\n" +
-                                "        },\n" +
+                                "        }\n" +
                                 "    ],\n" +
-                                "    \"paginate\": {\n" +
+                                "    \"pagination\": {\n" +
                                 "        \"current_page\": 1,\n" +
+                                "        \"current_pages\": [\n" +
+                                "            1,\n" +
+                                "            2,\n" +
+                                "            3,\n" +
+                                "            4,\n" +
+                                "            5\n" +
+                                "        ],\n" +
                                 "        \"next_page\": 2,\n" +
-                                "        \"per_page\": 8,\n" +
+                                "        \"per_page\": 2,\n" +
                                 "        \"prev_page\": null,\n" +
-                                "        \"total_pages\": 2\n" +
+                                "        \"total_pages\": 5\n" +
                                 "    },\n" +
-                                "    \"total_count\": 9\n" +
+                                "    \"total\": 10\n" +
                                 "}"
                     )
                 )
@@ -292,60 +293,65 @@ class CryptrAPITest {
         assertEquals(2, resp?.size)
 
         if (resp !== null) {
-            assertContains(resp.map { u -> u.profile.email }, "omvold7jx62g@acme-company.io")
-            assertContains(resp.map { u -> u.profile.email }, "12345@acme-company.co")
-            assertContains(resp.map { u -> u.profile.address }, null)
+            assertContains(resp.map { u -> u.email }, "omvold7jx62g@acme-company.io")
+            assertContains(resp.map { u -> u.email }, "nedra_boehm@hotmail.com")
+            assertContains(resp.map { u -> u.address }, null)
         }
     }
 
     @Test
     fun getUserShouldReturnUser() {
         stubFor(
-            get("/api/v2/org/acme-company/users/d5f20c7c-c151-4177-8ee8-071d32317ea8")
+            get("/api/v2/org/acme-company/users/61254d31-3a33-4b10-bc22-f410f4927d42")
                 .withHost(equalTo("dev.cryptr.eu"))
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"__access__\": \"limited_to:acme-company\",\n" +
                                 "    \"__domain__\": \"acme-company\",\n" +
                                 "    \"__environment__\": \"sandbox\",\n" +
-                                "    \"__managed_by__\": \"shark-academy\",\n" +
                                 "    \"__type__\": \"User\",\n" +
-                                "    \"id\": \"d5f20c7c-c151-4177-8ee8-071d32317ea8\",\n" +
-                                "    \"inserted_at\": \"2023-04-28T15:24:55\",\n" +
-                                "    \"metadata\": [],\n" +
-                                "    \"profile\": {\n" +
-                                "        \"__access__\": \"limited_to:acme-company\",\n" +
-                                "        \"__domain__\": \"acme-company\",\n" +
-                                "        \"__environment__\": \"sandbox\",\n" +
-                                "        \"__managed_by__\": \"shark-academy\",\n" +
-                                "        \"__type__\": \"Profile\",\n" +
-                                "        \"address\": null,\n" +
-                                "        \"birthdate\": null,\n" +
-                                "        \"email\": \"omvold7jx62g@acme-company.io\",\n" +
-                                "        \"family_name\": null,\n" +
-                                "        \"gender\": null,\n" +
-                                "        \"given_name\": null,\n" +
-                                "        \"locale\": null,\n" +
-                                "        \"name\": \" \",\n" +
-                                "        \"nickname\": null,\n" +
-                                "        \"phone_number\": null,\n" +
-                                "        \"picture\": null,\n" +
-                                "        \"profile\": null,\n" +
-                                "        \"website\": null,\n" +
-                                "        \"zoneinfo\": null\n" +
+                                "    \"address\": {\n" +
+                                "        \"country\": \"FR\",\n" +
+                                "        \"formatted\": \"165 avenue de Bretagne\\n59000, France\",\n" +
+                                "        \"locality\": null,\n" +
+                                "        \"postal_code\": \"59000\",\n" +
+                                "        \"region\": \"Nord\",\n" +
+                                "        \"street_address\": \"165 avenue de Bretagne\"\n" +
                                 "    },\n" +
-                                "    \"updated_at\": \"2023-04-28T15:24:55\"\n" +
+                                "    \"email\": \"nedra_boehm@hotmail.com\",\n" +
+                                "    \"email_verified\": false,\n" +
+                                "    \"id\": \"61254d31-3a33-4b10-bc22-f410f4927d42\",\n" +
+                                "    \"inserted_at\": \"2023-05-02T12:09:41\",\n" +
+                                "    \"meta_data\": [],\n" +
+                                "    \"phone_number\": \"+1 555-415-1337\",\n" +
+                                "    \"phone_number_verified\": false,\n" +
+                                "    \"profile\": {\n" +
+                                "        \"birthdate\": \"1943-01-19\",\n" +
+                                "        \"family_name\": \"Joplin\",\n" +
+                                "        \"gender\": \"female\",\n" +
+                                "        \"given_name\": \"Janis\",\n" +
+                                "        \"locale\": \"fr\",\n" +
+                                "        \"nickname\": \"Jany\",\n" +
+                                "        \"picture\": \"http://www.example.com/avatar.jpeg\",\n" +
+                                "        \"preferred_username\": null,\n" +
+                                "        \"website\": \"http://www.example.com\",\n" +
+                                "        \"zoneinfo\": \"America/Los_Angeles\"\n" +
+                                "    },\n" +
+                                "    \"updated_at\": \"2023-05-02T12:09:41\"\n" +
                                 "}"
                     )
                 )
         )
 
-        val resp = cryptrApi?.getUser("acme-company", "d5f20c7c-c151-4177-8ee8-071d32317ea8")
+        val resp = cryptrApi?.getUser("acme-company", "61254d31-3a33-4b10-bc22-f410f4927d42")
         assertNotNull(resp)
         if (resp != null) {
-            assertEquals(resp.profile.email, "omvold7jx62g@acme-company.io")
-            assertNull(resp.profile.address)
+            assertEquals(resp.email, "nedra_boehm@hotmail.com")
+            assertEquals("FR", resp.address?.country)
+            assertEquals("165 avenue de Bretagne\n59000, France", resp.address?.formatted)
+            assertNull(resp.address?.locality)
+            assertEquals("59000", resp.address?.postalCode)
+            assertEquals("165 avenue de Bretagne", resp.address?.streetAddress)
         }
     }
 
@@ -357,75 +363,50 @@ class CryptrAPITest {
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"__access__\": \"limited_to:acme-company\",\n" +
                                 "    \"__domain__\": \"acme-company\",\n" +
                                 "    \"__environment__\": \"sandbox\",\n" +
-                                "    \"__managed_by__\": \"shark-academy\",\n" +
                                 "    \"__type__\": \"User\",\n" +
-                                "    \"id\": \"61254d31-3a33-4b10-bc22-f410f4927d42\",\n" +
-                                "    \"inserted_at\": \"2023-05-02T12:09:41\",\n" +
-                                "    \"metadata\": [],\n" +
+                                "    \"address\": null,\n" +
+                                "    \"email\": \"aryanna.stroman@gmail.com\",\n" +
+                                "    \"email_verified\": false,\n" +
+                                "    \"id\": \"9ef8cc11-40e0-432a-8816-6a3b5034519f\",\n" +
+                                "    \"inserted_at\": \"2023-05-03T14:03:09\",\n" +
+                                "    \"meta_data\": [],\n" +
+                                "    \"phone_number\": null,\n" +
+                                "    \"phone_number_verified\": false,\n" +
                                 "    \"profile\": {\n" +
-                                "        \"__access__\": \"limited_to:acme-company\",\n" +
-                                "        \"__domain__\": \"acme-company\",\n" +
-                                "        \"__environment__\": \"sandbox\",\n" +
-                                "        \"__managed_by__\": \"shark-academy\",\n" +
-                                "        \"__type__\": \"Profile\",\n" +
-                                "        \"address\": {\n" +
-                                "            \"__access__\": \"limited_to:acme-company\",\n" +
-                                "            \"__domain__\": \"acme-company\",\n" +
-                                "            \"__managed_by__\": \"shark-academy\",\n" +
-                                "            \"__type__\": \"Address\",\n" +
-                                "            \"country\": \"FR\",\n" +
-                                "            \"formatted\": \"165 avenue de Bretagne\\n59000, France\",\n" +
-                                "            \"id\": \"d5095077-4d7c-4379-9924-cac9d13bced9\",\n" +
-                                "            \"postal_code\": \"59000\",\n" +
-                                "            \"region\": \"Nord\",\n" +
-                                "            \"street_address\": \"165 avenue de Bretagne\"\n" +
-                                "        },\n" +
-                                "        \"birthdate\": \"1943-01-19\",\n" +
-                                "        \"email\": \"nedra_boehm@hotmail.com\",\n" +
-                                "        \"family_name\": \"Joplin\",\n" +
-                                "        \"gender\": \"female\",\n" +
-                                "        \"given_name\": \"Janis\",\n" +
-                                "        \"locale\": \"fr\",\n" +
-                                "        \"name\": \"Janis Joplin\",\n" +
-                                "        \"nickname\": \"Jany\",\n" +
-                                "        \"phone_number\": \"+1 555-415-1337\",\n" +
-                                "        \"picture\": \"http://www.example.com/avatar.jpeg\",\n" +
-                                "        \"profile\": \"http://www.example.com/profile\",\n" +
-                                "        \"website\": \"http://www.example.com\",\n" +
-                                "        \"zoneinfo\": \"America/Los_Angeles\"\n" +
+                                "        \"birthdate\": null,\n" +
+                                "        \"family_name\": null,\n" +
+                                "        \"gender\": null,\n" +
+                                "        \"given_name\": null,\n" +
+                                "        \"locale\": null,\n" +
+                                "        \"nickname\": null,\n" +
+                                "        \"picture\": null,\n" +
+                                "        \"preferred_username\": null,\n" +
+                                "        \"website\": null,\n" +
+                                "        \"zoneinfo\": null\n" +
                                 "    },\n" +
-                                "    \"updated_at\": \"2023-05-02T12:09:41\"\n" +
+                                "    \"updated_at\": \"2023-05-03T14:03:09\"\n" +
                                 "}"
                     )
                 )
         )
 
-        val resp = cryptrApi?.createUser("acme-company", "nedra_boehm@hotmail.com")
+        val resp = cryptrApi?.createUser("acme-company", "aryanna.stroman@gmail.com")
         assertNotNull(resp)
         if (resp != null) {
-            assertEquals("nedra_boehm@hotmail.com", resp.profile.email)
-            assertEquals("1943-01-19", resp.profile.birthdate)
-            assertEquals("Joplin", resp.profile.familyName)
-            assertEquals("female", resp.profile.gender)
-            assertEquals("Janis", resp.profile.givenName)
-            assertEquals("fr", resp.profile.locale)
-            assertEquals("Janis Joplin", resp.profile.name)
-            assertEquals("Jany", resp.profile.nickname)
-            assertEquals("+1 555-415-1337", resp.profile.phoneNumber)
-            assertEquals("http://www.example.com/avatar.jpeg", resp.profile.picture)
-            assertEquals("http://www.example.com/profile", resp.profile.profile)
-            assertEquals("http://www.example.com", resp.profile.website)
-            assertEquals("America/Los_Angeles", resp.profile.zoneinfo)
-
-            assertEquals("d5095077-4d7c-4379-9924-cac9d13bced9", resp.profile.address?.id)
-            assertEquals("FR", resp.profile.address?.country)
-            assertEquals("165 avenue de Bretagne", resp.profile.address?.streetAddress)
-            assertEquals("165 avenue de Bretagne\n59000, France", resp.profile.address?.formatted)
-            assertEquals("59000", resp.profile.address?.postalCode)
-            assertEquals("Nord", resp.profile.address?.region)
+            assertEquals("aryanna.stroman@gmail.com", resp.email)
+            assertNull(resp.profile?.birthdate)
+            assertNull(resp.address)
+            assertNull(resp.profile?.familyName)
+            assertNull(resp.profile?.gender)
+            assertNull(resp.profile?.givenName)
+            assertNull(resp.profile?.locale)
+            assertNull(resp.profile?.nickname)
+            assertNull(resp.phoneNumber)
+            assertNull(resp.profile?.picture)
+            assertNull(resp.profile?.website)
+            assertNull(resp.profile?.zoneinfo)
         }
     }
 
@@ -437,57 +418,40 @@ class CryptrAPITest {
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"__access__\": \"limited_to:acme-company\",\n" +
                                 "    \"__domain__\": \"acme-company\",\n" +
                                 "    \"__environment__\": \"sandbox\",\n" +
-                                "    \"__managed_by__\": \"shark-academy\",\n" +
                                 "    \"__type__\": \"User\",\n" +
-                                "    \"id\": \"61254d31-3a33-4b10-bc22-f410f4927d42\",\n" +
-                                "    \"inserted_at\": \"2023-05-02T12:09:41\",\n" +
-                                "    \"metadata\": [],\n" +
+                                "    \"address\": null,\n" +
+                                "    \"email\": \"giuseppe.schoen@hotmail.com\",\n" +
+                                "    \"email_verified\": false,\n" +
+                                "    \"id\": \"d1e61734-514d-4755-8697-91143d11e528\",\n" +
+                                "    \"inserted_at\": \"2023-05-03T14:10:52\",\n" +
+                                "    \"meta_data\": [],\n" +
+                                "    \"phone_number\": null,\n" +
+                                "    \"phone_number_verified\": false,\n" +
                                 "    \"profile\": {\n" +
-                                "        \"__access__\": \"limited_to:acme-company\",\n" +
-                                "        \"__domain__\": \"acme-company\",\n" +
-                                "        \"__environment__\": \"sandbox\",\n" +
-                                "        \"__managed_by__\": \"shark-academy\",\n" +
-                                "        \"__type__\": \"Profile\",\n" +
-                                "        \"address\": {\n" +
-                                "            \"__access__\": \"limited_to:acme-company\",\n" +
-                                "            \"__domain__\": \"acme-company\",\n" +
-                                "            \"__managed_by__\": \"shark-academy\",\n" +
-                                "            \"__type__\": \"Address\",\n" +
-                                "            \"country\": \"FR\",\n" +
-                                "            \"formatted\": \"165 avenue de Bretagne\\n59000, France\",\n" +
-                                "            \"id\": \"d5095077-4d7c-4379-9924-cac9d13bced9\",\n" +
-                                "            \"postal_code\": \"59000\",\n" +
-                                "            \"region\": \"Nord\",\n" +
-                                "            \"street_address\": \"165 avenue de Bretagne\"\n" +
-                                "        },\n" +
-                                "        \"birthdate\": \"1943-01-19\",\n" +
-                                "        \"email\": \"nedra_boehm@hotmail.com\",\n" +
-                                "        \"family_name\": \"Joplin\",\n" +
-                                "        \"gender\": \"female\",\n" +
-                                "        \"given_name\": \"Janis\",\n" +
-                                "        \"locale\": \"fr\",\n" +
-                                "        \"name\": \"Janis Joplin\",\n" +
-                                "        \"nickname\": \"Jany\",\n" +
-                                "        \"phone_number\": \"+1 555-415-1337\",\n" +
-                                "        \"picture\": \"http://www.example.com/avatar.jpeg\",\n" +
-                                "        \"profile\": \"http://www.example.com/profile\",\n" +
-                                "        \"website\": \"http://www.example.com\",\n" +
-                                "        \"zoneinfo\": \"America/Los_Angeles\"\n" +
+                                "        \"birthdate\": null,\n" +
+                                "        \"family_name\": null,\n" +
+                                "        \"gender\": null,\n" +
+                                "        \"given_name\": null,\n" +
+                                "        \"locale\": null,\n" +
+                                "        \"nickname\": null,\n" +
+                                "        \"picture\": null,\n" +
+                                "        \"preferred_username\": null,\n" +
+                                "        \"website\": null,\n" +
+                                "        \"zoneinfo\": null\n" +
                                 "    },\n" +
-                                "    \"updated_at\": \"2023-05-02T12:09:41\"\n" +
+                                "    \"updated_at\": \"2023-05-03T14:10:52\"\n" +
                                 "}"
                     )
                 )
         )
 
-        val user = User(profile = Profile(email = "omvold7jx62g@acme-company.io"))
+        val user = User(email = "omvold7jx62g@acme-company.io")
         val resp = cryptrApi?.createUser("acme-company", user)
         assertNotNull(resp)
         if (resp !== null) {
-            assertEquals("59000", resp.profile.address?.postalCode)
+            assertNull(resp.address?.postalCode)
         }
     }
 

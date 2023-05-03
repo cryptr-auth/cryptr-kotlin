@@ -3,10 +3,10 @@ package cryptr.kotlin
 import cryptr.kotlin.enums.Environment
 import cryptr.kotlin.models.Application
 import cryptr.kotlin.models.Organization
-import cryptr.kotlin.models.Profile
 import cryptr.kotlin.models.User
 import cryptr.kotlin.objects.Constants
 import kotlinx.serialization.decodeFromString
+import org.json.JSONObject
 
 
 /**
@@ -96,9 +96,11 @@ class CryptrAPI(
      */
     fun listUsers(organizationDomain: String): ArrayList<User> {
         val resp = makeRequest(buildUserPath(organizationDomain), apiKeyToken = retrieveApiKeyToken())
+        println(resp)
         val users: ArrayList<User> = ArrayList()
         for (i in resp.getJSONArray("data")) {
             try {
+                println(i as JSONObject)
                 users.add(format.decodeFromString<User>(i.toString()))
             } catch (e: Exception) {
                 println("error")
@@ -129,7 +131,7 @@ class CryptrAPI(
      * @return the created [User]
      */
     fun createUser(organizationDomain: String, userEmail: String): User? {
-        return createUser(organizationDomain, user = User(Profile(email = userEmail)))
+        return createUser(organizationDomain, user = User(email = userEmail))
     }
 
     fun createUser(organizationDomain: String, user: User): User? {
