@@ -3,7 +3,9 @@ package cryptr.kotlin
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ApplicationType
+import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.Application
+import cryptr.kotlin.models.Environment
 import cryptr.kotlin.models.Organization
 import cryptr.kotlin.models.User
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -38,51 +40,54 @@ class CryptrAPITest {
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"__type__\": \"List\",\n" +
-                                "    \"data\": [\n" +
+                                "    \"datas\": [\n" +
                                 "        {\n" +
-                                "            \"__access__\": \"limited_to:test-store\",\n" +
-                                "            \"__domain__\": \"test-store\",\n" +
-                                "            \"__environment__\": \"production\",\n" +
-                                "            \"__managed_by__\": \"shark-academy\",\n" +
                                 "            \"__type__\": \"Organization\",\n" +
-                                "            \"country_name\": \"FR\",\n" +
-                                "            \"domain\": \"test-store\",\n" +
-                                "            \"id\": \"6b99d8fc-28be-45d5-8571-4206af5ff376\",\n" +
-                                "            \"inserted_at\": \"2023-01-10T11:13:08\",\n" +
-                                "            \"locality\": \"Lille\",\n" +
-                                "            \"name\": \"Test Store\",\n" +
-                                "            \"privacy_policy_url\": null,\n" +
-                                "            \"state\": \"Nord\",\n" +
-                                "            \"terms_of_service_url\": null,\n" +
-                                "            \"updated_at\": \"2023-01-10T11:13:13\"\n" +
+                                "            \"domain\": \"thibaud-paco\",\n" +
+                                "            \"environments\": [\n" +
+                                "                {\n" +
+                                "                    \"id\": \"57f6e6a5-e833-49c5-8172-a94ec7a91b50\",\n" +
+                                "                    \"name\": \"production\",\n" +
+                                "                    \"status\": \"down\"\n" +
+                                "                },\n" +
+                                "                {\n" +
+                                "                    \"id\": \"40ce67ff-baa5-49bb-b20c-7ddefc7e205e\",\n" +
+                                "                    \"name\": \"sandbox\",\n" +
+                                "                    \"status\": \"down\"\n" +
+                                "                }\n" +
+                                "            ],\n" +
+                                "            \"inserted_at\": \"2023-04-27T13:54:42\",\n" +
+                                "            \"name\": \"Thibaud Paco\",\n" +
+                                "            \"updated_at\": \"2023-04-27T13:55:03\"\n" +
                                 "        },\n" +
                                 "        {\n" +
-                                "            \"__access__\": \"limited_to:toffee-company\",\n" +
-                                "            \"__domain__\": \"toffee-company\",\n" +
-                                "            \"__environment__\": \"production\",\n" +
-                                "            \"__managed_by__\": \"shark-academy\",\n" +
                                 "            \"__type__\": \"Organization\",\n" +
-                                "            \"country_name\": \"FR\",\n" +
-                                "            \"domain\": \"toffee-company\",\n" +
-                                "            \"id\": \"10876fdb-2ee8-41c7-899e-97ad27d7cd0f\",\n" +
-                                "            \"inserted_at\": \"2023-01-04T10:00:07\",\n" +
-                                "            \"locality\": \"Lille\",\n" +
-                                "            \"name\": \"Toffee company\",\n" +
-                                "            \"privacy_policy_url\": null,\n" +
-                                "            \"state\": \"Nord\",\n" +
-                                "            \"terms_of_service_url\": null,\n" +
-                                "            \"updated_at\": \"2023-01-04T10:00:20\"\n" +
-                                "        },\n" +
+                                "            \"domain\": \"thibaud-java\",\n" +
+                                "            \"environments\": [\n" +
+                                "                {\n" +
+                                "                    \"id\": \"7389e2d4-e49c-4371-8bfb-1f6bc243fe74\",\n" +
+                                "                    \"name\": \"production\",\n" +
+                                "                    \"status\": \"down\"\n" +
+                                "                },\n" +
+                                "                {\n" +
+                                "                    \"id\": \"f3751057-724d-41e8-9057-73067d46e715\",\n" +
+                                "                    \"name\": \"sandbox\",\n" +
+                                "                    \"status\": \"down\"\n" +
+                                "                }\n" +
+                                "            ],\n" +
+                                "            \"inserted_at\": \"2023-04-27T13:50:29\",\n" +
+                                "            \"name\": \"thibaud-java\",\n" +
+                                "            \"updated_at\": \"2023-04-27T13:50:49\"\n" +
+                                "        }\n" +
                                 "    ],\n" +
                                 "    \"paginate\": {\n" +
                                 "        \"current_page\": 1,\n" +
                                 "        \"next_page\": 2,\n" +
-                                "        \"per_page\": 8,\n" +
+                                "        \"per_page\": 2,\n" +
                                 "        \"prev_page\": null,\n" +
-                                "        \"total_pages\": 3\n" +
-                                "    },\n" +
-                                "    \"total_count\": 23\n" +
+                                "        \"total_count\": 23,\n" +
+                                "        \"total_pages\": 12\n" +
+                                "    }\n" +
                                 "}"
                     )
                 )
@@ -94,27 +99,43 @@ class CryptrAPITest {
             assertContains(
                 resp.toArray(),
                 Organization(
-                    id = "6b99d8fc-28be-45d5-8571-4206af5ff376",
-                    domain = "test-store",
-                    name = "Test Store",
-                    updatedAt = "2023-01-10T11:13:13",
-                    state = "Nord",
-                    countryName = "FR",
-                    locality = "Lille",
-                    insertedAt = "2023-01-10T11:13:08"
+                    domain = "thibaud-paco",
+                    name = "Thibaud Paco",
+                    updatedAt = "2023-04-27T13:55:03",
+                    insertedAt = "2023-04-27T13:54:42",
+                    environments = setOf(
+                        Environment(
+                            id = "57f6e6a5-e833-49c5-8172-a94ec7a91b50",
+                            name = "production",
+                            status = EnvironmentStatus.DOWN
+                        ),
+                        Environment(
+                            id = "40ce67ff-baa5-49bb-b20c-7ddefc7e205e",
+                            name = "sandbox",
+                            status = EnvironmentStatus.DOWN
+                        )
+                    )
                 )
             )
             assertContains(
                 resp.toArray(),
                 Organization(
-                    id = "10876fdb-2ee8-41c7-899e-97ad27d7cd0f",
-                    domain = "toffee-company",
-                    name = "Toffee company",
-                    updatedAt = "2023-01-04T10:00:20",
-                    state = "Nord",
-                    countryName = "FR",
-                    locality = "Lille",
-                    insertedAt = "2023-01-04T10:00:07"
+                    domain = "thibaud-java",
+                    name = "thibaud-java",
+                    updatedAt = "2023-04-27T13:50:49",
+                    insertedAt = "2023-04-27T13:50:29",
+                    environments = setOf(
+                        Environment(
+                            id = "7389e2d4-e49c-4371-8bfb-1f6bc243fe74",
+                            name = "production",
+                            status = EnvironmentStatus.DOWN
+                        ),
+                        Environment(
+                            id = "f3751057-724d-41e8-9057-73067d46e715",
+                            name = "sandbox",
+                            status = EnvironmentStatus.DOWN
+                        )
+                    )
                 )
             )
         }
@@ -123,43 +144,53 @@ class CryptrAPITest {
     @Test
     fun getOrganization() {
         stubFor(
-            get("/api/v2/organizations/toffee-company")
+            get("/api/v2/organizations/thibaud-java")
                 .withHost(equalTo("dev.cryptr.eu"))
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"__access__\": \"limited_to:toffee-company\",\n" +
-                                "    \"__domain__\": \"toffee-company\",\n" +
-                                "    \"__environment__\": \"production\",\n" +
-                                "    \"__managed_by__\": \"shark-academy\",\n" +
                                 "    \"__type__\": \"Organization\",\n" +
-                                "    \"country_name\": \"FR\",\n" +
-                                "    \"domain\": \"toffee-company\",\n" +
-                                "    \"id\": \"10876fdb-2ee8-41c7-899e-97ad27d7cd0f\",\n" +
-                                "    \"inserted_at\": \"2023-01-04T10:00:07\",\n" +
-                                "    \"locality\": \"Lille\",\n" +
-                                "    \"name\": \"Toffee company\",\n" +
-                                "    \"privacy_policy_url\": null,\n" +
-                                "    \"state\": \"Nord\",\n" +
-                                "    \"terms_of_service_url\": null,\n" +
-                                "    \"updated_at\": \"2023-01-04T10:00:20\"\n" +
+                                "    \"domain\": \"thibaud-java\",\n" +
+                                "    \"environments\": [\n" +
+                                "        {\n" +
+                                "            \"id\": \"7389e2d4-e49c-4371-8bfb-1f6bc243fe74\",\n" +
+                                "            \"name\": \"production\",\n" +
+                                "            \"status\": \"down\"\n" +
+                                "        },\n" +
+                                "        {\n" +
+                                "            \"id\": \"f3751057-724d-41e8-9057-73067d46e715\",\n" +
+                                "            \"name\": \"sandbox\",\n" +
+                                "            \"status\": \"down\"\n" +
+                                "        }\n" +
+                                "    ],\n" +
+                                "    \"inserted_at\": \"2023-04-27T13:50:29\",\n" +
+                                "    \"name\": \"thibaud-java\",\n" +
+                                "    \"updated_at\": \"2023-04-27T13:50:49\"\n" +
                                 "}"
                     )
                 )
 
         )
-        val resp = cryptrApi?.getOrganization("toffee-company")
+        val resp = cryptrApi?.getOrganization("thibaud-java")
         assertNotNull(resp)
         assertEquals(
             Organization(
-                id = "10876fdb-2ee8-41c7-899e-97ad27d7cd0f",
-                name = "Toffee company",
-                domain = "toffee-company",
-                countryName = "FR",
-                state = "Nord",
-                locality = "Lille",
-                updatedAt = "2023-01-04T10:00:20",
-                insertedAt = "2023-01-04T10:00:07"
+                name = "thibaud-java",
+                domain = "thibaud-java",
+                updatedAt = "2023-04-27T13:50:49",
+                insertedAt = "2023-04-27T13:50:29",
+                environments = setOf(
+                    Environment(
+                        id = "7389e2d4-e49c-4371-8bfb-1f6bc243fe74",
+                        name = "production",
+                        status = EnvironmentStatus.DOWN
+                    ),
+                    Environment(
+                        id = "f3751057-724d-41e8-9057-73067d46e715",
+                        name = "sandbox",
+                        status = EnvironmentStatus.DOWN
+                    )
+                )
             ), resp
         )
     }
@@ -172,19 +203,28 @@ class CryptrAPITest {
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"id\": \"some-api-key-id\",\n" +
-                                "    \"domain\": \"thibaud-paco\",\n" +
-                                "    \"name\": \"Thibaud Paco\",\n" +
-                                "    \"country_name\": \"FR\",\n" +
-                                "    \"state\": \"Hauts-de-France\",\n" +
-                                "    \"locality\": \"Lille\",\n" +
-                                "    \"updated_at\": \"2023-01-04T10:00:20\",\n" +
-                                "    \"inserted_at\": \"2023-01-04T10:00:20\"\n" +
+                                "    \"__type__\": \"Organization\",\n" +
+                                "    \"domain\": \"another-organization\",\n" +
+                                "    \"environments\": [\n" +
+                                "        {\n" +
+                                "            \"id\": \"3aeaaa7d-9c9f-409b-b598-b08975673907\",\n" +
+                                "            \"name\": \"production\",\n" +
+                                "            \"status\": \"down\"\n" +
+                                "        },\n" +
+                                "        {\n" +
+                                "            \"id\": \"410b9e25-95d8-4694-b0c1-4e3d29f490f5\",\n" +
+                                "            \"name\": \"sandbox\",\n" +
+                                "            \"status\": \"down\"\n" +
+                                "        }\n" +
+                                "    ],\n" +
+                                "    \"inserted_at\": \"2023-05-03T14:58:45\",\n" +
+                                "    \"name\": \"Another organization\",\n" +
+                                "    \"updated_at\": \"2023-05-03T14:58:45\"\n" +
                                 "}"
                     )
                 )
         )
-        val org = Organization(name = "Thibaud Paco")
+        val org = Organization(name = "Another organization")
         val createdOrga = cryptrApi?.createOrganization(org)
         assertNotNull(createdOrga)
         if (createdOrga != null) {

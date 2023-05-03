@@ -1,7 +1,7 @@
 package cryptr.kotlin
 
 import cryptr.kotlin.enums.ChallengeType
-import cryptr.kotlin.enums.Environment
+import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.models.SSOChallenge
 import kotlinx.serialization.decodeFromString
 import org.json.JSONObject
@@ -14,14 +14,14 @@ import org.json.JSONObject
  * - SSO SAML Challenges
  */
 class CryptrHeadless(
-    tenantDomain: String = System.getProperty(Environment.CRYPTR_TENANT_DOMAIN.toString()),
-    baseUrl: String = System.getProperty(Environment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
+    tenantDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_TENANT_DOMAIN.toString()),
+    baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
     defaultRedirectUrl: String = System.getProperty(
-        Environment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
+        CryptrEnvironment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
         DEFAULT_REDIRECT_URL
     ),
-    apiKeyClientId: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_ID.toString()),
-    apiKeyClientSecret: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
+    apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
+    apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
 ) :
     Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret) {
 

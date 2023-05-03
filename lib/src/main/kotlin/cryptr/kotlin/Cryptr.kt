@@ -1,7 +1,7 @@
 package cryptr.kotlin
 
 import cryptr.kotlin.enums.CryptrApiPath
-import cryptr.kotlin.enums.Environment
+import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.objects.Constants
 import kotlinx.serialization.json.Json
 import org.json.JSONException
@@ -27,14 +27,14 @@ const val DEFAULT_REDIRECT_URL = "http://localhost:8080/callback"
  * @param apiKeyClientSecret The secret of your API KEY
  */
 open class Cryptr(
-    protected val tenantDomain: String = System.getProperty(Environment.CRYPTR_TENANT_DOMAIN.toString()),
-    protected val baseUrl: String = System.getProperty(Environment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
+    protected val tenantDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_TENANT_DOMAIN.toString()),
+    protected val baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
     protected val defaultRedirectUrl: String = System.getProperty(
-        Environment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
+        CryptrEnvironment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
         DEFAULT_REDIRECT_URL
     ),
-    protected val apiKeyClientId: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_ID.toString()),
-    protected val apiKeyClientSecret: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
+    protected val apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
+    protected val apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
 ) {
     val format = Json { ignoreUnknownKeys = true }
 

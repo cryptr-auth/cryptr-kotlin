@@ -5,14 +5,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Organization(
-    val id: String? = null,
     val domain: String? = null,
-    val name: String,
     @SerialName("updated_at") val updatedAt: String? = null,
-    @SerialName("country_name") val countryName: String = "FR",
-    val state: String = "Nord",
+    val name: String,
     @SerialName("inserted_at") val insertedAt: String? = null,
-    val locality: String? = "Lille"
+    val environments: Set<Environment>? = null
 ) {
     companion object {
         const val apiResourceName: String = "organizations"
@@ -20,10 +17,7 @@ data class Organization(
 
     fun creationMap(): Map<String, String?> {
         return mapOf(
-            "name" to name,
-            "locality" to locality,
-            "state" to state,
-            "country_name" to countryName
+            "name" to name
         )
     }
 }

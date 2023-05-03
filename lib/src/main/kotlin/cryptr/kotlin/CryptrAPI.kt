@@ -1,26 +1,25 @@
 package cryptr.kotlin
 
-import cryptr.kotlin.enums.Environment
+import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.models.Application
 import cryptr.kotlin.models.Organization
 import cryptr.kotlin.models.User
 import cryptr.kotlin.objects.Constants
 import kotlinx.serialization.decodeFromString
-import org.json.JSONObject
 
 
 /**
  * Cryptr to handle resources such as Organization, User, Application...
  */
 class CryptrAPI(
-    tenantDomain: String = System.getProperty(Environment.CRYPTR_TENANT_DOMAIN.toString()),
-    baseUrl: String = System.getProperty(Environment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
+    tenantDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_TENANT_DOMAIN.toString()),
+    baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
     defaultRedirectUrl: String = System.getProperty(
-        Environment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
+        CryptrEnvironment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
         DEFAULT_REDIRECT_URL
     ),
-    apiKeyClientId: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_ID.toString()),
-    apiKeyClientSecret: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
+    apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
+    apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
 ) : Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret) {
 
     private fun buildApiPath(resourceName: String, resourceId: String? = null): String {
@@ -58,7 +57,7 @@ class CryptrAPI(
     fun listOrganizations(): ArrayList<Organization> {
         val resp = makeRequest(buildOrganizationPath(), apiKeyToken = retrieveApiKeyToken())
         val organizations: ArrayList<Organization> = ArrayList()
-        for (i in resp.getJSONArray("data")) {
+        for (i in resp.getJSONArray("datas")) {
             organizations.add(format.decodeFromString<Organization>(i.toString()))
         }
         return organizations
@@ -96,11 +95,9 @@ class CryptrAPI(
      */
     fun listUsers(organizationDomain: String): ArrayList<User> {
         val resp = makeRequest(buildUserPath(organizationDomain), apiKeyToken = retrieveApiKeyToken())
-        println(resp)
         val users: ArrayList<User> = ArrayList()
         for (i in resp.getJSONArray("data")) {
             try {
-                println(i as JSONObject)
                 users.add(format.decodeFromString<User>(i.toString()))
             } catch (e: Exception) {
                 println("error")
