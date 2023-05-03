@@ -10,7 +10,7 @@ data class Organization(
     val name: String,
     @SerialName("inserted_at") val insertedAt: String? = null,
     val environments: Set<Environment>? = null
-) {
+) : CryptrResource() {
     companion object {
         const val apiResourceName: String = "organizations"
     }

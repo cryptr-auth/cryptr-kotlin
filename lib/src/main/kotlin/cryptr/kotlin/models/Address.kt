@@ -11,4 +11,4 @@ data class Address(
     @SerialName("postal_code") val postalCode: String? = null,
     val region: String? = null,
     @SerialName("street_address") val streetAddress: String? = null
-)
+) : CryptrResource()

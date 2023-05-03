@@ -15,7 +15,7 @@ data class User(
     val profile: Profile? = null,
     @SerialName("inserted_at") val insertedAt: String? = null,
     @SerialName("updated_at") val updatedAt: String? = null,
-) {
+) : CryptrResource() {
     companion object {
         const val apiResourceName: String = "users"
     }

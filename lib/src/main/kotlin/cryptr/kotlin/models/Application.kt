@@ -21,7 +21,7 @@ data class Application(
     @SerialName("allowed_logout_urls") val allowedLogoutUrls: Set<String>? = null,
     @SerialName("updated_at") val updatedAt: String? = null,
     @SerialName("inserted_at") val insertedAt: String? = null
-) {
+) : CryptrResource() {
     companion object {
         const val apiResourceName: String = "applications"
     }
