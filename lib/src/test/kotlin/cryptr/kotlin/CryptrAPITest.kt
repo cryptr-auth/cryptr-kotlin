@@ -504,79 +504,33 @@ class CryptrAPITest {
                     ok(
                         "{\n" +
                                 "    \"__type__\": \"List\",\n" +
-                                "    \"data\": [],\n" +
-                                "    \"paginate\": {\n" +
-                                "        \"current_page\": 1,\n" +
-                                "        \"next_page\": null,\n" +
-                                "        \"per_page\": 8,\n" +
-                                "        \"prev_page\": null,\n" +
-                                "        \"total_pages\": 0\n" +
-                                "    },\n" +
-                                "    \"total_count\": 0\n" +
-                                "}"
-                    )
-                )
-        )
-        stubFor(
-            get("/api/v2/org/shark-academy/applications")
-                .withHost(equalTo("dev.cryptr.eu"))
-                .willReturn(
-                    ok(
-                        "{\n" +
-                                "    \"__type__\": \"List\",\n" +
                                 "    \"data\": [\n" +
                                 "        {\n" +
-                                "            \"__access__\": \"all_organizations_of:shark-academy\",\n" +
-                                "            \"__domain__\": \"shark-academy\",\n" +
+                                "            \"__access__\": \"limited_to:acme-company\",\n" +
+                                "            \"__domain__\": \"acme-company\",\n" +
                                 "            \"__environment__\": \"sandbox\",\n" +
                                 "            \"__managed_by__\": \"shark-academy\",\n" +
                                 "            \"__type__\": \"Application\",\n" +
                                 "            \"allowed_logout_urls\": [\n" +
-                                "                \"https://debug-communitiz-app.onrender.com\"\n" +
+                                "                \"https://d5ee-78-117-68-62.eu.ngrok.io\"\n" +
                                 "            ],\n" +
                                 "            \"allowed_origins_cors\": [\n" +
-                                "                \"https://debug-communitiz-app.onrender.com\"\n" +
+                                "                \"https://d5ee-78-117-68-62.eu.ngrok.io\"\n" +
                                 "            ],\n" +
                                 "            \"allowed_redirect_urls\": [\n" +
-                                "                \"https://debug-communitiz-app.onrender.com\"\n" +
+                                "                \"https://d5ee-78-117-68-62.eu.ngrok.io\"\n" +
                                 "            ],\n" +
-                                "            \"application_type\": \"vue\",\n" +
-                                "            \"client_id\": \"ae04b642-4214-40fa-bd6e-8ae35724c071\",\n" +
-                                "            \"default_origin_cors\": \"https://debug-communitiz-app.onrender.com\",\n" +
-                                "            \"default_redirect_uri_after_login\": \"https://debug-communitiz-app.onrender.com\",\n" +
-                                "            \"default_redirect_uri_after_logout\": \"https://debug-communitiz-app.onrender.com\",\n" +
+                                "            \"application_type\": \"ruby_on_rails\",\n" +
+                                "            \"client_id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
+                                "            \"default_origin_cors\": \"https://d5ee-78-117-68-62.eu.ngrok.io\",\n" +
+                                "            \"default_redirect_uri_after_login\": \"https://d5ee-78-117-68-62.eu.ngrok.io\",\n" +
+                                "            \"default_redirect_uri_after_logout\": \"https://d5ee-78-117-68-62.eu.ngrok.io\",\n" +
                                 "            \"description\": null,\n" +
-                                "            \"id\": \"ae04b642-4214-40fa-bd6e-8ae35724c071\",\n" +
-                                "            \"inserted_at\": \"2023-02-24T10:27:22\",\n" +
-                                "            \"name\": \"Community App Thibs debug App\",\n" +
-                                "            \"updated_at\": \"2023-02-24T10:27:22\"\n" +
-                                "        },\n" +
-                                "        {\n" +
-                                "            \"__access__\": \"all_organizations_of:shark-academy\",\n" +
-                                "            \"__domain__\": \"shark-academy\",\n" +
-                                "            \"__environment__\": \"sandbox\",\n" +
-                                "            \"__managed_by__\": \"shark-academy\",\n" +
-                                "            \"__type__\": \"Application\",\n" +
-                                "            \"allowed_logout_urls\": [\n" +
-                                "                \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                                "            ],\n" +
-                                "            \"allowed_origins_cors\": [\n" +
-                                "                \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                                "            ],\n" +
-                                "            \"allowed_redirect_urls\": [\n" +
-                                "                \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                                "            ],\n" +
-                                "            \"application_type\": \"react\",\n" +
-                                "            \"client_id\": \"a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f\",\n" +
-                                "            \"default_origin_cors\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                                "            \"default_redirect_uri_after_login\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                                "            \"default_redirect_uri_after_logout\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                                "            \"description\": null,\n" +
-                                "            \"id\": \"a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f\",\n" +
-                                "            \"inserted_at\": \"2023-02-08T07:57:00\",\n" +
-                                "            \"name\": \"Community App Communitiz Real QA App\",\n" +
-                                "            \"updated_at\": \"2023-02-08T07:57:00\"\n" +
-                                "        },\n" +
+                                "            \"id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
+                                "            \"inserted_at\": \"2023-05-02T16:06:47\",\n" +
+                                "            \"name\": \"Max Rails app\",\n" +
+                                "            \"updated_at\": \"2023-05-02T16:06:47\"\n" +
+                                "        }\n" +
                                 "    ],\n" +
                                 "    \"paginate\": {\n" +
                                 "        \"current_page\": 1,\n" +
@@ -585,7 +539,7 @@ class CryptrAPITest {
                                 "        \"prev_page\": null,\n" +
                                 "        \"total_pages\": 1\n" +
                                 "    },\n" +
-                                "    \"total_count\": 8\n" +
+                                "    \"total_count\": 1\n" +
                                 "}"
                     )
                 )
@@ -593,26 +547,22 @@ class CryptrAPITest {
 
         val acmeApps = cryptrApi?.listApplications("acme-company")
         assertNotNull(acmeApps)
-        assertEquals(0, acmeApps?.size)
-
-        val apps = cryptrApi?.listApplications("shark-academy")
-        assertNotNull(apps)
-        if (apps !== null) {
-            assertEquals(2, apps.size)
-            assertContains(apps.map { a -> a.applicationType }, ApplicationType.REACT)
+        assertEquals(1, acmeApps?.size)
+        if (acmeApps !== null) {
+            assertContains(acmeApps.map { a -> a.applicationType }, ApplicationType.RUBY_ON_RAILS)
         }
     }
 
     @Test
     fun getApplication() {
         stubFor(
-            get("/api/v2/org/shark-academy/applications/a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f")
+            get("/api/v2/org/acme-company/applications/bc3583eb-59e3-4edf-83c4-96bd308430cc")
                 .withHost(equalTo("dev.cryptr.eu"))
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"__access__\": \"all_organizations_of:shark-academy\",\n" +
-                                "    \"__domain__\": \"shark-academy\",\n" +
+                                "    \"__access__\": \"limited_to:acme-company\",\n" +
+                                "    \"__domain__\": \"acme-company\",\n" +
                                 "    \"__environment__\": \"sandbox\",\n" +
                                 "    \"__managed_by__\": \"shark-academy\",\n" +
                                 "    \"__type__\": \"Application\",\n" +
@@ -625,25 +575,25 @@ class CryptrAPITest {
                                 "    \"allowed_redirect_urls\": [\n" +
                                 "        \"https://communitiz-app-vuejs.onrender.com\"\n" +
                                 "    ],\n" +
-                                "    \"application_type\": \"react\",\n" +
-                                "    \"client_id\": \"a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f\",\n" +
+                                "    \"application_type\": \"ruby_on_rails\",\n" +
+                                "    \"client_id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
                                 "    \"default_origin_cors\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
                                 "    \"default_redirect_uri_after_login\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
                                 "    \"default_redirect_uri_after_logout\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
                                 "    \"description\": null,\n" +
-                                "    \"id\": \"a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f\",\n" +
-                                "    \"inserted_at\": \"2023-02-08T07:57:00\",\n" +
+                                "    \"id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
+                                "    \"inserted_at\": \"2023-05-02T16:06:47\",\n" +
                                 "    \"name\": \"Community App Communitiz Real QA App\",\n" +
-                                "    \"updated_at\": \"2023-02-08T07:57:00\"\n" +
+                                "    \"updated_at\": \"2023-05-02T16:06:47\"\n" +
                                 "}"
                     )
                 )
         )
 
-        val app = cryptrApi?.getApplication("shark-academy", "a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f")
+        val app = cryptrApi?.getApplication("acme-company", "bc3583eb-59e3-4edf-83c4-96bd308430cc")
         assertNotNull(app)
         if (app !== null) {
-            assertEquals("a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f", app.id)
+            assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", app.id)
             app.allowedLogoutUrls?.let { assertContains(it.asIterable(), "https://communitiz-app-vuejs.onrender.com") }
             app.allowedOriginsCors?.let { assertContains(it.asIterable(), "https://communitiz-app-vuejs.onrender.com") }
             app.allowedRedirectUrls?.let {
@@ -652,15 +602,15 @@ class CryptrAPITest {
                     "https://communitiz-app-vuejs.onrender.com"
                 )
             }
-            assertEquals(ApplicationType.REACT, app.applicationType)
-            assertEquals("a7c56b66-d7dc-46f9-a4a8-b93ef7e2120f", app.clientId)
+            assertEquals(ApplicationType.RUBY_ON_RAILS, app.applicationType)
+            assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", app.clientId)
             assertEquals("https://communitiz-app-vuejs.onrender.com", app.defaultOriginCors)
             assertEquals("https://communitiz-app-vuejs.onrender.com", app.defaultRedirectUriAfterLogin)
             assertEquals("https://communitiz-app-vuejs.onrender.com", app.defaultRedirectUriAfterLogout)
             assertNull(app.description)
-            assertEquals("2023-02-08T07:57:00", app.insertedAt)
+            assertEquals("2023-05-02T16:06:47", app.insertedAt)
             assertEquals("Community App Communitiz Real QA App", app.name)
-            assertEquals("2023-02-08T07:57:00", app.updatedAt)
+            assertEquals("2023-05-02T16:06:47", app.updatedAt)
         }
     }
 
@@ -678,47 +628,47 @@ class CryptrAPITest {
                                 "    \"__managed_by__\": \"shark-academy\",\n" +
                                 "    \"__type__\": \"Application\",\n" +
                                 "    \"allowed_logout_urls\": [\n" +
-                                "        \"https://some-saas.io\"\n" +
+                                "        \"https://angular.saas.io\"\n" +
                                 "    ],\n" +
                                 "    \"allowed_origins_cors\": [\n" +
-                                "        \"https://some-saas.io\"\n" +
+                                "        \"https://angular.saas.io\"\n" +
                                 "    ],\n" +
                                 "    \"allowed_redirect_urls\": [\n" +
-                                "        \"https://some-saas.io\"\n" +
+                                "        \"https://angular.saas.io\"\n" +
                                 "    ],\n" +
                                 "    \"application_type\": \"angular\",\n" +
-                                "    \"client_id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
-                                "    \"default_origin_cors\": \"https://some-saas.io\",\n" +
-                                "    \"default_redirect_uri_after_login\": \"https://some-saas.io\",\n" +
-                                "    \"default_redirect_uri_after_logout\": \"https://some-saas.io\",\n" +
+                                "    \"client_id\": \"22bf3525-c3d7-4b0f-b28c-d126c801c9e5\",\n" +
+                                "    \"default_origin_cors\": \"https://angular.saas.io\",\n" +
+                                "    \"default_redirect_uri_after_login\": \"https://angular.saas.io\",\n" +
+                                "    \"default_redirect_uri_after_logout\": \"https://angular.saas.io\",\n" +
                                 "    \"description\": null,\n" +
-                                "    \"id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
-                                "    \"inserted_at\": \"2023-05-02T16:06:47\",\n" +
-                                "    \"name\": \"Angular app\",\n" +
-                                "    \"updated_at\": \"2023-05-02T16:06:47\"\n" +
+                                "    \"id\": \"22bf3525-c3d7-4b0f-b28c-d126c801c9e5\",\n" +
+                                "    \"inserted_at\": \"2023-05-03T16:29:32\",\n" +
+                                "    \"name\": \"Some Angular app\",\n" +
+                                "    \"updated_at\": \"2023-05-03T16:29:32\"\n" +
                                 "}"
                     )
                 )
         )
         val app = cryptrApi?.createApplication(
             "acme-company",
-            Application(name = "Angular App", applicationType = ApplicationType.ANGULAR)
+            Application(name = "Some Angular App", applicationType = ApplicationType.ANGULAR)
         )
         assertNotNull(app)
         if (app !== null) {
-            assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", app.id)
-            app.allowedLogoutUrls?.let { assertContains(it.asIterable(), "https://some-saas.io") }
-            app.allowedOriginsCors?.let { assertContains(it.asIterable(), "https://some-saas.io") }
-            app.allowedRedirectUrls?.let { assertContains(it.asIterable(), "https://some-saas.io") }
+            assertEquals("22bf3525-c3d7-4b0f-b28c-d126c801c9e5", app.id)
+            app.allowedLogoutUrls?.let { assertContains(it.asIterable(), "https://angular.saas.io") }
+            app.allowedOriginsCors?.let { assertContains(it.asIterable(), "https://angular.saas.io") }
+            app.allowedRedirectUrls?.let { assertContains(it.asIterable(), "https://angular.saas.io") }
             assertEquals(ApplicationType.ANGULAR, app.applicationType)
-            assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", app.clientId)
-            assertEquals("https://some-saas.io", app.defaultOriginCors)
-            assertEquals("https://some-saas.io", app.defaultRedirectUriAfterLogin)
-            assertEquals("https://some-saas.io", app.defaultRedirectUriAfterLogout)
+            assertEquals("22bf3525-c3d7-4b0f-b28c-d126c801c9e5", app.clientId)
+            assertEquals("https://angular.saas.io", app.defaultOriginCors)
+            assertEquals("https://angular.saas.io", app.defaultRedirectUriAfterLogin)
+            assertEquals("https://angular.saas.io", app.defaultRedirectUriAfterLogout)
             assertNull(app.description)
-            assertEquals("2023-05-02T16:06:47", app.insertedAt)
-            assertEquals("Angular app", app.name)
-            assertEquals("2023-05-02T16:06:47", app.updatedAt)
+            assertEquals("2023-05-03T16:29:32", app.insertedAt)
+            assertEquals("Some Angular app", app.name)
+            assertEquals("2023-05-03T16:29:32", app.updatedAt)
         }
     }
 }

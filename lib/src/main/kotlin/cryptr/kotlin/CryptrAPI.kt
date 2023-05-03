@@ -142,18 +142,16 @@ class CryptrAPI(
      */
     fun listApplications(organizationDomain: String): ArrayList<Application> {
         val path = buildApplicationPath(organizationDomain)
-//        println(path)
         val resp = makeRequest(path, apiKeyToken = retrieveApiKeyToken())
         val applications: ArrayList<Application> = ArrayList()
-//            println(resp)
         for (i in resp.getJSONArray("data")) {
             try {
                 applications.add(format.decodeFromString<Application>(i.toString()))
             } catch (e: Exception) {
+                println("error application")
                 println(e.message)
             }
         }
-//        println(applications.size)
         return applications
     }
 
