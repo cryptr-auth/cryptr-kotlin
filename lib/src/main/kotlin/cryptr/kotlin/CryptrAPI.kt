@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.models.Application
+import cryptr.kotlin.models.Listing
 import cryptr.kotlin.models.Organization
 import cryptr.kotlin.models.User
 import cryptr.kotlin.objects.Constants
@@ -54,13 +55,9 @@ class CryptrAPI(
      * List all [Organization] records according toused API Key
      */
 
-    fun listOrganizations(): ArrayList<Organization> {
+    fun listOrganizations(): Listing<Organization> {
         val resp = makeRequest(buildOrganizationPath(), apiKeyToken = retrieveApiKeyToken())
-        val organizations: ArrayList<Organization> = ArrayList()
-        for (i in resp.getJSONArray("datas")) {
-            organizations.add(format.decodeFromString<Organization>(i.toString()))
-        }
-        return organizations
+        return format.decodeFromString<Listing<Organization>>(resp.toString())
     }
 
     /**
@@ -91,21 +88,14 @@ class CryptrAPI(
     /**
      * List all [User] according to consumed API Key
      *
-     * @re
+     * @param organizationDomain The organization domain where to look for users
+     * @return [Listing] with [User]
      */
-    fun listUsers(organizationDomain: String): ArrayList<User> {
+    fun listUsers(organizationDomain: String): Listing<User> {
         val resp = makeRequest(buildUserPath(organizationDomain), apiKeyToken = retrieveApiKeyToken())
-        val users: ArrayList<User> = ArrayList()
-        for (i in resp.getJSONArray("data")) {
-            try {
-                users.add(format.decodeFromString<User>(i.toString()))
-            } catch (e: Exception) {
-                println("error")
-                println(e.message)
-            }
-        }
-        return users
+        return format.decodeFromString<Listing<User>>(resp.toString())
     }
+
 
     /**
      * Return the requested [User]
@@ -140,19 +130,10 @@ class CryptrAPI(
     /**
      * Applications
      */
-    fun listApplications(organizationDomain: String): ArrayList<Application> {
+    fun listApplications(organizationDomain: String): Listing<Application> {
         val path = buildApplicationPath(organizationDomain)
         val resp = makeRequest(path, apiKeyToken = retrieveApiKeyToken())
-        val applications: ArrayList<Application> = ArrayList()
-        for (i in resp.getJSONArray("data")) {
-            try {
-                applications.add(format.decodeFromString<Application>(i.toString()))
-            } catch (e: Exception) {
-                println("error application")
-                println(e.message)
-            }
-        }
-        return applications
+        return format.decodeFromString<Listing<Application>>(resp.toString())
     }
 
     fun getApplication(organizationDomain: String, applicationId: String): Application? {

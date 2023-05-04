@@ -3,8 +3,8 @@ package cryptr.kotlin.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-abstract class Listing(
-    val data: Set<CryptrResource> = setOf(),
+data class Listing<T : CryptrResource>(
+    val data: Set<T> = setOf(),
     val pagination: Pagination,
     val total: Int = 0
 ) : CryptrResource()

@@ -40,7 +40,7 @@ class CryptrAPITest {
                 .willReturn(
                     ok(
                         "{\n" +
-                                "    \"datas\": [\n" +
+                                "    \"data\": [\n" +
                                 "        {\n" +
                                 "            \"__type__\": \"Organization\",\n" +
                                 "            \"domain\": \"thibaud-paco\",\n" +
@@ -80,24 +80,25 @@ class CryptrAPITest {
                                 "            \"updated_at\": \"2023-04-27T13:50:49\"\n" +
                                 "        }\n" +
                                 "    ],\n" +
-                                "    \"paginate\": {\n" +
+                                "    \"pagination\": {\n" +
                                 "        \"current_page\": 1,\n" +
                                 "        \"next_page\": 2,\n" +
                                 "        \"per_page\": 2,\n" +
                                 "        \"prev_page\": null,\n" +
-                                "        \"total_count\": 23,\n" +
                                 "        \"total_pages\": 12\n" +
-                                "    }\n" +
+                                "    },\n" +
+                                "    \"total\": 23\n" +
                                 "}"
                     )
                 )
         )
-        val resp = cryptrApi?.listOrganizations()
-        assertEquals(2, resp?.size)
-
-        if (resp != null) {
+        val organizationListing = cryptrApi?.listOrganizations()
+        assertNotNull(organizationListing)
+        if (organizationListing != null) {
+            assertEquals(2, organizationListing.data.size)
+            assertEquals(23, organizationListing.total)
             assertContains(
-                resp.toArray(),
+                organizationListing.data,
                 Organization(
                     domain = "thibaud-paco",
                     name = "Thibaud Paco",
@@ -118,7 +119,7 @@ class CryptrAPITest {
                 )
             )
             assertContains(
-                resp.toArray(),
+                organizationListing.data,
                 Organization(
                     domain = "thibaud-java",
                     name = "thibaud-java",
@@ -329,13 +330,14 @@ class CryptrAPITest {
                     )
                 )
         )
-        val resp = cryptrApi?.listUsers("acme-company")
-        assertEquals(2, resp?.size)
-
-        if (resp !== null) {
-            assertContains(resp.map { u -> u.email }, "omvold7jx62g@acme-company.io")
-            assertContains(resp.map { u -> u.email }, "nedra_boehm@hotmail.com")
-            assertContains(resp.map { u -> u.address }, null)
+        val userListing = cryptrApi?.listUsers("acme-company")
+        assertNotNull(userListing)
+        if (userListing != null) {
+            assertEquals(10, userListing.total)
+            assertEquals(2, userListing.data.size)
+            assertContains(userListing.data.map { u -> u.email }, "omvold7jx62g@acme-company.io")
+            assertContains(userListing.data.map { u -> u.email }, "nedra_boehm@hotmail.com")
+            assertContains(userListing.data.map { u -> u.address }, null)
         }
     }
 
@@ -532,24 +534,27 @@ class CryptrAPITest {
                                 "            \"updated_at\": \"2023-05-02T16:06:47\"\n" +
                                 "        }\n" +
                                 "    ],\n" +
-                                "    \"paginate\": {\n" +
+                                "    \"pagination\": {\n" +
                                 "        \"current_page\": 1,\n" +
                                 "        \"next_page\": null,\n" +
                                 "        \"per_page\": 8,\n" +
                                 "        \"prev_page\": null,\n" +
                                 "        \"total_pages\": 1\n" +
                                 "    },\n" +
-                                "    \"total_count\": 1\n" +
+                                "    \"total\": 1\n" +
                                 "}"
                     )
                 )
         )
 
-        val acmeApps = cryptrApi?.listApplications("acme-company")
-        assertNotNull(acmeApps)
-        assertEquals(1, acmeApps?.size)
-        if (acmeApps !== null) {
-            assertContains(acmeApps.map { a -> a.applicationType }, ApplicationType.RUBY_ON_RAILS)
+        val applicationListing = cryptrApi?.listApplications("acme-company")
+        assertNotNull(applicationListing)
+        if (applicationListing !== null) {
+            assertEquals(1, applicationListing.data.size)
+            assertEquals(1, applicationListing.total)
+            assertNull(applicationListing.pagination.nextPage)
+            assertNull(applicationListing.pagination.prevPage)
+            assertContains(applicationListing.data.map { a -> a.applicationType }, ApplicationType.RUBY_ON_RAILS)
         }
     }
 
