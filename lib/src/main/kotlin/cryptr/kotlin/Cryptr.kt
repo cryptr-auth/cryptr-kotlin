@@ -3,6 +3,7 @@ package cryptr.kotlin
 import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.objects.Constants
+import io.github.oshai.KotlinLogging
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
@@ -12,7 +13,6 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-import java.util.logging.Logger
 
 const val DEFAULT_BASE_URL = "https://auth.cryptr.eu"
 const val DEFAULT_REDIRECT_URL = "http://localhost:8080/callback"
@@ -38,22 +38,18 @@ open class Cryptr(
 ) {
     val format = Json { ignoreUnknownKeys = true }
 
-
-    companion object {
-        @JvmStatic
-        protected val logger = Logger.getAnonymousLogger()
-    }
+    private val logger = KotlinLogging.logger {}
 
     init {
-//        logger.info(
-//            """Cryptr intialized with:
-//            |- tenantDomain: $tenantDomain
-//            |- baseUrl: $baseUrl
-//            |- defaultRedirection: $defaultRedirectUrl
-//            |- apiKeyClientId: $apiKeyClientId
-//            |- apiKeyClientSecret: $apiKeyClientSecret
-//        """.trimMargin()
-//        )
+        logInfo {
+            """Cryptr intialized with:
+            |- tenantDomain: $tenantDomain
+            |- baseUrl: $baseUrl
+            |- defaultRedirection: $defaultRedirectUrl
+            |- apiKeyClientId: $apiKeyClientId
+            |- apiKeyClientSecret: $apiKeyClientSecret
+        """.trimMargin()
+        }
     }
 
     private fun buildCryptrUrl(path: String): String {
@@ -66,13 +62,27 @@ open class Cryptr(
             .stream()
             .map { p ->
 //                println(p.key)
-//                println(p.value?.javaClass)
-//                println(p.value?.javaClass?.let { println(it.declaredFields.map { f -> f.type.isArray }) })
+//                println(p.value?.javaClass.toString())
+//                println(p.value?.javaClass.toString() == "class java.util.ArrayList")
                 p.key + "=" + URLEncoder.encode(p.value.toString(), "utf-8")
             }
             .reduce { p1, p2 -> "$p1&$p2" }
             .map { s -> "$s" }
             .orElse("")
+    }
+
+    private fun logInfo(info: () -> Any?) {
+        logger.info("[Cryptr]")
+        logger.info { info() }
+    }
+
+    private fun logDebug(debug: () -> Any?) {
+        logger.debug("[Cryptr]")
+        logger.debug { debug() }
+    }
+
+    private fun logException(exception: java.lang.Exception) {
+        logger.error(exception) { "[Cryptr] an exception occured:\n$exception" }
     }
 
     protected fun makeRequest(
@@ -82,7 +92,6 @@ open class Cryptr(
     ): JSONObject {
         try {
             val url = URL(buildCryptrUrl(path))
-//            println(url)
             val conn = url.openConnection() as HttpURLConnection
 
             conn.doOutput = true
@@ -107,13 +116,16 @@ open class Cryptr(
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
                 try {
+                    logDebug { response.toString() }
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
+                    logException(ej)
                     return JSONObject().put("error", response.toString())
                 }
 
             }
         } catch (e: Exception) {
+            logException(e)
             return JSONObject().put("error", e.message)
         }
     }

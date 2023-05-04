@@ -61,7 +61,7 @@ class CryptrAPI(
     }
 
     /**
-     * Get Organization from it's id
+     * Get Organization from its id
      *
      * @param domain The id reference of requested Organization
      *
