@@ -1,6 +1,6 @@
 package cryptr.kotlin.enums
 
-enum class Environment {
+enum class CryptrEnvironment {
     CRYPTR_API_KEY_CLIENT_ID,
     CRYPTR_API_KEY_CLIENT_SECRET,
     CRYPTR_BASE_URL,

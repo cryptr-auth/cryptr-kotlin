@@ -1,39 +1,28 @@
 package cryptr.kotlin.models
 
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.json.buildJsonObject
-import kotlinx.serialization.json.put
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class User(
-    val profile: Profile,
+    val email: String,
     val id: String? = null,
-    val updatedAt: String? = null,
-    val insertedAt: String? = null
-) {
+    val address: Address? = null,
+//    val metadata: Set<> = [],
+    @SerialName("phone_number") val phoneNumber: String? = null,
+    @SerialName("phone_number_verified") val phoneNumberVerified: Boolean = false,
+    @SerialName("email_verified") val emailVerified: Boolean = false,
+    val profile: Profile? = null,
+    @SerialName("inserted_at") val insertedAt: String? = null,
+    @SerialName("updated_at") val updatedAt: String? = null,
+) : CryptrResource() {
     companion object {
         const val apiResourceName: String = "users"
     }
 
-    constructor(jsonObject: JSONObject) : this(
-        Profile(jsonObject.getJSONObject("profile")),
-        jsonObject.getString("id"),
-        jsonObject.getString("updated_at"),
-        jsonObject.getString("inserted_at")
-    )
-
-    fun toJSonObject(): JsonObject {
-        return buildJsonObject {
-            put("id", id)
-            put("email", profile.email)
-            put("updated_at", updatedAt)
-            put("inserted_at", insertedAt)
-        }
-    }
-
     fun creationMap(): Map<String, String?> {
         return mapOf(
-            "email" to profile.email
+            "email" to email
         )
     }
 }

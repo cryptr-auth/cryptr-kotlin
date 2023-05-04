@@ -1,8 +1,11 @@
 package cryptr.kotlin
 
 import cryptr.kotlin.enums.ChallengeType
-import cryptr.kotlin.enums.Environment
+import cryptr.kotlin.enums.CryptrEnvironment
+import cryptr.kotlin.models.SSOChallenge
+import kotlinx.serialization.decodeFromString
 import org.json.JSONObject
+
 
 /**
  * Cryptr for headless process
@@ -11,14 +14,14 @@ import org.json.JSONObject
  * - SSO SAML Challenges
  */
 class CryptrHeadless(
-    tenantDomain: String = System.getProperty(Environment.CRYPTR_TENANT_DOMAIN.toString()),
-    baseUrl: String = System.getProperty(Environment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
+    tenantDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_TENANT_DOMAIN.toString()),
+    baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
     defaultRedirectUrl: String = System.getProperty(
-        Environment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
+        CryptrEnvironment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
         DEFAULT_REDIRECT_URL
     ),
-    apiKeyClientId: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_ID.toString()),
-    apiKeyClientSecret: String = System.getProperty(Environment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
+    apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
+    apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
 ) :
     Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret) {
 
@@ -35,7 +38,7 @@ class CryptrHeadless(
         redirectUri: String = defaultRedirectUrl,
         orgDomain: String? = null,
         userEmail: String? = null
-    ): JSONObject? {
+    ): SSOChallenge {
         return createSSOChallenge(redirectUri, orgDomain, userEmail)
     }
 
@@ -52,7 +55,7 @@ class CryptrHeadless(
         redirectUri: String = defaultRedirectUrl,
         orgDomain: String? = null,
         userEmail: String? = null
-    ): JSONObject? {
+    ): SSOChallenge {
         return createSSOChallenge(redirectUri, orgDomain, userEmail, ChallengeType.OAUTH)
     }
 
@@ -64,21 +67,22 @@ class CryptrHeadless(
      * @param orgDomain Organization domain linked to the targeted SSO Connection
      * @param userEmail End-User email linked to the SSO Connection
      * @param authType (Optional, Default: SAML)
-     * @return a JSONObject with `authorization_url`that end-user has to open to do his authententication process
+     * @return a [SSOChallenge] with `authorization_url`that end-user has to open to do his authententication process
      */
     fun createSSOChallenge(
         redirectUri: String = defaultRedirectUrl,
         orgDomain: String? = null,
         userEmail: String? = null,
         authType: ChallengeType? = ChallengeType.SAML
-    ): JSONObject? {
+    ): SSOChallenge {
         if (orgDomain != null || userEmail != null) {
             val path = "api/v2/sso-${authType?.value}-challenges"
             val params = if (orgDomain !== null) mapOf(
                 "redirect_uri" to redirectUri,
                 "org_domain" to orgDomain
             ) else mapOf("redirect_uri" to redirectUri, "user_email" to userEmail)
-            return makeRequest(path, params, retrieveApiKeyToken())
+            val resp = makeRequest(path, params, retrieveApiKeyToken())
+            return format.decodeFromString<SSOChallenge>(resp.toString())
         } else {
             throw Exception("requires either orgDomain or endUser value")
         }

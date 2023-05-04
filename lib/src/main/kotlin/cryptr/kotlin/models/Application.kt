@@ -1,43 +1,30 @@
 package cryptr.kotlin.models
 
 import cryptr.kotlin.enums.ApplicationType
-import org.json.JSONArray
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 import org.json.JSONObject
 
+@Serializable
 data class Application(
     val name: String,
-    val applicationType: ApplicationType,
+    @SerialName("application_type") val applicationType: ApplicationType,
     val id: String? = null,
-    val clientId: String? = null,
-    val defaultOriginCors: String? = null,
-    val defaultRedirectUriAfterLogout: String? = null,
-    val defaultRedirectUriAfterLogin: String? = null,
+    @SerialName("client_id") val clientId: String? = null,
+    @SerialName("default_origin_cors") val defaultOriginCors: String? = null,
+    @SerialName("default_redirect_uri_after_logout") val defaultRedirectUriAfterLogout: String? = null,
+    @SerialName("default_redirect_uri_after_login") val defaultRedirectUriAfterLogin: String? = null,
     val description: String? = null,
-    val allowedOriginsCors: JSONArray? = null,
-    val allowedRedirectUrls: JSONArray? = null,
-    val allowedLogoutUrls: JSONArray? = null,
-    val updatedAt: String? = null,
-    val insertedAt: String? = null
-) {
+    // Set to avoid duplicate values
+    @SerialName("allowed_origins_cors") val allowedOriginsCors: Set<String>? = null,
+    @SerialName("allowed_redirect_urls") val allowedRedirectUrls: Set<String>? = null,
+    @SerialName("allowed_logout_urls") val allowedLogoutUrls: Set<String>? = null,
+    @SerialName("updated_at") val updatedAt: String? = null,
+    @SerialName("inserted_at") val insertedAt: String? = null
+) : CryptrResource() {
     companion object {
         const val apiResourceName: String = "applications"
     }
-
-    constructor(jsonObject: JSONObject) : this(
-        jsonObject.getString("name"),
-        ApplicationType.values().first { it.type == jsonObject.getString("application_type") },
-        jsonObject.optString("id"),
-        jsonObject.optString("client_id"),
-        jsonObject.optString("default_origin_cors"),
-        jsonObject.optString("default_redirect_uri_after_logout"),
-        jsonObject.optString("default_redirect_uri_after_login"),
-        jsonObject.optString("description"),
-        jsonObject.optJSONArray("allowed_origins_cors"),
-        jsonObject.optJSONArray("allowed_redirect_urls"),
-        jsonObject.optJSONArray("allowed_logout_urls"),
-        jsonObject.optString("updated_at"),
-        jsonObject.optString("inserted_at")
-    )
 
     fun toJSONObject(): JSONObject {
         val obj = JSONObject()

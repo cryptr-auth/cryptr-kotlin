@@ -1,9 +1,8 @@
 package cryptr.kotlin.models
 
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-data class ChallengeResponse(val accessToken: String?) {
-    constructor(jsonObject: JSONObject) : this(
-        jsonObject.getString("access_token")
-    )
+@Serializable
+data class ChallengeResponse(@SerialName("access_token") val accessToken: String?) {
 }

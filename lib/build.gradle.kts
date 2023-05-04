@@ -14,6 +14,9 @@ plugins {
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.8.10"
 
+    kotlin("plugin.serialization") version "1.8.10"
+    id("org.jetbrains.kotlinx.kover") version "0.7.0-Beta"
+
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
     `maven-publish`
@@ -42,6 +45,7 @@ dependencies {
     //JSON
     api("org.json:json:20200518")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-properties:1.5.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 
@@ -79,6 +83,14 @@ publishing {
     publications {
         create<MavenPublication>("Cryptr") {
             from(components["java"])
+        }
+    }
+}
+
+koverReport {
+    filters {
+        excludes {
+            classes("cryptr.kotlin.objects.Constants", "cryptr.kotlin.enums.*")
         }
     }
 }

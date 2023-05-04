@@ -1,41 +1,22 @@
 package cryptr.kotlin.models
 
-import org.json.JSONObject
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class Profile(
-    val email: String,
-    val address: Address? = null,
     val birthdate: String? = null,
+    @SerialName("family_name") val familyName: String? = null,
     val gender: String? = null,
-    val profile: Any? = null,
-    val givenName: String? = null,
+    @SerialName("given_name") val givenName: String? = null,
     val locale: String? = null,
-    val picture: String? = null,
-    val name: String? = null,
     val nickname: String? = null,
-    val phoneNumber: Any? = null,
-    val familyName: String? = null,
+    val picture: String? = null,
+    @SerialName("preferred_username") val preferredUsername: String? = null,
     val website: String? = null,
     val zoneinfo: String? = null
-) {
+) : CryptrResource() {
     companion object {
         const val apiResouceName: String = "profile"
     }
-
-    constructor(jsonObject: JSONObject) : this(
-        jsonObject.getString("email"),
-        if (jsonObject.isNull("address")) null else Address(jsonObject.optJSONObject("address")),
-        jsonObject.optString("birthdate"),
-        jsonObject.optString("gender"),
-        jsonObject.opt("profile"),
-        jsonObject.optString("given_name"),
-        jsonObject.optString("locale"),
-        jsonObject.optString("picture"),
-        jsonObject.optString("name"),
-        jsonObject.optString("nickname"),
-        jsonObject.opt("phone_number"),
-        jsonObject.optString("family_name"),
-        jsonObject.optString("website"),
-        jsonObject.optString("zoneinfo")
-    )
 }
