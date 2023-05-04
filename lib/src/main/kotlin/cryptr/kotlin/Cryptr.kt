@@ -72,17 +72,15 @@ open class Cryptr(
     }
 
     private fun logInfo(info: () -> Any?) {
-        logger.info("[Cryptr]")
         logger.info { info() }
     }
 
     private fun logDebug(debug: () -> Any?) {
-        logger.debug("[Cryptr]")
         logger.debug { debug() }
     }
 
     private fun logException(exception: java.lang.Exception) {
-        logger.error(exception) { "[Cryptr] an exception occured:\n$exception" }
+        logger.error(exception) { "an exception occured:\n$exception" }
     }
 
     protected fun makeRequest(
