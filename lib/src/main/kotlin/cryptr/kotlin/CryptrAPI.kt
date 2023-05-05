@@ -55,13 +55,18 @@ class CryptrAPI(
      * List all [Organization] records according toused API Key
      */
 
-    fun listOrganizations(): Listing<Organization> {
+    fun listOrganizations(): Listing<Organization>? {
         val resp = makeRequest(buildOrganizationPath(), apiKeyToken = retrieveApiKeyToken())
-        return format.decodeFromString<Listing<Organization>>(resp.toString())
+        return try {
+            format.decodeFromString<Listing<Organization>>(resp.toString())
+        } catch (e: Exception) {
+            logException(e)
+            null
+        }
     }
 
     /**
-     * Get Organization from it's id
+     * Get Organization from its id
      *
      * @param domain The id reference of requested Organization
      *
@@ -91,9 +96,14 @@ class CryptrAPI(
      * @param organizationDomain The organization domain where to look for users
      * @return [Listing] with [User]
      */
-    fun listUsers(organizationDomain: String): Listing<User> {
+    fun listUsers(organizationDomain: String): Listing<User>? {
         val resp = makeRequest(buildUserPath(organizationDomain), apiKeyToken = retrieveApiKeyToken())
-        return format.decodeFromString<Listing<User>>(resp.toString())
+        return try {
+            format.decodeFromString<Listing<User>>(resp.toString())
+        } catch (e: Exception) {
+            logException(e)
+            null
+        }
     }
 
 
@@ -130,10 +140,15 @@ class CryptrAPI(
     /**
      * Applications
      */
-    fun listApplications(organizationDomain: String): Listing<Application> {
+    fun listApplications(organizationDomain: String): Listing<Application>? {
         val path = buildApplicationPath(organizationDomain)
         val resp = makeRequest(path, apiKeyToken = retrieveApiKeyToken())
-        return format.decodeFromString<Listing<Application>>(resp.toString())
+        return try {
+            format.decodeFromString<Listing<Application>>(resp.toString())
+        } catch (e: Exception) {
+            logException(e)
+            null
+        }
     }
 
     fun getApplication(organizationDomain: String, applicationId: String): Application? {

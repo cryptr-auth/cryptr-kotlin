@@ -1,18 +1,22 @@
 package cryptr.kotlin
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.LoggerContext
 import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.objects.Constants
+import io.github.oshai.KotlinLogging
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
+import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 import java.net.URLEncoder
-import java.util.logging.Logger
 
 const val DEFAULT_BASE_URL = "https://auth.cryptr.eu"
 const val DEFAULT_REDIRECT_URL = "http://localhost:8080/callback"
@@ -38,22 +42,21 @@ open class Cryptr(
 ) {
     val format = Json { ignoreUnknownKeys = true }
 
-
-    companion object {
-        @JvmStatic
-        protected val logger = Logger.getAnonymousLogger()
-    }
+    private val logger = KotlinLogging.logger {}
 
     init {
-//        logger.info(
-//            """Cryptr intialized with:
-//            |- tenantDomain: $tenantDomain
-//            |- baseUrl: $baseUrl
-//            |- defaultRedirection: $defaultRedirectUrl
-//            |- apiKeyClientId: $apiKeyClientId
-//            |- apiKeyClientSecret: $apiKeyClientSecret
-//        """.trimMargin()
-//        )
+        if (!isJUnitTest()) {
+            setLogLevel(Level.INFO.toString())
+        }
+        logInfo {
+            """Cryptr intialized with:
+            |- tenantDomain: $tenantDomain
+            |- baseUrl: $baseUrl
+            |- defaultRedirection: $defaultRedirectUrl
+            |- apiKeyClientId: $apiKeyClientId
+            |- apiKeyClientSecret: $apiKeyClientSecret
+        """.trimMargin()
+        }
     }
 
     private fun buildCryptrUrl(path: String): String {
@@ -66,12 +69,12 @@ open class Cryptr(
             .stream()
             .map { p ->
 //                println(p.key)
-//                println(p.value?.javaClass)
-//                println(p.value?.javaClass?.let { println(it.declaredFields.map { f -> f.type.isArray }) })
+//                println(p.value?.javaClass.toString())
+//                println(p.value?.javaClass.toString() == "class java.util.ArrayList")
                 p.key + "=" + URLEncoder.encode(p.value.toString(), "utf-8")
             }
             .reduce { p1, p2 -> "$p1&$p2" }
-            .map { s -> "$s" }
+            .map { s -> s }
             .orElse("")
     }
 
@@ -82,7 +85,6 @@ open class Cryptr(
     ): JSONObject {
         try {
             val url = URL(buildCryptrUrl(path))
-//            println(url)
             val conn = url.openConnection() as HttpURLConnection
 
             conn.doOutput = true
@@ -107,15 +109,58 @@ open class Cryptr(
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
                 try {
+                    logDebug { response.toString() }
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
+                    logException(ej)
                     return JSONObject().put("error", response.toString())
                 }
 
             }
         } catch (e: Exception) {
+            logException(e)
             return JSONObject().put("error", e.message)
         }
+    }
+
+    private fun currentLogger(): Logger {
+        val loggerContext: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+        val packageName = Cryptr::javaClass.name
+        return loggerContext.getLogger(packageName)
+    }
+
+
+    protected fun logInfo(info: () -> Any?) {
+        if (!isJUnitTest()) {
+            val currentLogger = currentLogger()
+            if (currentLogger.isInfoEnabled) {
+                logger.info(info().toString())
+            } else {
+                logger.warn("sorry Info level not active, current: ${currentLogger.level}")
+            }
+        }
+    }
+
+    protected fun logDebug(debug: () -> Any?) {
+        if (!isJUnitTest()) {
+            val currentLogger = currentLogger()
+            if (currentLogger.isInfoEnabled) {
+                logger.debug(debug().toString())
+            } else {
+                logger.warn("Sorry Debug level is not active, current: ${currentLogger.level}")
+            }
+        }
+    }
+
+    protected fun logException(exception: java.lang.Exception) {
+        if (!isJUnitTest()) {
+            logger.error("an exception occured:\n$exception")
+        }
+    }
+
+    fun setLogLevel(logLevel: String) {
+        val logger = currentLogger()
+        logger.level = Level.toLevel(logLevel)
     }
 
     fun retrieveApiKeyToken(): String? {
@@ -142,5 +187,14 @@ open class Cryptr(
             }
             return apiKeyToken
         }
+    }
+
+    open fun isJUnitTest(): Boolean {
+        for (element in Thread.currentThread().stackTrace) {
+            if (element.className.startsWith("org.junit.")) {
+                return true
+            }
+        }
+        return false
     }
 }
