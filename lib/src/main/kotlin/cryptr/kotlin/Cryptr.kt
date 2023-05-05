@@ -45,7 +45,9 @@ open class Cryptr(
     private val logger = KotlinLogging.logger {}
 
     init {
-        setLogLevel(Level.INFO.toString())
+        if (!isJUnitTest()) {
+            setLogLevel(Level.INFO.toString())
+        }
         logInfo {
             """Cryptr intialized with:
             |- tenantDomain: $tenantDomain
@@ -129,25 +131,31 @@ open class Cryptr(
 
 
     protected fun logInfo(info: () -> Any?) {
-        val currentLogger = currentLogger()
-        if (currentLogger.isInfoEnabled) {
-            logger.info(info().toString())
-        } else {
-            logger.warn("sorry Info level not active, current: ${currentLogger.level}")
+        if (!isJUnitTest()) {
+            val currentLogger = currentLogger()
+            if (currentLogger.isInfoEnabled) {
+                logger.info(info().toString())
+            } else {
+                logger.warn("sorry Info level not active, current: ${currentLogger.level}")
+            }
         }
     }
 
     protected fun logDebug(debug: () -> Any?) {
-        val currentLogger = currentLogger()
-        if (currentLogger.isInfoEnabled) {
-            logger.debug(debug().toString())
-        } else {
-            logger.warn("Sorry Debug level is not active, current: ${currentLogger.level}")
+        if (!isJUnitTest()) {
+            val currentLogger = currentLogger()
+            if (currentLogger.isInfoEnabled) {
+                logger.debug(debug().toString())
+            } else {
+                logger.warn("Sorry Debug level is not active, current: ${currentLogger.level}")
+            }
         }
     }
 
     protected fun logException(exception: java.lang.Exception) {
-        logger.error("an exception occured:\n$exception")
+        if (!isJUnitTest()) {
+            logger.error("an exception occured:\n$exception")
+        }
     }
 
     fun setLogLevel(logLevel: String) {
@@ -179,5 +187,14 @@ open class Cryptr(
             }
             return apiKeyToken
         }
+    }
+
+    open fun isJUnitTest(): Boolean {
+        for (element in Thread.currentThread().stackTrace) {
+            if (element.className.startsWith("org.junit.")) {
+                return true
+            }
+        }
+        return false
     }
 }
