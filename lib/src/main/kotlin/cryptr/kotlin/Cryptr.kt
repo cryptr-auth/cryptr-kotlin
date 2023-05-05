@@ -1,5 +1,8 @@
 package cryptr.kotlin
 
+import ch.qos.logback.classic.Level
+import ch.qos.logback.classic.Logger
+import ch.qos.logback.classic.LoggerContext
 import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.objects.Constants
@@ -7,6 +10,7 @@ import io.github.oshai.KotlinLogging
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
+import org.slf4j.LoggerFactory
 import java.io.BufferedReader
 import java.io.DataOutputStream
 import java.io.InputStreamReader
@@ -41,6 +45,7 @@ open class Cryptr(
     private val logger = KotlinLogging.logger {}
 
     init {
+        setLogLevel(Level.INFO.toString())
         logInfo {
             """Cryptr intialized with:
             |- tenantDomain: $tenantDomain
@@ -67,20 +72,8 @@ open class Cryptr(
                 p.key + "=" + URLEncoder.encode(p.value.toString(), "utf-8")
             }
             .reduce { p1, p2 -> "$p1&$p2" }
-            .map { s -> "$s" }
+            .map { s -> s }
             .orElse("")
-    }
-
-    private fun logInfo(info: () -> Any?) {
-        logger.info { info() }
-    }
-
-    private fun logDebug(debug: () -> Any?) {
-        logger.debug { debug() }
-    }
-
-    private fun logException(exception: java.lang.Exception) {
-        logger.error(exception) { "an exception occured:\n$exception" }
     }
 
     protected fun makeRequest(
@@ -126,6 +119,50 @@ open class Cryptr(
             logException(e)
             return JSONObject().put("error", e.message)
         }
+    }
+
+    private fun currentLogger(): Logger {
+        val loggerContext: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
+        val packageName = Cryptr::javaClass.name
+        return loggerContext.getLogger(packageName)
+    }
+
+
+    protected fun logInfo(info: () -> Any?) {
+        printCurrentLogLevel()
+        val currentLogger = currentLogger()
+        if (currentLogger.isInfoEnabled) {
+            logger.info(info().toString())
+        } else {
+            logger.warn("sorry Info level not active")
+        }
+    }
+
+    protected fun logDebug(debug: () -> Any?) {
+        printCurrentLogLevel()
+        val currentLogger = currentLogger()
+        if (currentLogger.isInfoEnabled) {
+            logger.debug(debug().toString())
+        } else {
+            logger.warn("Sorry Debug level is not active")
+        }
+    }
+
+    protected fun logException(exception: java.lang.Exception) {
+        printCurrentLogLevel()
+        logger.error("an exception occured:\n$exception")
+    }
+
+    private fun printCurrentLogLevel() {
+        val logger = currentLogger()
+        println("current level + ${logger.level}")
+    }
+
+    fun setLogLevel(logLevel: String) {
+        val logger = currentLogger()
+        printCurrentLogLevel()
+        logger.level = Level.toLevel(logLevel)
+        printCurrentLogLevel()
     }
 
     fun retrieveApiKeyToken(): String? {
