@@ -129,40 +129,30 @@ open class Cryptr(
 
 
     protected fun logInfo(info: () -> Any?) {
-        printCurrentLogLevel()
         val currentLogger = currentLogger()
         if (currentLogger.isInfoEnabled) {
             logger.info(info().toString())
         } else {
-            logger.warn("sorry Info level not active")
+            logger.warn("sorry Info level not active, current: ${currentLogger.level}")
         }
     }
 
     protected fun logDebug(debug: () -> Any?) {
-        printCurrentLogLevel()
         val currentLogger = currentLogger()
         if (currentLogger.isInfoEnabled) {
             logger.debug(debug().toString())
         } else {
-            logger.warn("Sorry Debug level is not active")
+            logger.warn("Sorry Debug level is not active, current: ${currentLogger.level}")
         }
     }
 
     protected fun logException(exception: java.lang.Exception) {
-        printCurrentLogLevel()
         logger.error("an exception occured:\n$exception")
-    }
-
-    private fun printCurrentLogLevel() {
-        val logger = currentLogger()
-        println("current level + ${logger.level}")
     }
 
     fun setLogLevel(logLevel: String) {
         val logger = currentLogger()
-        printCurrentLogLevel()
         logger.level = Level.toLevel(logLevel)
-        printCurrentLogLevel()
     }
 
     fun retrieveApiKeyToken(): String? {
