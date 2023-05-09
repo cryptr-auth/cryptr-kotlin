@@ -5,7 +5,6 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
-import kotlinx.serialization.encodeToString
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -189,7 +188,6 @@ class CryptrAPITest {
                         )
                     ), resp.value
                 )
-                println(cryptrApi?.format?.encodeToString(resp.value))
             }
         }
 
@@ -397,7 +395,6 @@ class CryptrAPITest {
             assertEquals("59000", user.address?.postalCode)
             assertEquals("165 avenue de Bretagne", user.address?.streetAddress)
 
-            println(cryptrApi?.format?.encodeToString(user))
         }
     }
 
@@ -664,7 +661,13 @@ class CryptrAPITest {
         )
         val appResponse = cryptrApi?.createApplication(
             "acme-company",
-            Application(name = "Some Angular App", applicationType = ApplicationType.ANGULAR)
+            Application(
+                name = "Some Angular App",
+                applicationType = ApplicationType.ANGULAR,
+                allowedRedirectUrls = setOf("https://angular.saas.io"),
+                allowedLogoutUrls = setOf("https://angular.saas.io"),
+                allowedOriginsCors = setOf("https://angular.saas.io")
+            )
         )
         assertNotNull(appResponse)
         if (appResponse !== null && appResponse is APISuccess) {

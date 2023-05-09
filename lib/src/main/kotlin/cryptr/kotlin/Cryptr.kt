@@ -65,7 +65,8 @@ open class Cryptr(
         return if (path.startsWith("/")) "$baseUrl$path" else "$baseUrl/$path"
     }
 
-    private fun mapToFormData(params: Map<String, Any?>): String? {
+
+    fun mapToFormData(params: Map<String, Any?>, prepend: String? = null): String {
         return params
             .entries
             .stream()
@@ -111,7 +112,7 @@ open class Cryptr(
             }
             if (params != null) {
                 val formData = mapToFormData(params)
-                conn.setRequestProperty("Content-Length", formData?.length.toString())
+                conn.setRequestProperty("Content-Length", formData.length.toString())
                 DataOutputStream(conn.outputStream).use { it.writeBytes(formData) }
             }
 
@@ -124,7 +125,7 @@ open class Cryptr(
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
                 try {
-                    logDebug { response.toString() }
+//                    logDebug { response.toString() }
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
                     logException(ej)

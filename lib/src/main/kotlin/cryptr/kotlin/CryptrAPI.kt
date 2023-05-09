@@ -4,6 +4,7 @@ import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.models.*
 import cryptr.kotlin.objects.Constants
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import org.json.JSONObject
 
 
@@ -145,7 +146,7 @@ class CryptrAPI(
     }
 
     fun createUser(organizationDomain: String, user: User): APIResult<User, ErrorMessage> {
-        val params = user.creationMap()
+        val params = JSONObject(format.encodeToString(user)).toMap()
         val resp = makeRequest(buildUserPath(organizationDomain), params, apiKeyToken = retrieveApiKeyToken())
         return handleApiResponse(resp) as APIResult<User, ErrorMessage>
     }
@@ -169,9 +170,10 @@ class CryptrAPI(
         organizationDomain: String,
         application: Application
     ): APIResult<Application, ErrorMessage> {
-        var params = application.toJSONObject().toMap()
+        val params = JSONObject(format.encodeToString(application)).toMap()
         val resp = makeRequest(buildApplicationPath(organizationDomain), params, retrieveApiKeyToken())
-        return handleApiResponse(resp) as APIResult<Application, ErrorMessage>
+        val appResponse = handleApiResponse(resp)
+        return appResponse as APIResult<Application, ErrorMessage>
     }
 
 }
