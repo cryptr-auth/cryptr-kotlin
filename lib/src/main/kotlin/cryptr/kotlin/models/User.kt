@@ -5,11 +5,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
-    override val cryptrType: String = "User",
+    @SerialName("__type__") override val cryptrType: String = "User",
+    @SerialName("__environment__") override val environment: String? = null,
+    @SerialName("__domain__") override val resourceDomain: String? = null,
     val email: String,
     val id: String? = null,
     val address: Address? = null,
-//    val metadata: Set<> = [],
+    @SerialName("meta_data") val metadata: Set<MetaData> = setOf(),
     @SerialName("phone_number") val phoneNumber: String? = null,
     @SerialName("phone_number_verified") val phoneNumberVerified: Boolean = false,
     @SerialName("email_verified") val emailVerified: Boolean = false,
@@ -19,11 +21,5 @@ data class User(
 ) : CryptrResource() {
     companion object {
         const val apiResourceName: String = "users"
-    }
-
-    fun creationMap(): Map<String, String?> {
-        return mapOf(
-            "email" to email
-        )
     }
 }
