@@ -69,11 +69,24 @@ open class Cryptr(
         return params
             .entries
             .stream()
-            .map { p ->
-//                println(p.key)
-//                println(p.value?.javaClass.toString())
-//                println(p.value?.javaClass.toString() == "class java.util.ArrayList")
-                p.key + "=" + URLEncoder.encode(p.value.toString(), "utf-8")
+            .filter { it.value != null }
+            .map { (key, value) ->
+                val realKey = if (prepend !== null) "$prepend[$key]" else key
+                when (value) {
+                    is ArrayList<*> ->
+                        value.joinToString(separator = "&") {
+                            "$realKey[]=" + URLEncoder.encode(
+                                it.toString(),
+                                "utf-8"
+                            )
+                        }
+
+                    is Map<*, *> ->
+                        mapToFormData(value.entries.associate { it.key.toString() to it.value }, "$key")
+
+                    else ->
+                        "$realKey=" + URLEncoder.encode(value.toString(), "utf-8")
+                }
             }
             .reduce { p1, p2 -> "$p1&$p2" }
             .map { s -> s }
