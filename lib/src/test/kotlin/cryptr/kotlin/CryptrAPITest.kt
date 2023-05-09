@@ -4,10 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
-import cryptr.kotlin.models.Application
-import cryptr.kotlin.models.Environment
-import cryptr.kotlin.models.Organization
-import cryptr.kotlin.models.User
+import cryptr.kotlin.models.*
 import kotlinx.serialization.encodeToString
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -96,7 +93,7 @@ class CryptrAPITest {
         val organizationResponse = cryptrApi?.listOrganizations()
         assertNotNull(organizationResponse)
         if (organizationResponse is APISuccess) {
-            val organizationListing = organizationResponse.value
+            val organizationListing = organizationResponse.value as Listing<Organization>
             assertEquals(2, organizationListing.data.size)
             assertEquals(23, organizationListing.total)
             assertContains(

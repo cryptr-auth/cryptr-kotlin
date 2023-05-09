@@ -10,7 +10,7 @@ data class APISuccess<CryptrResource, ErrorMessage>(val value: CryptrResource) :
     APIResult<CryptrResource, ErrorMessage>()
 
 @Serializable
-data class APIError<CryptrResource, ErrorMessage>(val value: ErrorMessage) : APIResult<CryptrResource, ErrorMessage>()
+data class APIError<CryptrResource, ErrorMessage>(val error: ErrorMessage) : APIResult<CryptrResource, ErrorMessage>()
 
 @Serializable
 data class ErrorMessage(val message: String)

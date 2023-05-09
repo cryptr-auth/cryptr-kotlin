@@ -11,10 +11,12 @@ import org.json.JSONObject
 
 object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(CryptrResource::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<CryptrResource> {
+        println(">>> selectDeserializer")
         val jsonObjElement = JSONObject(element.toString())
         if (jsonObjElement.has("data") && jsonObjElement.optJSONArray("data") !== null) {
             val itemType = jsonObjElement.getJSONArray("data").getJSONObject(0).optString("__type__")
             val listSerializerType = listItemSerializer(itemType)
+            println("[SOON] selectDeserializer for $listSerializerType")
             return Listing.serializer(listSerializerType)
         }
 
@@ -24,6 +26,7 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
     }
 
     private fun listItemSerializer(itemType: String?): KSerializer<out CryptrResource> {
+        println(">> listItemSerializer")
         println("here looking for $itemType")
         return when (itemType) {
             "Address" -> Address.serializer()

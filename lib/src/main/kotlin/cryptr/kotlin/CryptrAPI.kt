@@ -74,23 +74,24 @@ class CryptrAPI(
      *
      * @return the requested [Organization]
      */
-    fun getOrganization(domain: String): APIResult<CryptrResource, ErrorMessage> {
+    fun getOrganization(domain: String): APIResult<Organization, ErrorMessage> {
         val resp = makeRequest(buildOrganizationPath(domain), apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp)
+        return handleApiResponse(resp) as APIResult<Organization, ErrorMessage>
     }
 
-    fun toJSONString(result: APIResult<CryptrResource, ErrorMessage>): String? {
+    fun toJSONString(result: APIResult<*, ErrorMessage>): String {
         try {
             return when (result) {
                 is APISuccess ->
-                    format.encodeToString(CryptrSerializer, result.value)
+                    format.encodeToString(CryptrSerializer, result.value as CryptrResource)
 
                 is APIError ->
-                    format.encodeToString(ErrorMessage.serializer(), result.value)
+//                    logInfo { "toto" }.toString()
+                    format.encodeToString(ErrorMessage.serializer(), result.error)
             }
         } catch (e: Exception) {
             println("toJSONString error ${e.message}")
-            return null
+            return e.message.toString()
         }
     }
 
@@ -101,10 +102,10 @@ class CryptrAPI(
      *
      * @return the created [Organization]
      */
-    fun createOrganization(organization: Organization): APIResult<CryptrResource, ErrorMessage> {
+    fun createOrganization(organization: Organization): APIResult<Organization, ErrorMessage> {
         var params = organization.creationMap()
         val resp = makeRequest(buildOrganizationPath(), params, retrieveApiKeyToken())
-        return handleApiResponse(resp)
+        return handleApiResponse(resp) as APIResult<Organization, ErrorMessage>
     }
 
     /**
@@ -126,9 +127,9 @@ class CryptrAPI(
      *
      * @return The requested [User]
      */
-    fun getUser(organizationDomain: String, userId: String): APIResult<CryptrResource, ErrorMessage> {
+    fun getUser(organizationDomain: String, userId: String): APIResult<User, ErrorMessage> {
         val resp = makeRequest(buildUserPath(organizationDomain, userId), apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp)
+        return handleApiResponse(resp) as APIResult<User, ErrorMessage>
     }
 
     /**
@@ -139,14 +140,14 @@ class CryptrAPI(
      *
      * @return the created [User]
      */
-    fun createUser(organizationDomain: String, userEmail: String): APIResult<CryptrResource, ErrorMessage> {
+    fun createUser(organizationDomain: String, userEmail: String): APIResult<User, ErrorMessage> {
         return createUser(organizationDomain, user = User(email = userEmail))
     }
 
-    fun createUser(organizationDomain: String, user: User): APIResult<CryptrResource, ErrorMessage> {
+    fun createUser(organizationDomain: String, user: User): APIResult<User, ErrorMessage> {
         val params = user.creationMap()
         val resp = makeRequest(buildUserPath(organizationDomain), params, apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp)
+        return handleApiResponse(resp) as APIResult<User, ErrorMessage>
     }
 
     /**
@@ -158,19 +159,19 @@ class CryptrAPI(
         return handleApiResponse(resp) as APIResult<Listing<Application>, ErrorMessage>
     }
 
-    fun getApplication(organizationDomain: String, applicationId: String): APIResult<CryptrResource, ErrorMessage> {
+    fun getApplication(organizationDomain: String, applicationId: String): APIResult<Application, ErrorMessage> {
         val resp =
             makeRequest(buildApplicationPath(organizationDomain, applicationId), apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp)
+        return handleApiResponse(resp) as APIResult<Application, ErrorMessage>
     }
 
     fun createApplication(
         organizationDomain: String,
         application: Application
-    ): APIResult<CryptrResource, ErrorMessage> {
+    ): APIResult<Application, ErrorMessage> {
         var params = application.toJSONObject().toMap()
         val resp = makeRequest(buildApplicationPath(organizationDomain), params, retrieveApiKeyToken())
-        return handleApiResponse(resp)
+        return handleApiResponse(resp) as APIResult<Application, ErrorMessage>
     }
 
 }
