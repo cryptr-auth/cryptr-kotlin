@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Profile(
+    override val cryptrType: String = "Profile",
     val birthdate: String? = null,
     @SerialName("family_name") val familyName: String? = null,
     val gender: String? = null,

@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class User(
+    override val cryptrType: String = "User",
     val email: String,
     val id: String? = null,
     val address: Address? = null,

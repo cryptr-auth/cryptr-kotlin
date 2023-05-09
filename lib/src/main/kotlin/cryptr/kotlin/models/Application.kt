@@ -7,6 +7,7 @@ import org.json.JSONObject
 
 @Serializable
 data class Application(
+    override val cryptrType: String = "Application",
     val name: String,
     @SerialName("application_type") val applicationType: ApplicationType,
     val id: String? = null,

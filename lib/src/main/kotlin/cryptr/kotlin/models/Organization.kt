@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Organization(
+    override val cryptrType: String = "Organization",
     val domain: String? = null,
     @SerialName("updated_at") val updatedAt: String? = null,
     val name: String,

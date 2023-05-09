@@ -5,6 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Address(
+    override val cryptrType: String = "Address",
     val country: String? = null,
     val formatted: String? = null,
     val locality: String? = null,

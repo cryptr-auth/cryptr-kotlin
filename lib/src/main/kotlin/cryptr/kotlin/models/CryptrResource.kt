@@ -1,12 +1,13 @@
 package cryptr.kotlin.models
 
+import cryptr.kotlin.CryptrSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
-@Serializable
+@Serializable(with = CryptrSerializer::class)
 abstract class CryptrResource {
     @SerialName("__type__")
-    val cryptrType: String = ""
+    abstract val cryptrType: String
 
     @SerialName("__environment__")
     val environment: String? = null
