@@ -43,15 +43,14 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
 
     //JSON
-    api("org.json:json:20200518")
+    api("org.json:json:20220320")
 
     // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:4.0.0-beta-22")
-    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.6")
+    implementation(group = "ch.qos.logback", name = "logback-classic", version = "1.2.9")
 
     // Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-properties:1.5.0")
+    api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
 }
 

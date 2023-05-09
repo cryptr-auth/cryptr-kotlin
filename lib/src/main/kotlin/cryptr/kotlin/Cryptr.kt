@@ -7,6 +7,7 @@ import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.objects.Constants
 import io.github.oshai.KotlinLogging
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
@@ -40,7 +41,8 @@ open class Cryptr(
     protected val apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
     protected val apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
 ) {
-    val format = Json { ignoreUnknownKeys = true }
+    @OptIn(ExperimentalSerializationApi::class)
+    val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
 
     private val logger = KotlinLogging.logger {}
 
@@ -63,15 +65,29 @@ open class Cryptr(
         return if (path.startsWith("/")) "$baseUrl$path" else "$baseUrl/$path"
     }
 
-    private fun mapToFormData(params: Map<String, Any?>): String? {
+
+    fun mapToFormData(params: Map<String, Any?>, prepend: String? = null): String {
         return params
             .entries
             .stream()
-            .map { p ->
-//                println(p.key)
-//                println(p.value?.javaClass.toString())
-//                println(p.value?.javaClass.toString() == "class java.util.ArrayList")
-                p.key + "=" + URLEncoder.encode(p.value.toString(), "utf-8")
+            .filter { it.value != null }
+            .map { (key, value) ->
+                val realKey = if (prepend !== null) "$prepend[$key]" else key
+                when (value) {
+                    is ArrayList<*> ->
+                        value.joinToString(separator = "&") {
+                            "$realKey[]=" + URLEncoder.encode(
+                                it.toString(),
+                                "utf-8"
+                            )
+                        }
+
+                    is Map<*, *> ->
+                        mapToFormData(value.entries.associate { it.key.toString() to it.value }, "$key")
+
+                    else ->
+                        "$realKey=" + URLEncoder.encode(value.toString(), "utf-8")
+                }
             }
             .reduce { p1, p2 -> "$p1&$p2" }
             .map { s -> s }
@@ -96,7 +112,7 @@ open class Cryptr(
             }
             if (params != null) {
                 val formData = mapToFormData(params)
-                conn.setRequestProperty("Content-Length", formData?.length.toString())
+                conn.setRequestProperty("Content-Length", formData.length.toString())
                 DataOutputStream(conn.outputStream).use { it.writeBytes(formData) }
             }
 
@@ -109,7 +125,7 @@ open class Cryptr(
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
                 try {
-                    logDebug { response.toString() }
+//                    logDebug { response.toString() }
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
                     logException(ej)

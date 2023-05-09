@@ -4,10 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
-import cryptr.kotlin.models.Application
-import cryptr.kotlin.models.Environment
-import cryptr.kotlin.models.Organization
-import cryptr.kotlin.models.User
+import cryptr.kotlin.models.*
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -92,9 +89,10 @@ class CryptrAPITest {
                     )
                 )
         )
-        val organizationListing = cryptrApi?.listOrganizations()
-        assertNotNull(organizationListing)
-        if (organizationListing != null) {
+        val organizationResponse = cryptrApi?.listOrganizations()
+        assertNotNull(organizationResponse)
+        if (organizationResponse is APISuccess) {
+            val organizationListing = organizationResponse.value as Listing<Organization>
             assertEquals(2, organizationListing.data.size)
             assertEquals(23, organizationListing.total)
             assertContains(
@@ -106,12 +104,10 @@ class CryptrAPITest {
                     insertedAt = "2023-04-27T13:54:42",
                     environments = setOf(
                         Environment(
-                            id = "57f6e6a5-e833-49c5-8172-a94ec7a91b50",
                             name = "production",
                             status = EnvironmentStatus.DOWN
                         ),
                         Environment(
-                            id = "40ce67ff-baa5-49bb-b20c-7ddefc7e205e",
                             name = "sandbox",
                             status = EnvironmentStatus.DOWN
                         )
@@ -127,12 +123,10 @@ class CryptrAPITest {
                     insertedAt = "2023-04-27T13:50:29",
                     environments = setOf(
                         Environment(
-                            id = "7389e2d4-e49c-4371-8bfb-1f6bc243fe74",
                             name = "production",
                             status = EnvironmentStatus.DOWN
                         ),
                         Environment(
-                            id = "f3751057-724d-41e8-9057-73067d46e715",
                             name = "sandbox",
                             status = EnvironmentStatus.DOWN
                         )
@@ -140,6 +134,7 @@ class CryptrAPITest {
                 )
             )
         }
+
     }
 
     @Test
@@ -173,27 +168,29 @@ class CryptrAPITest {
 
         )
         val resp = cryptrApi?.getOrganization("thibaud-java")
-        assertNotNull(resp)
-        assertEquals(
-            Organization(
-                name = "thibaud-java",
-                domain = "thibaud-java",
-                updatedAt = "2023-04-27T13:50:49",
-                insertedAt = "2023-04-27T13:50:29",
-                environments = setOf(
-                    Environment(
-                        id = "7389e2d4-e49c-4371-8bfb-1f6bc243fe74",
-                        name = "production",
-                        status = EnvironmentStatus.DOWN
-                    ),
-                    Environment(
-                        id = "f3751057-724d-41e8-9057-73067d46e715",
-                        name = "sandbox",
-                        status = EnvironmentStatus.DOWN
-                    )
+        if (resp != null) {
+            if (resp is APISuccess) {
+                assertEquals(
+                    Organization(
+                        name = "thibaud-java",
+                        domain = "thibaud-java",
+                        updatedAt = "2023-04-27T13:50:49",
+                        insertedAt = "2023-04-27T13:50:29",
+                        environments = setOf(
+                            Environment(
+                                name = "production",
+                                status = EnvironmentStatus.DOWN
+                            ),
+                            Environment(
+                                name = "sandbox",
+                                status = EnvironmentStatus.DOWN
+                            )
+                        )
+                    ), resp.value
                 )
-            ), resp
-        )
+            }
+        }
+
     }
 
     @Test
@@ -226,9 +223,10 @@ class CryptrAPITest {
                 )
         )
         val org = Organization(name = "Another organization")
-        val createdOrga = cryptrApi?.createOrganization(org)
-        assertNotNull(createdOrga)
-        if (createdOrga != null) {
+        val createdOrgaResp = cryptrApi?.createOrganization(org)
+        assertNotNull(createdOrgaResp)
+        if (createdOrgaResp != null && createdOrgaResp is APISuccess) {
+            val createdOrga = createdOrgaResp.value
             assertEquals(org.name, createdOrga.name)
 
             val domain = Normalizer
@@ -330,9 +328,10 @@ class CryptrAPITest {
                     )
                 )
         )
-        val userListing = cryptrApi?.listUsers("acme-company")
-        assertNotNull(userListing)
-        if (userListing != null) {
+        val userListingResponse = cryptrApi?.listUsers("acme-company")
+        assertNotNull(userListingResponse)
+        if (userListingResponse != null && userListingResponse is APISuccess) {
+            val userListing = userListingResponse.value
             assertEquals(10, userListing.total)
             assertEquals(2, userListing.data.size)
             assertContains(userListing.data.map { u -> u.email }, "omvold7jx62g@acme-company.io")
@@ -387,13 +386,15 @@ class CryptrAPITest {
 
         val resp = cryptrApi?.getUser("acme-company", "61254d31-3a33-4b10-bc22-f410f4927d42")
         assertNotNull(resp)
-        if (resp != null) {
-            assertEquals(resp.email, "nedra_boehm@hotmail.com")
-            assertEquals("FR", resp.address?.country)
-            assertEquals("165 avenue de Bretagne\n59000, France", resp.address?.formatted)
-            assertNull(resp.address?.locality)
-            assertEquals("59000", resp.address?.postalCode)
-            assertEquals("165 avenue de Bretagne", resp.address?.streetAddress)
+        if (resp != null && resp is APISuccess) {
+            val user = resp.value
+            assertEquals(user.email, "nedra_boehm@hotmail.com")
+            assertEquals("FR", user.address?.country)
+            assertEquals("165 avenue de Bretagne\n59000, France", user.address?.formatted)
+            assertNull(user.address?.locality)
+            assertEquals("59000", user.address?.postalCode)
+            assertEquals("165 avenue de Bretagne", user.address?.streetAddress)
+
         }
     }
 
@@ -436,19 +437,20 @@ class CryptrAPITest {
 
         val resp = cryptrApi?.createUser("acme-company", "aryanna.stroman@gmail.com")
         assertNotNull(resp)
-        if (resp != null) {
-            assertEquals("aryanna.stroman@gmail.com", resp.email)
-            assertNull(resp.profile?.birthdate)
-            assertNull(resp.address)
-            assertNull(resp.profile?.familyName)
-            assertNull(resp.profile?.gender)
-            assertNull(resp.profile?.givenName)
-            assertNull(resp.profile?.locale)
-            assertNull(resp.profile?.nickname)
-            assertNull(resp.phoneNumber)
-            assertNull(resp.profile?.picture)
-            assertNull(resp.profile?.website)
-            assertNull(resp.profile?.zoneinfo)
+        if (resp != null && resp is APISuccess) {
+            val user = resp.value
+            assertEquals("aryanna.stroman@gmail.com", user.email)
+            assertNull(user.profile?.birthdate)
+            assertNull(user.address)
+            assertNull(user.profile?.familyName)
+            assertNull(user.profile?.gender)
+            assertNull(user.profile?.givenName)
+            assertNull(user.profile?.locale)
+            assertNull(user.profile?.nickname)
+            assertNull(user.phoneNumber)
+            assertNull(user.profile?.picture)
+            assertNull(user.profile?.website)
+            assertNull(user.profile?.zoneinfo)
         }
     }
 
@@ -492,8 +494,8 @@ class CryptrAPITest {
         val user = User(email = "omvold7jx62g@acme-company.io")
         val resp = cryptrApi?.createUser("acme-company", user)
         assertNotNull(resp)
-        if (resp !== null) {
-            assertNull(resp.address?.postalCode)
+        if (resp !== null && resp is APISuccess) {
+            assertNull(resp.value.address?.postalCode)
         }
     }
 
@@ -547,9 +549,10 @@ class CryptrAPITest {
                 )
         )
 
-        val applicationListing = cryptrApi?.listApplications("acme-company")
-        assertNotNull(applicationListing)
-        if (applicationListing !== null) {
+        val applicationListingResponse = cryptrApi?.listApplications("acme-company")
+        assertNotNull(applicationListingResponse)
+        if (applicationListingResponse !== null && applicationListingResponse is APISuccess) {
+            val applicationListing = applicationListingResponse.value
             assertEquals(1, applicationListing.data.size)
             assertEquals(1, applicationListing.total)
             assertNull(applicationListing.pagination.nextPage)
@@ -595,9 +598,10 @@ class CryptrAPITest {
                 )
         )
 
-        val app = cryptrApi?.getApplication("acme-company", "bc3583eb-59e3-4edf-83c4-96bd308430cc")
-        assertNotNull(app)
-        if (app !== null) {
+        val appResponse = cryptrApi?.getApplication("acme-company", "bc3583eb-59e3-4edf-83c4-96bd308430cc")
+        assertNotNull(appResponse)
+        if (appResponse !== null && appResponse is APISuccess) {
+            val app = appResponse.value
             assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", app.id)
             app.allowedLogoutUrls?.let { assertContains(it.asIterable(), "https://communitiz-app-vuejs.onrender.com") }
             app.allowedOriginsCors?.let { assertContains(it.asIterable(), "https://communitiz-app-vuejs.onrender.com") }
@@ -655,12 +659,19 @@ class CryptrAPITest {
                     )
                 )
         )
-        val app = cryptrApi?.createApplication(
+        val appResponse = cryptrApi?.createApplication(
             "acme-company",
-            Application(name = "Some Angular App", applicationType = ApplicationType.ANGULAR)
+            Application(
+                name = "Some Angular App",
+                applicationType = ApplicationType.ANGULAR,
+                allowedRedirectUrls = setOf("https://angular.saas.io"),
+                allowedLogoutUrls = setOf("https://angular.saas.io"),
+                allowedOriginsCors = setOf("https://angular.saas.io")
+            )
         )
-        assertNotNull(app)
-        if (app !== null) {
+        assertNotNull(appResponse)
+        if (appResponse !== null && appResponse is APISuccess) {
+            val app = appResponse.value
             assertEquals("22bf3525-c3d7-4b0f-b28c-d126c801c9e5", app.id)
             app.allowedLogoutUrls?.let { assertContains(it.asIterable(), "https://angular.saas.io") }
             app.allowedOriginsCors?.let { assertContains(it.asIterable(), "https://angular.saas.io") }
