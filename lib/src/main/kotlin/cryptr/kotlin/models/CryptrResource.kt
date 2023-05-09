@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable(with = CryptrSerializer::class)
-sealed class CryptrResource {
+abstract class CryptrResource {
     @SerialName("__type__")
     abstract val cryptrType: String
 

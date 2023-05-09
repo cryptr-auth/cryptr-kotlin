@@ -104,7 +104,7 @@ class CryptrAPI(
      * @return the created [Organization]
      */
     fun createOrganization(organization: Organization): APIResult<Organization, ErrorMessage> {
-        var params = organization.creationMap()
+        val params = JSONObject(format.encodeToString(organization)).toMap()
         val resp = makeRequest(buildOrganizationPath(), params, retrieveApiKeyToken())
         return handleApiResponse(resp) as APIResult<Organization, ErrorMessage>
     }

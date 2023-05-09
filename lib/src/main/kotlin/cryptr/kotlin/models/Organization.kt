@@ -15,10 +15,4 @@ data class Organization(
     companion object {
         const val apiResourceName: String = "organizations"
     }
-
-    fun creationMap(): Map<String, String?> {
-        return mapOf(
-            "name" to name
-        )
-    }
 }
