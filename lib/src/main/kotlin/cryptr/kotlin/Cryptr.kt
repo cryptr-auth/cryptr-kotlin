@@ -7,6 +7,7 @@ import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.objects.Constants
 import io.github.oshai.KotlinLogging
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import org.json.JSONException
 import org.json.JSONObject
@@ -40,7 +41,8 @@ open class Cryptr(
     protected val apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
     protected val apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
 ) {
-    val format = Json { ignoreUnknownKeys = true }
+    @OptIn(ExperimentalSerializationApi::class)
+    val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
 
     private val logger = KotlinLogging.logger {}
 
