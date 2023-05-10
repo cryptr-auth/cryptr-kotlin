@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.deleted.DeletedUser
 import cryptr.kotlin.objects.Constants
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -171,11 +172,16 @@ class CryptrAPI(
      *
      * @return the deleted [User]
      */
-    fun deleteUser(user: User): APIResult<User, ErrorMessage> {
-        val resp =
-            user.resourceDomain?.let { buildUserPath(it, user.id) }
-                ?.let { makeDeleteRequest(it, retrieveApiKeyToken()) }
-        return resp?.let { handleApiResponse(it) } as APIResult<User, ErrorMessage>
+    fun deleteUser(user: User): DeletedUser? {
+        val response = makeDeleteRequest(buildUserPath(user.resourceDomain.toString(), user.id), retrieveApiKeyToken())
+        return try {
+            format.decodeFromString<DeletedUser>(response.toString())
+        } catch (e: Exception) {
+            println("handle APiResponse error")
+            logException(e)
+            return null
+//            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /**
@@ -211,11 +217,19 @@ class CryptrAPI(
      *
      * @return the deleted [Application]
      */
-    fun deleteApplication(application: Application): APIResult<Application, ErrorMessage> {
-        val resp =
-            application.resourceDomain?.let { buildApplicationPath(it, application.id) }
-                ?.let { makeDeleteRequest(it, retrieveApiKeyToken()) }
-        return resp?.let { handleApiResponse(it) } as APIResult<Application, ErrorMessage>
+    fun deleteApplication(application: Application): Application? {
+        val response = makeDeleteRequest(
+            buildApplicationPath(application.resourceDomain.toString(), application.id),
+            retrieveApiKeyToken()
+        )
+        return try {
+            format.decodeFromString<Application>(response.toString())
+        } catch (e: Exception) {
+            println("handle APiResponse error")
+            logException(e)
+            return null
+//            APIError(ErrorMessage(response.toString()))
+        }
     }
 
 }

@@ -3,15 +3,13 @@ package cryptr.kotlin
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.deleted.DeletedUser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import kotlin.test.assertContains
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertNull
+import kotlin.test.*
 
 class CryptrSerializerTest {
     lateinit var cryptrApi: CryptrAPI
@@ -212,7 +210,7 @@ class CryptrSerializerTest {
                 "            \"updated_at\": \"2023-04-27T13:50:49\"\n" +
                 "        }\n" +
                 "    ],\n" +
-                "    \"paginate\": {\n" +
+                "    \"pagination\": {\n" +
                 "        \"current_page\": 1,\n" +
                 "        \"next_page\": 2,\n" +
                 "        \"per_page\": 2,\n" +
@@ -232,5 +230,201 @@ class CryptrSerializerTest {
         assertEquals(12, listing.pagination.totalPages)
         assertEquals(2, listing.data.size)
         assertNull(listing.resourceDomain)
+    }
+
+    @Test
+    fun serializeDeleted() {
+        val body = "{\n" +
+                "  \"deleted\": true,\n" +
+                "  \"resource\": {\n" +
+                "    \"address\": null,\n" +
+                "    \"email_verified\": false,\n" +
+                "    \"__environment__\": \"sandbox\",\n" +
+                "    \"profile\": {\n" +
+                "      \"website\": null,\n" +
+                "      \"zoneinfo\": null,\n" +
+                "      \"birthdate\": null,\n" +
+                "      \"gender\": null,\n" +
+                "      \"nickname\": null,\n" +
+                "      \"preferred_username\": null,\n" +
+                "      \"given_name\": \"hamid\",\n" +
+                "      \"locale\": null,\n" +
+                "      \"family_name\": \"Echarkaoui\",\n" +
+                "      \"picture\": null\n" +
+                "    },\n" +
+                "    \"phone_number_verified\": false,\n" +
+                "    \"__domain__\": \"acme-company\",\n" +
+                "    \"updated_at\": \"2023-02-23T18:33:28\",\n" +
+                "    \"__type__\": \"User\",\n" +
+                "    \"meta_data\": [\n" +
+                "      {\n" +
+                "        \"id\": \"46cd27a9-466a-4e2f-acb5-5af9acf4ec5d\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"email\",\n" +
+                "          \"id\": \"f1acb4c6-a535-4026-b326-7c3d94bc9d18\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"8ce5248c-3158-4de7-a2df-92336b1d1427\",\n" +
+                "        \"value\": \"hamid\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"first_name\",\n" +
+                "          \"id\": \"ddf87f5d-db31-4da3-9a0f-9f552ad1a262\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"4d171054-4688-4017-9ec5-d5220bcfaec6\",\n" +
+                "        \"value\": \"Echarkaoui\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"last_name\",\n" +
+                "          \"id\": \"aa4ccab9-e471-4892-9fc5-868447360001\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"99bca1ff-66bf-4587-a8ba-1382e8b9cbcc\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"saml_nameid\",\n" +
+                "          \"id\": \"3baaed8b-1670-406a-a1f0-506b873dfdc1\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"79a8515b-22f5-4538-9d3f-66577dc4c3a9\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"saml_subject\",\n" +
+                "          \"id\": \"cd8e4eb3-684a-42b5-91f3-051e4792d683\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"d938f458-7e8b-4ce5-b044-a36aec31d4cf\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"uid\",\n" +
+                "          \"id\": \"4f263c3b-63a4-4964-b1d5-7a47e6d50f26\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"phone_number\": null,\n" +
+                "    \"id\": \"1e3c7c1e-a826-446f-8c9e-2a7e2374d805\",\n" +
+                "    \"inserted_at\": \"2023-02-23T17:18:49\",\n" +
+                "    \"email\": \"hamid@cryptr.co\"\n" +
+                "  }\n" +
+                "}"
+        val decoded = cryptrApi.format.decodeFromString<DeletedUser>(body)
+        assertIs<DeletedUser>(decoded)
+        assertIs<User>(decoded.resource)
+        assertTrue(decoded.deleted)
+    }
+
+    @Test
+    fun serializeNotDeleted() {
+        val body = "{\n" +
+                "  \"deleted\": false,\n" +
+                "  \"resource\": {\n" +
+                "    \"address\": null,\n" +
+                "    \"email_verified\": false,\n" +
+                "    \"__environment__\": \"sandbox\",\n" +
+                "    \"profile\": {\n" +
+                "      \"website\": null,\n" +
+                "      \"zoneinfo\": null,\n" +
+                "      \"birthdate\": null,\n" +
+                "      \"gender\": null,\n" +
+                "      \"nickname\": null,\n" +
+                "      \"preferred_username\": null,\n" +
+                "      \"given_name\": \"hamid\",\n" +
+                "      \"locale\": null,\n" +
+                "      \"family_name\": \"Echarkaoui\",\n" +
+                "      \"picture\": null\n" +
+                "    },\n" +
+                "    \"phone_number_verified\": false,\n" +
+                "    \"__domain__\": \"acme-company\",\n" +
+                "    \"updated_at\": \"2023-02-23T18:33:28\",\n" +
+                "    \"__type__\": \"User\",\n" +
+                "    \"meta_data\": [\n" +
+                "      {\n" +
+                "        \"id\": \"46cd27a9-466a-4e2f-acb5-5af9acf4ec5d\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"email\",\n" +
+                "          \"id\": \"f1acb4c6-a535-4026-b326-7c3d94bc9d18\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"8ce5248c-3158-4de7-a2df-92336b1d1427\",\n" +
+                "        \"value\": \"hamid\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"first_name\",\n" +
+                "          \"id\": \"ddf87f5d-db31-4da3-9a0f-9f552ad1a262\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"4d171054-4688-4017-9ec5-d5220bcfaec6\",\n" +
+                "        \"value\": \"Echarkaoui\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"last_name\",\n" +
+                "          \"id\": \"aa4ccab9-e471-4892-9fc5-868447360001\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"99bca1ff-66bf-4587-a8ba-1382e8b9cbcc\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"saml_nameid\",\n" +
+                "          \"id\": \"3baaed8b-1670-406a-a1f0-506b873dfdc1\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"79a8515b-22f5-4538-9d3f-66577dc4c3a9\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"saml_subject\",\n" +
+                "          \"id\": \"cd8e4eb3-684a-42b5-91f3-051e4792d683\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      },\n" +
+                "      {\n" +
+                "        \"id\": \"d938f458-7e8b-4ce5-b044-a36aec31d4cf\",\n" +
+                "        \"value\": \"hamid@cryptr.co\",\n" +
+                "        \"key\": {\n" +
+                "          \"name\": \"uid\",\n" +
+                "          \"id\": \"4f263c3b-63a4-4964-b1d5-7a47e6d50f26\",\n" +
+                "          \"type\": \"string\",\n" +
+                "          \"required\": false\n" +
+                "        }\n" +
+                "      }\n" +
+                "    ],\n" +
+                "    \"phone_number\": null,\n" +
+                "    \"id\": \"1e3c7c1e-a826-446f-8c9e-2a7e2374d805\",\n" +
+                "    \"inserted_at\": \"2023-02-23T17:18:49\",\n" +
+                "    \"email\": \"hamid@cryptr.co\"\n" +
+                "  }\n" +
+                "}"
+        val decoded = cryptrApi.format.decodeFromString<DeletedUser>(body)
+        assertIs<DeletedUser>(decoded)
+        assertIs<User>(decoded.resource)
+        assertFalse(decoded.deleted)
     }
 }
