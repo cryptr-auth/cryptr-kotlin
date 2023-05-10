@@ -94,6 +94,41 @@ open class Cryptr(
             .orElse("")
     }
 
+    protected fun makeDeleteRequest(path: String, apiKeyToken: String? = ""): JSONObject {
+        try {
+            val url = URL(buildCryptrUrl(path))
+            val conn = url.openConnection() as HttpURLConnection
+
+            conn.doOutput = true
+            conn.useCaches = false
+            conn.requestMethod = "DELETE"
+            conn.setRequestProperty("Accept", "application/json")
+            if (apiKeyToken != "" && apiKeyToken !== null) {
+                conn.setRequestProperty("Authorization", "Bearer $apiKeyToken")
+            }
+
+            BufferedReader(
+                InputStreamReader(if (conn.responseCode > 299) conn.errorStream else conn.inputStream, "utf-8")
+            ).use { br ->
+                val response = StringBuilder()
+                var responseLine: String?
+                while (br.readLine().also { responseLine = it } != null) {
+                    response.append(responseLine!!.trim { it <= ' ' })
+                }
+                try {
+                    logDebug { response.toString() }
+                    return JSONObject(response.toString())
+                } catch (ej: JSONException) {
+                    logException(ej)
+                    return JSONObject().put("error", response.toString())
+                }
+            }
+        } catch (e: Exception) {
+            logException(e)
+            return JSONObject().put("error", e.message)
+        }
+    }
+
     protected fun makeRequest(
         path: String,
         params: Map<String, Any?>? = null,
@@ -125,7 +160,7 @@ open class Cryptr(
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
                 try {
-//                    logDebug { response.toString() }
+                    logDebug { response.toString() }
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
                     logException(ej)

@@ -110,6 +110,18 @@ class CryptrAPI(
     }
 
     /**
+     * Delete a given [Organization]
+     *
+     * @param organization The [Organization] to delete
+     *
+     * @return the deleted [Organization]
+     */
+    fun deleteOrganization(organization: Organization): APIResult<Organization, ErrorMessage> {
+        val resp = makeDeleteRequest(buildOrganizationPath(organization.domain), retrieveApiKeyToken())
+        return handleApiResponse(resp) as APIResult<Organization, ErrorMessage>
+    }
+
+    /**
      * List all [User] according to consumed API Key
      *
      * @param organizationDomain The organization domain where to look for users
@@ -151,6 +163,21 @@ class CryptrAPI(
         return handleApiResponse(resp) as APIResult<User, ErrorMessage>
     }
 
+
+    /**
+     * Delete a given [User]
+     *
+     * @param user The [User] to delete
+     *
+     * @return the deleted [User]
+     */
+    fun deleteUser(user: User): APIResult<User, ErrorMessage> {
+        val resp =
+            user.resourceDomain?.let { buildUserPath(it, user.id) }
+                ?.let { makeDeleteRequest(it, retrieveApiKeyToken()) }
+        return resp?.let { handleApiResponse(it) } as APIResult<User, ErrorMessage>
+    }
+
     /**
      * Applications
      */
@@ -174,6 +201,21 @@ class CryptrAPI(
         val resp = makeRequest(buildApplicationPath(organizationDomain), params, retrieveApiKeyToken())
         val appResponse = handleApiResponse(resp)
         return appResponse as APIResult<Application, ErrorMessage>
+    }
+
+
+    /**
+     * Delete a given [Application]
+     *
+     * @param application The [Application] to delete
+     *
+     * @return the deleted [Application]
+     */
+    fun deleteApplication(application: Application): APIResult<Application, ErrorMessage> {
+        val resp =
+            application.resourceDomain?.let { buildApplicationPath(it, application.id) }
+                ?.let { makeDeleteRequest(it, retrieveApiKeyToken()) }
+        return resp?.let { handleApiResponse(it) } as APIResult<Application, ErrorMessage>
     }
 
 }
