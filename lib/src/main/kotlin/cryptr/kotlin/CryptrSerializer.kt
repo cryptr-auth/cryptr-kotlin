@@ -1,6 +1,7 @@
 package cryptr.kotlin
 
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.connections.SsoConnection
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
@@ -29,7 +30,9 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
             "Organization" -> Organization.serializer()
             "Profile" -> Profile.serializer()
             "User" -> User.serializer()
-            else -> throw Exception("Error list serializer not found for $itemType")
+            "SsoConnection" -> SsoConnection.serializer()
+            "Redirection" -> Redirection.serializer()
+            else -> throw Exception("Error serializer not found for $itemType")
         }
     }
 }
