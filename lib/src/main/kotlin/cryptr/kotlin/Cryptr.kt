@@ -116,6 +116,8 @@ open class Cryptr(
             val url = URL(buildCryptrUrl(path))
             val conn = url.openConnection() as HttpURLConnection
 
+            logDebug { url.toString() }
+
             conn.doOutput = true
             conn.useCaches = false
             if (requestMethod !== null) {
@@ -129,6 +131,7 @@ open class Cryptr(
             if (params != null) {
                 val formData = mapToFormData(params)
                 conn.setRequestProperty("Content-Length", formData.length.toString())
+                logDebug { formData.toString() }
                 DataOutputStream(conn.outputStream).use { it.writeBytes(formData) }
             }
 

@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.connections.SsoConnection
 import cryptr.kotlin.models.deleted.DeletedUser
 import cryptr.kotlin.objects.Constants
 import kotlinx.serialization.decodeFromString
@@ -48,6 +49,14 @@ class CryptrAPI(
 
     private fun buildApplicationPath(organizationDomain: String, resourceId: String? = null): String {
         return buildOrganizationResourcePath(organizationDomain, Application.apiResourceName, resourceId)
+    }
+
+    private fun buildSSOConnectionPath(organizationDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(organizationDomain, "sso-connections", resourceId)
+    }
+
+    private fun buildAdminOnboardingUrl(organizationDomain: String, onboardingType: String): String {
+        return buildOrganizationResourcePath(organizationDomain, "admin-onboarding", onboardingType)
     }
 
     private fun handleApiResponse(response: JSONObject): APIResult<CryptrResource, ErrorMessage> {
@@ -257,6 +266,81 @@ class CryptrAPI(
             return null
 //            APIError(ErrorMessage(response.toString()))
         }
+    }
+
+    /** Creates a [SsoConnection]
+     *
+     */
+    fun createSSOConnection(
+        organizationDomain: String,
+        providerType: String? = null,
+        applicationId: String? = null,
+        ssoAdminEmail: String? = null,
+        sendEmail: Boolean? = true
+    ): APIResult<SsoConnection, ErrorMessage> {
+        val params = mapOf(
+            "provider_type" to providerType,
+            "application_id" to applicationId,
+            "sso_admin_email" to ssoAdminEmail,
+            "send_email" to sendEmail
+        )
+        val resp = makeRequest(
+            buildSSOConnectionPath(organizationDomain),
+            params,
+            retrieveApiKeyToken()
+        )
+        return handleApiResponse(resp) as APIResult<SsoConnection, ErrorMessage>
+    }
+
+    /**
+     * Creates AdminOnbording
+     */
+    fun createSSOAdminOnboarding(
+        organizationDomain: String,
+        ssoAdminEmail: String? = null,
+        providerType: String? = null,
+        emailTemplateId: String? = null,
+    ): APIResult<AdminOnboarding, ErrorMessage> {
+        val path = buildAdminOnboardingUrl(organizationDomain, "sso-connections")
+        val params = mapOf(
+            "it_admin_email" to ssoAdminEmail,
+            "provider_type" to providerType,
+            "email_template_id" to emailTemplateId
+        )
+        val resp = makeRequest(
+            path,
+            params,
+            retrieveApiKeyToken(),
+            "POST"
+        )
+        return handleApiResponse(resp) as APIResult<AdminOnboarding, ErrorMessage>
+    }
+
+
+    /** Invites Admin
+     *
+     */
+    fun inviteAdmin(ssoConnection: SsoConnection): APIResult<CryptrResource, ErrorMessage> {
+        val resp = makeRequest(
+            buildAdminOnboardingUrl(ssoConnection.resourceDomain.toString(), "sso-connections") + "/invite",
+            apiKeyToken = retrieveApiKeyToken(),
+            requestMethod = "POST"
+        )
+
+        return handleApiResponse(resp)
+    }
+
+    /** Reset SSO Connection Admin onboarding
+     *
+     */
+    fun resetSSOAdminOnboarding(ssoConnection: SsoConnection): APIResult<CryptrResource, ErrorMessage> {
+        val resp = makeRequest(
+            buildAdminOnboardingUrl(ssoConnection.resourceDomain.toString(), "sso-connections") + "/reset",
+            apiKeyToken = retrieveApiKeyToken(),
+            requestMethod = "PATCH"
+        )
+        return handleApiResponse(resp)
+
     }
 
 }

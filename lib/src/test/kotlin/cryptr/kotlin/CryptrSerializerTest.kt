@@ -3,6 +3,7 @@ package cryptr.kotlin
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.connections.SsoConnection
 import cryptr.kotlin.models.deleted.DeletedUser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -426,5 +427,94 @@ class CryptrSerializerTest {
         assertIs<DeletedUser>(decoded)
         assertIs<User>(decoded.resource)
         assertFalse(decoded.deleted)
+    }
+
+    @Test
+    fun serializeSSOConnection() {
+        val body = "{\n" +
+                "    \"__access__\": \"limited_to:factor\",\n" +
+                "    \"__domain__\": \"factor\",\n" +
+                "    \"__environment__\": \"production\",\n" +
+                "    \"__managed_by__\": \"shark-academy\",\n" +
+                "    \"__type__\": \"SsoConnection\",\n" +
+                "    \"active\": true,\n" +
+                "    \"default_redirection\": {\n" +
+                "        \"__access__\": \"all_organizations_of:shark-academy\",\n" +
+                "        \"__domain__\": \"shark-academy\",\n" +
+                "        \"__environment__\": \"sandbox\",\n" +
+                "        \"__managed_by__\": \"shark-academy\",\n" +
+                "        \"__type__\": \"Redirection\",\n" +
+                "        \"app_id\": \"863b0070-1a35-4261-91de-d27cc8c6b24a\",\n" +
+                "        \"app_tenant_owner_id\": \"b0b0cc57-4580-4fc3-a5db-4dacc70cfe21\",\n" +
+                "        \"id\": \"6b806720-5e6c-4498-a332-58e79e931832\",\n" +
+                "        \"idp_id\": null,\n" +
+                "        \"sp_id\": \"shark_academy_MgF6Z9maZKriEBbLM9KZJj\",\n" +
+                "        \"uri\": \"http://localhost:4000\"\n" +
+                "    },\n" +
+                "    \"id\": \"factor_qYyGSpFJihHb7jJLf3agVo\",\n" +
+                "    \"inserted_at\": \"2023-05-11T11:35:58\",\n" +
+                "    \"metadata\": null,\n" +
+                "    \"onboarding\": {\n" +
+                "        \"__access__\": \"all_organizations_of:shark-academy\",\n" +
+                "        \"__domain__\": \"shark-academy\",\n" +
+                "        \"__environment__\": \"production\",\n" +
+                "        \"__managed_by__\": \"shark-academy\",\n" +
+                "        \"__type__\": \"EnterpriseConnectionOnboarding\",\n" +
+                "        \"email_template_id\": null,\n" +
+                "        \"id\": \"a6216afe-53ef-4a8e-bd62-07f49c7c825f\",\n" +
+                "        \"inserted_at\": \"2023-05-11T11:35:58\",\n" +
+                "        \"provider_type\": null,\n" +
+                "        \"sso_admin_email\": \"thibaud@cryptr.co\",\n" +
+                "        \"state\": \"not_initialized\",\n" +
+                "        \"tutorial_step\": 0,\n" +
+                "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
+                "    },\n" +
+                "    \"provider_type\": \"unset\",\n" +
+                "    \"seats_limit\": null,\n" +
+                "    \"sp_id\": \"shark_academy_MgF6Z9maZKriEBbLM9KZJj\",\n" +
+                "    \"updated_at\": \"2023-05-11T11:35:58\",\n" +
+                "    \"user_security_type\": \"none\"\n" +
+                "}"
+
+        println(body)
+
+        val decoded = cryptrApi.format.decodeFromString<SsoConnection>(body)
+        println(decoded)
+        assertIs<SsoConnection>(decoded)
+    }
+
+    @Test
+    fun serializeSSOOnboarding() {
+        val body = "{\n" +
+                "        \"__access__\": \"all_organizations_of:shark-academy\",\n" +
+                "        \"__domain__\": \"shark-academy\",\n" +
+                "        \"__environment__\": \"production\",\n" +
+                "        \"__managed_by__\": \"shark-academy\",\n" +
+                "        \"__type__\": \"EnterpriseConnectionOnboarding\",\n" +
+                "        \"email_template_id\": null,\n" +
+                "        \"id\": \"a6216afe-53ef-4a8e-bd62-07f49c7c825f\",\n" +
+                "        \"inserted_at\": \"2023-05-11T11:35:58\",\n" +
+                "        \"provider_type\": null,\n" +
+                "        \"sso_admin_email\": \"thibaud@cryptr.co\",\n" +
+                "        \"state\": \"not_initialized\",\n" +
+                "        \"tutorial_step\": 0,\n" +
+                "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
+                "    }"
+
+        println(body)
+
+        val decoded = cryptrApi.format.decodeFromString<AdminOnboarding>(body)
+        println(decoded)
+        assertIs<AdminOnboarding>(decoded)
+    }
+
+    @Test
+    fun serializeOutput() {
+        val body =
+            "{\"__access__\":\"limited_to:factor\",\"__domain__\":\"factor\",\"__environment__\":\"production\",\"__managed_by__\":\"shark-academy\",\"__type__\":\"SsoConnection\",\"active\":true,\"default_redirection\":null,\"id\":\"factor_i8TQXJHEuMkFMoFaUCzxAA\",\"inserted_at\":\"2023-05-11T13:37:34\",\"metadata\":null,\"onboarding\":null,\"provider_type\":\"okta\",\"seats_limit\":null,\"sp_id\":\"shark_academy_MgF6Z9maZKriEBbLM9KZJj\",\"updated_at\":\"2023-05-11T13:37:34\",\"user_security_type\":\"none\"}"
+
+        val decoded = cryptrApi.format.decodeFromString<SsoConnection>(body)
+        print(decoded)
+        assertIs<SsoConnection>(decoded)
     }
 }
