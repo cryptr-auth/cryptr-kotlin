@@ -24,7 +24,7 @@ data class SsoConnection(
     @SerialName("users_provisioning_on_first_login") val usersProvisioningOnFirstLogin: Int? = null,
 
     @SerialName("updated_at") val updatedAt: String? = null,
-    @SerialName("insertedAt") val insertedAt: String? = null,
+    @SerialName("inserted_at") val insertedAt: String? = null,
 
     @SerialName("onboarding") val onboarding: AdminOnboarding?
 ) : CryptrResource()
