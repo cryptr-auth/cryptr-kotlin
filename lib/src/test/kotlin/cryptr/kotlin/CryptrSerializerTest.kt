@@ -476,10 +476,7 @@ class CryptrSerializerTest {
                 "    \"user_security_type\": \"none\"\n" +
                 "}"
 
-        println(body)
-
         val decoded = cryptrApi.format.decodeFromString<SsoConnection>(body)
-        println(decoded)
         assertIs<SsoConnection>(decoded)
     }
 
@@ -501,10 +498,7 @@ class CryptrSerializerTest {
                 "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
                 "    }"
 
-        println(body)
-
         val decoded = cryptrApi.format.decodeFromString<AdminOnboarding>(body)
-        println(decoded)
         assertIs<AdminOnboarding>(decoded)
     }
 
@@ -514,7 +508,6 @@ class CryptrSerializerTest {
             "{\"__access__\":\"limited_to:factor\",\"__domain__\":\"factor\",\"__environment__\":\"production\",\"__managed_by__\":\"shark-academy\",\"__type__\":\"SsoConnection\",\"active\":true,\"default_redirection\":null,\"id\":\"factor_i8TQXJHEuMkFMoFaUCzxAA\",\"inserted_at\":\"2023-05-11T13:37:34\",\"metadata\":null,\"onboarding\":null,\"provider_type\":\"okta\",\"seats_limit\":null,\"sp_id\":\"shark_academy_MgF6Z9maZKriEBbLM9KZJj\",\"updated_at\":\"2023-05-11T13:37:34\",\"user_security_type\":\"none\"}"
 
         val decoded = cryptrApi.format.decodeFromString<SsoConnection>(body)
-        print(decoded)
         assertIs<SsoConnection>(decoded)
     }
 }
