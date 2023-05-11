@@ -94,10 +94,23 @@ open class Cryptr(
             .orElse("")
     }
 
-    protected fun makeRequest(
+    protected fun makeDeleteRequest(path: String, apiKeyToken: String? = ""): JSONObject {
+        return makeRequest(path = path, apiKeyToken = apiKeyToken, requestMethod = "DELETE")
+    }
+
+    protected fun makeUpdateRequest(
         path: String,
         params: Map<String, Any?>? = null,
         apiKeyToken: String? = ""
+    ): JSONObject {
+        return makeRequest(path, params, apiKeyToken, "PUT")
+    }
+
+    protected fun makeRequest(
+        path: String,
+        params: Map<String, Any?>? = null,
+        apiKeyToken: String? = "",
+        requestMethod: String? = null
     ): JSONObject {
         try {
             val url = URL(buildCryptrUrl(path))
@@ -105,6 +118,9 @@ open class Cryptr(
 
             conn.doOutput = true
             conn.useCaches = false
+            if (requestMethod !== null) {
+                conn.requestMethod = requestMethod
+            }
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
             conn.setRequestProperty("Accept", "application/json")
             if (apiKeyToken !== "" && apiKeyToken !== null) {
@@ -125,7 +141,7 @@ open class Cryptr(
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
                 try {
-//                    logDebug { response.toString() }
+                    if (!url.toString().contains("token")) logDebug { response.toString() }
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
                     logException(ej)

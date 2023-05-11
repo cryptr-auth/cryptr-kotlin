@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.deleted.DeletedUser
 import cryptr.kotlin.objects.Constants
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -110,6 +111,18 @@ class CryptrAPI(
     }
 
     /**
+     * Delete a given [Organization]
+     *
+     * @param organization The [Organization] to delete
+     *
+     * @return the deleted [Organization]
+     */
+    fun deleteOrganization(organization: Organization): APIResult<Organization, ErrorMessage> {
+        val resp = makeDeleteRequest(buildOrganizationPath(organization.domain), retrieveApiKeyToken())
+        return handleApiResponse(resp) as APIResult<Organization, ErrorMessage>
+    }
+
+    /**
      * List all [User] according to consumed API Key
      *
      * @param organizationDomain The organization domain where to look for users
@@ -152,7 +165,49 @@ class CryptrAPI(
     }
 
     /**
-     * Applications
+     * Updates the given [User]
+     *
+     * @param userToUpdate The [User] to update
+     *
+     * @return updated [User]
+     */
+
+    fun updateUser(userToUpdate: User): APIResult<User, ErrorMessage> {
+        val params = JSONObject(format.encodeToString(userToUpdate)).toMap()
+        val response = makeUpdateRequest(
+            buildUserPath(userToUpdate.resourceDomain.toString(), userToUpdate.id),
+            params,
+            retrieveApiKeyToken()
+        )
+        return handleApiResponse(response) as APIResult<User, ErrorMessage>
+    }
+
+
+    /**
+     * Delete a given [User]
+     *
+     * @param user The [User] to delete
+     *
+     * @return the deleted [User]
+     */
+    fun deleteUser(user: User): DeletedUser? {
+        val response = makeDeleteRequest(buildUserPath(user.resourceDomain.toString(), user.id), retrieveApiKeyToken())
+        return try {
+            format.decodeFromString<DeletedUser>(response.toString())
+        } catch (e: Exception) {
+            println("handle APiResponse error")
+            logException(e)
+            return null
+//            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * List Organization [Application]s
+     *
+     * @param organizationDomain Organization's domain
+     *
+     * @return [APIResult] the response
      */
     fun listApplications(organizationDomain: String): APIResult<Listing<Application>, ErrorMessage> {
         val path = buildApplicationPath(organizationDomain)
@@ -166,6 +221,11 @@ class CryptrAPI(
         return handleApiResponse(resp) as APIResult<Application, ErrorMessage>
     }
 
+    /**
+     * Creates an [Application] on your Cryptr service for [Organization provided]
+     *
+     * @param
+     */
     fun createApplication(
         organizationDomain: String,
         application: Application
@@ -174,6 +234,29 @@ class CryptrAPI(
         val resp = makeRequest(buildApplicationPath(organizationDomain), params, retrieveApiKeyToken())
         val appResponse = handleApiResponse(resp)
         return appResponse as APIResult<Application, ErrorMessage>
+    }
+
+
+    /**
+     * Delete a given [Application]
+     *
+     * @param application The [Application] to delete
+     *
+     * @return the deleted [Application]
+     */
+    fun deleteApplication(application: Application): Application? {
+        val response = makeDeleteRequest(
+            buildApplicationPath(application.resourceDomain.toString(), application.id),
+            retrieveApiKeyToken()
+        )
+        return try {
+            format.decodeFromString<Application>(response.toString())
+        } catch (e: Exception) {
+            println("handle APiResponse error")
+            logException(e)
+            return null
+//            APIError(ErrorMessage(response.toString()))
+        }
     }
 
 }
