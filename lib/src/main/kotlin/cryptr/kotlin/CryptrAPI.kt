@@ -164,6 +164,24 @@ class CryptrAPI(
         return handleApiResponse(resp) as APIResult<User, ErrorMessage>
     }
 
+    /**
+     * Updates the given [User]
+     *
+     * @param userToUpdate The [User] to update
+     *
+     * @return updated [User]
+     */
+
+    fun updateUser(userToUpdate: User): APIResult<User, ErrorMessage> {
+        val params = JSONObject(format.encodeToString(userToUpdate)).toMap()
+        val response = makeUpdateRequest(
+            buildUserPath(userToUpdate.resourceDomain.toString(), userToUpdate.id),
+            params,
+            retrieveApiKeyToken()
+        )
+        return handleApiResponse(response) as APIResult<User, ErrorMessage>
+    }
+
 
     /**
      * Delete a given [User]

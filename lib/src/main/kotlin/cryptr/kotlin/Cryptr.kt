@@ -95,44 +95,22 @@ open class Cryptr(
     }
 
     protected fun makeDeleteRequest(path: String, apiKeyToken: String? = ""): JSONObject {
-        try {
-            val url = URL(buildCryptrUrl(path))
-            val conn = url.openConnection() as HttpURLConnection
+        return makeRequest(path = path, apiKeyToken = apiKeyToken, requestMethod = "DELETE")
+    }
 
-            conn.doOutput = true
-            conn.useCaches = false
-            conn.requestMethod = "DELETE"
-            conn.setRequestProperty("Accept", "application/json")
-            if (apiKeyToken != "" && apiKeyToken !== null) {
-                conn.setRequestProperty("Authorization", "Bearer $apiKeyToken")
-            }
-
-            BufferedReader(
-                InputStreamReader(if (conn.responseCode > 299) conn.errorStream else conn.inputStream, "utf-8")
-            ).use { br ->
-                val response = StringBuilder()
-                var responseLine: String?
-                while (br.readLine().also { responseLine = it } != null) {
-                    response.append(responseLine!!.trim { it <= ' ' })
-                }
-                try {
-                    logDebug { response.toString() }
-                    return JSONObject(response.toString())
-                } catch (ej: JSONException) {
-                    logException(ej)
-                    return JSONObject().put("error", response.toString())
-                }
-            }
-        } catch (e: Exception) {
-            logException(e)
-            return JSONObject().put("error", e.message)
-        }
+    protected fun makeUpdateRequest(
+        path: String,
+        params: Map<String, Any?>? = null,
+        apiKeyToken: String? = ""
+    ): JSONObject {
+        return makeRequest(path, params, apiKeyToken, "PUT")
     }
 
     protected fun makeRequest(
         path: String,
         params: Map<String, Any?>? = null,
-        apiKeyToken: String? = ""
+        apiKeyToken: String? = "",
+        requestMethod: String? = null
     ): JSONObject {
         try {
             val url = URL(buildCryptrUrl(path))
@@ -140,6 +118,9 @@ open class Cryptr(
 
             conn.doOutput = true
             conn.useCaches = false
+            if (requestMethod !== null) {
+                conn.requestMethod = requestMethod
+            }
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
             conn.setRequestProperty("Accept", "application/json")
             if (apiKeyToken !== "" && apiKeyToken !== null) {
@@ -160,7 +141,7 @@ open class Cryptr(
                     response.append(responseLine!!.trim { it <= ' ' })
                 }
                 try {
-                    logDebug { response.toString() }
+                    if (!url.toString().contains("token")) logDebug { response.toString() }
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
                     logException(ej)
