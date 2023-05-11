@@ -18,5 +18,5 @@ data class AdminOnboarding(
     @SerialName("sso_admin_email") val ssoAdminEmail: String,
     @SerialName("onboarding_type") val onboardingType: String = "sso-connection",
     @SerialName("updated_at") val updatedAt: String? = null,
-    @SerialName("insertedAt") val insertedAt: String? = null,
+    @SerialName("inserted_at") val insertedAt: String? = null,
 ) : CryptrResource()
