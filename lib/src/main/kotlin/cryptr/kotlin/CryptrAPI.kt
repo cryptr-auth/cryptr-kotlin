@@ -203,7 +203,11 @@ class CryptrAPI(
     }
 
     /**
-     * Applications
+     * List Organization [Application]s
+     *
+     * @param organizationDomain Organization's domain
+     *
+     * @return [APIResult] the response
      */
     fun listApplications(organizationDomain: String): APIResult<Listing<Application>, ErrorMessage> {
         val path = buildApplicationPath(organizationDomain)
@@ -217,6 +221,11 @@ class CryptrAPI(
         return handleApiResponse(resp) as APIResult<Application, ErrorMessage>
     }
 
+    /**
+     * Creates an [Application] on your Cryptr service for [Organization provided]
+     *
+     * @param
+     */
     fun createApplication(
         organizationDomain: String,
         application: Application
