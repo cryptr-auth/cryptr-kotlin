@@ -33,9 +33,6 @@ class CryptrTest {
         cryptr = Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
     }
 
-    @Test
-    fun makeRequest() {
-    }
 
     @Test
     fun retrievedApiKeyTokenWithStoreTokenShouldReturnsIt() {

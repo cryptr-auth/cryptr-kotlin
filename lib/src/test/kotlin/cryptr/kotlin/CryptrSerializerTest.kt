@@ -13,7 +13,7 @@ import org.junit.jupiter.api.Test
 import kotlin.test.*
 
 class CryptrSerializerTest {
-    lateinit var cryptrApi: CryptrAPI
+    lateinit var cryptr: Cryptr
     lateinit var format: Json
 
     @BeforeEach
@@ -23,8 +23,8 @@ class CryptrSerializerTest {
         val defaultRedirectUrl = "http://localhost:8080/callback"
         val apiKeyClientId = "my-api-key-client-id"
         val apiKeyClientSecret = "my-api-key-client-secret"
-        cryptrApi = CryptrAPI(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
-        format = cryptrApi.format
+        cryptr = Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
+        format = cryptr.format
         System.setProperty("CRYPTR_API_KEY_TOKEN", "stored-api-key")
     }
 
@@ -325,7 +325,7 @@ class CryptrSerializerTest {
                 "    \"email\": \"hamid@cryptr.co\"\n" +
                 "  }\n" +
                 "}"
-        val decoded = cryptrApi.format.decodeFromString<DeletedUser>(body)
+        val decoded = cryptr.format.decodeFromString<DeletedUser>(body)
         assertIs<DeletedUser>(decoded)
         assertIs<User>(decoded.resource)
         assertTrue(decoded.deleted)
@@ -423,7 +423,7 @@ class CryptrSerializerTest {
                 "    \"email\": \"hamid@cryptr.co\"\n" +
                 "  }\n" +
                 "}"
-        val decoded = cryptrApi.format.decodeFromString<DeletedUser>(body)
+        val decoded = cryptr.format.decodeFromString<DeletedUser>(body)
         assertIs<DeletedUser>(decoded)
         assertIs<User>(decoded.resource)
         assertFalse(decoded.deleted)
@@ -476,7 +476,7 @@ class CryptrSerializerTest {
                 "    \"user_security_type\": \"none\"\n" +
                 "}"
 
-        val decoded = cryptrApi.format.decodeFromString<SsoConnection>(body)
+        val decoded = cryptr.format.decodeFromString<SsoConnection>(body)
         assertIs<SsoConnection>(decoded)
     }
 
@@ -498,7 +498,7 @@ class CryptrSerializerTest {
                 "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
                 "    }"
 
-        val decoded = cryptrApi.format.decodeFromString<AdminOnboarding>(body)
+        val decoded = cryptr.format.decodeFromString<AdminOnboarding>(body)
         assertIs<AdminOnboarding>(decoded)
     }
 
@@ -507,7 +507,7 @@ class CryptrSerializerTest {
         val body =
             "{\"__access__\":\"limited_to:factor\",\"__domain__\":\"factor\",\"__environment__\":\"production\",\"__managed_by__\":\"shark-academy\",\"__type__\":\"SsoConnection\",\"active\":true,\"default_redirection\":null,\"id\":\"factor_i8TQXJHEuMkFMoFaUCzxAA\",\"inserted_at\":\"2023-05-11T13:37:34\",\"metadata\":null,\"onboarding\":null,\"provider_type\":\"okta\",\"seats_limit\":null,\"sp_id\":\"shark_academy_MgF6Z9maZKriEBbLM9KZJj\",\"updated_at\":\"2023-05-11T13:37:34\",\"user_security_type\":\"none\"}"
 
-        val decoded = cryptrApi.format.decodeFromString<SsoConnection>(body)
+        val decoded = cryptr.format.decodeFromString<SsoConnection>(body)
         assertIs<SsoConnection>(decoded)
     }
 }
