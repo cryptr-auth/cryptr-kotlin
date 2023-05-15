@@ -17,6 +17,7 @@ plugins {
     kotlin("plugin.serialization") version "1.8.10"
     id("org.jetbrains.kotlinx.kover") version "0.7.0-Beta"
 
+    signing
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
     `maven-publish`
@@ -85,9 +86,40 @@ tasks.named<Test>("test") {
 }
 
 publishing {
+    repositories {
+        maven {
+            
+        }
+    }
     publications {
         create<MavenPublication>("Cryptr") {
             from(components["java"])
+        }
+        create<MavenPublication>("maven") {
+            artifactId = "cryptr-kotlin"
+            from(components["java"])
+
+            pom {
+                name.set("Cryptr SDK")
+                description.set("Th Cryptr Kotlin SDK allows you to acces Cryptr API and services in JVM languages")
+                licenses {
+                    license {
+                        name.set("MIT License")
+                    }
+                }
+                developers {
+                    developer {
+                        id.set("tuxtux59")
+                        name.set("Thibaud RENAUX")
+                        email.set("thibaud@cryptr.co")
+                    }
+                    developer {
+                        id.set("cryptrTeam")
+                        name.set("Cryptr Team")
+                        email.set("support@cryptr.co")
+                    }
+                }
+            }
         }
     }
 }
