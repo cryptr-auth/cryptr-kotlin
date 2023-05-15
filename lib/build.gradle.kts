@@ -95,7 +95,11 @@ publishing {
 koverReport {
     filters {
         excludes {
-            classes("cryptr.kotlin.objects.Constants", "cryptr.kotlin.enums.*")
+            classes(
+                "cryptr.kotlin.objects.Constants",
+                "cryptr.kotlin.enums.*",
+                "cryptr.kotlin.interfaces.*",
+            )
         }
     }
 }

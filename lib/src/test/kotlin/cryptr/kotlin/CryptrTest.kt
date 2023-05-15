@@ -3,10 +3,7 @@ package cryptr.kotlin
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ApplicationType
-import cryptr.kotlin.models.Address
-import cryptr.kotlin.models.Application
-import cryptr.kotlin.models.Profile
-import cryptr.kotlin.models.User
+import cryptr.kotlin.models.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.json.JSONObject
@@ -18,10 +15,6 @@ import kotlin.test.assertEquals
 @WireMockTest(proxyMode = true)
 class CryptrTest {
     lateinit var cryptr: Cryptr
-
-    companion object {
-
-    }
 
     @BeforeEach
     fun init() {
@@ -35,15 +28,16 @@ class CryptrTest {
 
 
     @Test
-    fun retrievedApiKeyTokenWithStoreTokenShouldReturnsIt() {
+    fun retrieveApiKeyTokenWithStoreTokenShouldReturnsIt() {
         System.setProperty("CRYPTR_API_KEY_TOKEN", "stored-api-key")
 
         assertEquals("stored-api-key", cryptr.retrieveApiKeyToken())
     }
 
     @Test
-    fun retrievedApiKeyTokenWithPreviousFetchedTokenShouldReturnsIt() {
-        System.setProperty("CRYPTR_API_KEY_TOKEN", "previous-fetched-api-key")
+    fun retrieveApiKeyTokenWithPreviousFetchedTokenShouldReturnsIt() {
+        System.clearProperty("CRYPTR_API_KEY_TOKEN")
+        System.setProperty("CRYPTR_CURRENT_API_TOKEN", "previous-fetched-api-key")
 
         assertEquals("previous-fetched-api-key", cryptr.retrieveApiKeyToken())
     }
@@ -51,6 +45,7 @@ class CryptrTest {
     @Test
     fun retrieveApiKeyTokenWithoutSystemShouldRequestEndpoint() {
         System.clearProperty("CRYPTR_API_KEY_TOKEN")
+        System.clearProperty("CRYPTR_CURRENT_API_TOKEN")
         stubFor(
             post("/api/v2/oauth/token")
                 .withHost(equalTo("dev.cryptr.eu"))
@@ -60,29 +55,6 @@ class CryptrTest {
         assertEquals("some-jwt-token", cryptr.retrieveApiKeyToken())
     }
 
-    @Test
-    fun getTenantDomain() {
-    }
-
-    @Test
-    fun getBaseUrl() {
-    }
-
-    @Test
-    fun getDefaultRedirectUrl() {
-    }
-
-    @Test
-    fun getApiKeyClientId() {
-    }
-
-    @Test
-    fun getApiKeyClientSecret() {
-    }
-
-    @Test
-    fun getLogger() {
-    }
 
     @Test
     fun mapToFormDataShouldProperlyEncodeApplication() {
@@ -121,5 +93,25 @@ class CryptrTest {
         assertContains(formData, "profile[given_name]=John")
         assertContains(formData, "profile[family_name]=Doe")
         assertContains(formData, "address[locality]=Lille")
+    }
+
+    @Test
+    fun toJSONStringShouldSerializeSuccess() {
+        val resource = Organization(domain = "my-domain", name = "my Domain")
+        val apiSuccess = APISuccess<CryptrResource, ErrorMessage>(resource)
+        val jsonString = cryptr.toJSONString(apiSuccess)
+        assertEquals(
+            "{\"__type__\":\"Organization\",\"domain\":\"my-domain\"," +
+                    "\"updated_at\":null,\"name\":\"my Domain\",\"inserted_at\":null,\"environments\":[]}",
+            jsonString
+        )
+    }
+
+    @Test
+    fun toJSONStringShouldSerializeError() {
+        val error = ErrorMessage(message = "something went wrong")
+        val apiError = APIError<CryptrResource, ErrorMessage>(error)
+        val jsonString = cryptr.toJSONString(apiError)
+        assertEquals("{\"message\":\"something went wrong\"}", jsonString)
     }
 }
