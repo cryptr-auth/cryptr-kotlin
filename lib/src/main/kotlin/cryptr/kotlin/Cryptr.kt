@@ -192,8 +192,9 @@ class Cryptr(
      * List all [Organization] records according toused API Key
      */
 
-    fun listOrganizations(): APIResult<List<Organization>, ErrorMessage> {
-        val response = makeRequest(buildOrganizationPath(), baseUrl, apiKeyToken = retrieveApiKeyToken())
+    fun listOrganizations(perPage: Int? = 10, currentPage: Int? = 1): APIResult<List<Organization>, ErrorMessage> {
+        val response =
+            makeListRequest(buildOrganizationPath(), baseUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
         return try {
             println(response.toString())
             APISuccess(format.decodeFromString<List<Organization>>(response.toString()))
@@ -269,9 +270,19 @@ class Cryptr(
      * @param organizationDomain The organization domain where to look for users
      * @return [List] with [User]
      */
-    fun listUsers(organizationDomain: String): APIResult<List<User>, ErrorMessage> {
+    fun listUsers(
+        organizationDomain: String,
+        perPage: Int? = 10,
+        currentPage: Int? = 1
+    ): APIResult<List<User>, ErrorMessage> {
         val response =
-            makeRequest(buildUserPath(organizationDomain), baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
+            makeListRequest(
+                buildUserPath(organizationDomain),
+                baseUrl = baseUrl,
+                apiKeyToken = retrieveApiKeyToken(),
+                perPage,
+                currentPage
+            )
         return try {
             APISuccess(format.decodeFromString<List<User>>(response.toString()))
         } catch (e: Exception) {
@@ -384,12 +395,19 @@ class Cryptr(
      *
      * @return [APIResult] the response
      */
-    fun listApplications(organizationDomain: String): APIResult<List<Application>, ErrorMessage> {
+    fun listApplications(
+        organizationDomain: String,
+        perPage: Int? = 10,
+        currentPage: Int? = 1
+    ): APIResult<List<Application>, ErrorMessage> {
         val path = buildApplicationPath(organizationDomain)
-        val response = makeRequest(path, baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
+        val response =
+            makeListRequest(path, baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
         return try {
             APISuccess(format.decodeFromString<List<Application>>(response.toString()))
         } catch (e: Exception) {
+            println(e.message)
+            println(e.stackTrace)
             logException(e)
             APIError(ErrorMessage(response.toString()))
         }

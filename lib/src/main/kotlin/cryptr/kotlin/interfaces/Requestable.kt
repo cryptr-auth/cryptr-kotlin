@@ -13,6 +13,33 @@ import java.net.URL
 interface Requestable : URLable, Loggable {
 
 
+    fun paginationQuery(
+        perPage: Int? = 10,
+        currentPage: Int? = 1
+    ): String {
+        val map = mutableMapOf("per_page" to perPage, "current_page" to currentPage)
+        map.filter { (k, v) -> v !== null && v > 0 }
+        return if (map.isEmpty()) "" else "?" + mapToFormData(map)
+    }
+
+    fun makeListRequest(
+        path: String,
+        baseUrl: String = System.getProperty(
+            CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+            Constants.DEFAULT_BASE_URL
+        ),
+        apiKeyToken: String? = "",
+        perPage: Int? = 10,
+        currentPage: Int? = 1,
+    ): JSONObject {
+        return makeRequest(
+            path = path + paginationQuery(perPage, currentPage),
+            baseUrl = baseUrl,
+            apiKeyToken = apiKeyToken,
+            requestMethod = "GET"
+        )
+    }
+
     fun makeDeleteRequest(
         path: String,
         baseUrl: String = System.getProperty(
