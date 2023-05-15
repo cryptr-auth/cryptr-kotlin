@@ -1,5 +1,9 @@
 package cryptr.kotlin.interfaces
 
+import cryptr.kotlin.models.Application
+import cryptr.kotlin.models.Organization
+import cryptr.kotlin.models.User
+import cryptr.kotlin.objects.Constants
 import java.net.URLEncoder
 
 interface URLable {
@@ -34,5 +38,40 @@ interface URLable {
             .reduce { p1, p2 -> "$p1&$p2" }
             .map { s -> s }
             .orElse("")
+    }
+
+    fun buildApiPath(resourceName: String, resourceId: String? = null): String {
+        val baseApiPath = Constants.API_BASE_BATH + "/" + Constants.API_VERSION + "/" + resourceName
+        return if (resourceId != null && resourceId.length > 0) "$baseApiPath/$resourceId" else baseApiPath
+    }
+
+    fun buildOrganizationPath(resourceId: String? = null): String {
+        return buildApiPath(Organization.apiResourceName, resourceId)
+    }
+
+    fun buildOrganizationResourcePath(
+        organizationDomain: String,
+        resourceName: String,
+        resourceId: String?
+    ): String {
+        val baseApiOrgResourcePath =
+            Constants.API_BASE_BATH + "/" + Constants.API_VERSION + "/org/" + organizationDomain + "/" + resourceName
+        return if (resourceId !== null && resourceId.isNotEmpty()) "$baseApiOrgResourcePath/$resourceId" else baseApiOrgResourcePath
+    }
+
+    fun buildUserPath(organizationDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(organizationDomain, User.apiResourceName, resourceId)
+    }
+
+    fun buildApplicationPath(organizationDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(organizationDomain, Application.apiResourceName, resourceId)
+    }
+
+    fun buildSSOConnectionPath(organizationDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(organizationDomain, "sso-connections", resourceId)
+    }
+
+    fun buildAdminOnboardingUrl(organizationDomain: String, onboardingType: String): String {
+        return buildOrganizationResourcePath(organizationDomain, "admin-onboarding", onboardingType)
     }
 }
