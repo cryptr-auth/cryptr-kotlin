@@ -18,7 +18,7 @@ interface Requestable : URLable, Loggable {
         currentPage: Int? = 1
     ): String {
         val map = mutableMapOf("per_page" to perPage, "current_page" to currentPage)
-        map.filter { (k, v) -> v !== null && v > 0 }
+        map.filter { (_, v) -> v !== null && v > 0 }
         return if (map.isEmpty()) "" else "?" + mapToFormData(map)
     }
 

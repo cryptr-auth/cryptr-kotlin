@@ -12,4 +12,4 @@ plugins {
 }
 
 rootProject.name = "cryptr-kotlin"
-include("lib")
+// include("lib")
