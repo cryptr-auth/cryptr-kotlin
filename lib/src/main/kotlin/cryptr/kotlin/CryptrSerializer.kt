@@ -1,6 +1,7 @@
 package cryptr.kotlin
 
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.List
 import cryptr.kotlin.models.connections.SsoConnection
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
@@ -17,7 +18,7 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
         if (jsonObjElement.has("data") && jsonObjElement.optJSONArray("data") !== null) {
             val itemType = jsonObjElement.getJSONArray("data").getJSONObject(0).optString("__type__")
             val listSerializerType = listItemSerializer(itemType)
-            return Listing.serializer(listSerializerType)
+            return List.serializer(listSerializerType)
         }
 
         return listItemSerializer(rootType)

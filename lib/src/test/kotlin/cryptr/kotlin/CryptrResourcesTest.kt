@@ -5,6 +5,7 @@ import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.List
 import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedUser
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -369,7 +370,7 @@ class CryptrResourcesTest {
         assertNotNull(userListingResponse)
         if (userListingResponse is APISuccess) {
             val userListing = userListingResponse.value
-            assertIs<Listing<User>>(userListing)
+            assertIs<List<User>>(userListing)
             assertEquals(10, userListing.total)
             assertEquals(2, userListing.data.size)
             assertContains(userListing.data.map { u -> u.email }, "omvold7jx62g@acme-company.io")
@@ -488,7 +489,7 @@ class CryptrResourcesTest {
             assertNull(user.phoneNumber)
             assertNull(user.profile?.picture)
             assertNull(user.profile?.website)
-            assertNull(user.profile?.zoneinfo)
+            assertNull(user.profile?.zoneInfo)
         }
     }
 

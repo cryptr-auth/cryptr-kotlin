@@ -17,7 +17,7 @@ data class Profile(
     val picture: String? = null,
     @SerialName("preferred_username") val preferredUsername: String? = null,
     val website: String? = null,
-    val zoneinfo: String? = null
+    @SerialName("zoneinfo") val zoneInfo: String? = null
 ) : CryptrResource() {
     companion object {
         const val apiResouceName: String = "profile"

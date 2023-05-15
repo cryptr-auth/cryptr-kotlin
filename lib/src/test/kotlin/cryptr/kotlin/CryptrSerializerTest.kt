@@ -3,6 +3,7 @@ package cryptr.kotlin
 import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.List
 import cryptr.kotlin.models.connections.SsoConnection
 import cryptr.kotlin.models.deleted.DeletedUser
 import kotlinx.serialization.decodeFromString
@@ -108,7 +109,7 @@ class CryptrSerializerTest {
         assertNull(user.phoneNumber)
         assertNull(user.profile?.picture)
         assertNull(user.profile?.website)
-        assertNull(user.profile?.zoneinfo)
+        assertNull(user.profile?.zoneInfo)
 
         assertEquals(
             JSONObject(userJsonString).keySet().sorted(),
@@ -221,16 +222,16 @@ class CryptrSerializerTest {
                 "    \"total\": 23\n" +
                 "}"
 
-        val listing = format.decodeFromString<Listing<CryptrResource>>(listingJsonString)
+        val list = format.decodeFromString<List<CryptrResource>>(listingJsonString)
 
-        assertEquals(23, listing.total)
-        assertEquals(1, listing.pagination.currentPage)
-        assertEquals(2, listing.pagination.nextPage)
-        assertEquals(2, listing.pagination.perPage)
-        assertNull(listing.pagination.prevPage)
-        assertEquals(12, listing.pagination.totalPages)
-        assertEquals(2, listing.data.size)
-        assertNull(listing.resourceDomain)
+        assertEquals(23, list.total)
+        assertEquals(1, list.pagination.currentPage)
+        assertEquals(2, list.pagination.nextPage)
+        assertEquals(2, list.pagination.perPage)
+        assertNull(list.pagination.prevPage)
+        assertEquals(12, list.pagination.totalPages)
+        assertEquals(2, list.data.size)
+        assertNull(list.resourceDomain)
     }
 
     @Test

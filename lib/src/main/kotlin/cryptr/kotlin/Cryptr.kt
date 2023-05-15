@@ -6,6 +6,7 @@ import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.interfaces.Requestable
 import cryptr.kotlin.models.*
+import cryptr.kotlin.models.List
 import cryptr.kotlin.models.connections.SsoConnection
 import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedOrganization
@@ -17,6 +18,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.json.JSONArray
 import org.json.JSONObject
 
 /**
@@ -28,7 +30,7 @@ import org.json.JSONObject
  * @param apiKeyClientId The ID of your API KEY
  * @param apiKeyClientSecret The secret of your API KEY
  */
-open class Cryptr(
+class Cryptr(
     protected val tenantDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_TENANT_DOMAIN.toString()),
     protected val baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
     protected val defaultRedirectUrl: String = System.getProperty(
@@ -149,8 +151,8 @@ open class Cryptr(
                 "redirect_uri" to redirectUri,
                 "org_domain" to orgDomain
             ) else mapOf("redirect_uri" to redirectUri, "user_email" to userEmail)
-            val resp = makeRequest(path, baseUrl = baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
-            return format.decodeFromString<SSOChallenge>(resp.toString())
+            val response = makeRequest(path, baseUrl = baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+            return format.decodeFromString<SSOChallenge>(response.toString())
         } else {
             throw Exception("requires either orgDomain or endUser value")
         }
@@ -162,7 +164,7 @@ open class Cryptr(
      * @param code the query param received on your callbakc endpoint(redirectUri from create challentge fun)
      * @return JSONObject containing end-user session JWTs
      */
-    fun consumeSSOSamlChallengeCallback(code: String? = ""): JSONObject? {
+    fun consumeSSOSamlChallengeCallback(code: String? = ""): JSONObject {
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
             return makeRequest("oauth/token", baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
@@ -176,23 +178,29 @@ open class Cryptr(
      */
 
 
-    private fun handleApiResponse(response: JSONObject): APIResult<CryptrResource, ErrorMessage> {
-        return try {
-            APISuccess(format.decodeFromString(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
+//    private fun handleApiResponse(response: JSONObject): APIResult<CryptrResource, ErrorMessage> {
+//        return try {
+//            APISuccess(format.decodeFromString(response.toString()))
+//        } catch (e: Exception) {
+//            logException(e)
+//            APIError(ErrorMessage(response.toString()))
+//        }
+//    }
 
 
     /**
      * List all [Organization] records according toused API Key
      */
 
-    fun listOrganizations(): APIResult<Listing<Organization>, ErrorMessage> {
-        val resp = makeRequest(buildOrganizationPath(), baseUrl, apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp) as APIResult<Listing<Organization>, ErrorMessage>
+    fun listOrganizations(): APIResult<List<Organization>, ErrorMessage> {
+        val response = makeRequest(buildOrganizationPath(), baseUrl, apiKeyToken = retrieveApiKeyToken())
+        return try {
+            println(response.toString())
+            APISuccess(format.decodeFromString<List<Organization>>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /**
@@ -203,8 +211,14 @@ open class Cryptr(
      * @return the requested [Organization]
      */
     fun getOrganization(domain: String): APIResult<Organization, ErrorMessage> {
-        val resp = makeRequest(buildOrganizationPath(domain), baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp) as APIResult<Organization, ErrorMessage>
+        val response =
+            makeRequest(buildOrganizationPath(domain), baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Organization>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
 
@@ -217,8 +231,14 @@ open class Cryptr(
      */
     fun createOrganization(organization: Organization): APIResult<Organization, ErrorMessage> {
         val params = JSONObject(format.encodeToString(organization)).toMap()
-        val resp = makeRequest(buildOrganizationPath(), baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp) as APIResult<Organization, ErrorMessage>
+        val response =
+            makeRequest(buildOrganizationPath(), baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Organization>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /**
@@ -247,12 +267,17 @@ open class Cryptr(
      * List all [User] according to consumed API Key
      *
      * @param organizationDomain The organization domain where to look for users
-     * @return [Listing] with [User]
+     * @return [List] with [User]
      */
-    fun listUsers(organizationDomain: String): APIResult<Listing<User>, ErrorMessage> {
-        val resp =
+    fun listUsers(organizationDomain: String): APIResult<List<User>, ErrorMessage> {
+        val response =
             makeRequest(buildUserPath(organizationDomain), baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp) as APIResult<Listing<User>, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<List<User>>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
 
@@ -264,12 +289,17 @@ open class Cryptr(
      * @return The requested [User]
      */
     fun getUser(organizationDomain: String, userId: String): APIResult<User, ErrorMessage> {
-        val resp = makeRequest(
+        val response = makeRequest(
             buildUserPath(organizationDomain, userId),
             baseUrl = baseUrl,
             apiKeyToken = retrieveApiKeyToken()
         )
-        return handleApiResponse(resp) as APIResult<User, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<User>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /**
@@ -286,13 +316,18 @@ open class Cryptr(
 
     fun createUser(organizationDomain: String, user: User): APIResult<User, ErrorMessage> {
         val params = JSONObject(format.encodeToString(user)).toMap()
-        val resp = makeRequest(
+        val response = makeRequest(
             buildUserPath(organizationDomain),
             baseUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken()
         )
-        return handleApiResponse(resp) as APIResult<User, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<User>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /**
@@ -311,7 +346,12 @@ open class Cryptr(
             params = params,
             apiKeyToken = retrieveApiKeyToken()
         )
-        return handleApiResponse(response) as APIResult<User, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<User>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
 
@@ -344,20 +384,30 @@ open class Cryptr(
      *
      * @return [APIResult] the response
      */
-    fun listApplications(organizationDomain: String): APIResult<Listing<Application>, ErrorMessage> {
+    fun listApplications(organizationDomain: String): APIResult<List<Application>, ErrorMessage> {
         val path = buildApplicationPath(organizationDomain)
-        val resp = makeRequest(path, baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
-        return handleApiResponse(resp) as APIResult<Listing<Application>, ErrorMessage>
+        val response = makeRequest(path, baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<List<Application>>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     fun getApplication(organizationDomain: String, applicationId: String): APIResult<Application, ErrorMessage> {
-        val resp =
+        val response =
             makeRequest(
                 buildApplicationPath(organizationDomain, applicationId),
                 baseUrl = baseUrl,
                 apiKeyToken = retrieveApiKeyToken()
             )
-        return handleApiResponse(resp) as APIResult<Application, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<Application>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /**
@@ -370,15 +420,19 @@ open class Cryptr(
         application: Application
     ): APIResult<Application, ErrorMessage> {
         val params = JSONObject(format.encodeToString(application)).toMap()
-        val resp =
+        val response =
             makeRequest(
                 buildApplicationPath(organizationDomain),
                 baseUrl = baseUrl,
                 params = params,
                 apiKeyToken = retrieveApiKeyToken()
             )
-        val appResponse = handleApiResponse(resp)
-        return appResponse as APIResult<Application, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<Application>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
 
@@ -421,13 +475,18 @@ open class Cryptr(
             "sso_admin_email" to ssoAdminEmail,
             "send_email" to sendEmail
         )
-        val resp = makeRequest(
+        val response = makeRequest(
             buildSSOConnectionPath(organizationDomain),
             baseUrl = baseUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken()
         )
-        return handleApiResponse(resp) as APIResult<SsoConnection, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<SsoConnection>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /**
@@ -445,14 +504,19 @@ open class Cryptr(
             "provider_type" to providerType,
             "email_template_id" to emailTemplateId
         )
-        val resp = makeRequest(
+        val response = makeRequest(
             path,
             baseUrl = baseUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken(),
             requestMethod = "POST"
         )
-        return handleApiResponse(resp) as APIResult<AdminOnboarding, ErrorMessage>
+        return try {
+            APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
 
@@ -460,27 +524,37 @@ open class Cryptr(
      *
      */
     fun inviteAdmin(ssoConnection: SsoConnection): APIResult<CryptrResource, ErrorMessage> {
-        val resp = makeRequest(
+        val response = makeRequest(
             buildAdminOnboardingUrl(ssoConnection.resourceDomain.toString(), "sso-connections") + "/invite",
             baseUrl = baseUrl,
             apiKeyToken = retrieveApiKeyToken(),
             requestMethod = "POST"
         )
 
-        return handleApiResponse(resp)
+        return try {
+            APISuccess(format.decodeFromString<CryptrResource>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
     }
 
     /** Reset SSO Connection Admin onboarding
      *
      */
     fun resetSSOAdminOnboarding(ssoConnection: SsoConnection): APIResult<CryptrResource, ErrorMessage> {
-        val resp = makeRequest(
+        val response = makeRequest(
             buildAdminOnboardingUrl(ssoConnection.resourceDomain.toString(), "sso-connections") + "/reset",
             baseUrl = baseUrl,
             apiKeyToken = retrieveApiKeyToken(),
             requestMethod = "PATCH"
         )
-        return handleApiResponse(resp)
+        return try {
+            APISuccess(format.decodeFromString<CryptrResource>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
 
     }
 
@@ -488,9 +562,31 @@ open class Cryptr(
     /**
      * OTHER
      */
+    fun toJSONListString(result: APIResult<List<CryptrResource>, ErrorMessage>): String {
+        return try {
+            when (result) {
+                is APISuccess ->
+                    JSONObject()
+                        .put("total", result.value.total)
+                        .put(
+                            "data",
+                            JSONArray("[" + result.value.data.map { toJSONString(it) }.joinToString(",") + "]")
+                        )
+                        .put("pagination", JSONObject(format.encodeToString<Pagination>(result.value.pagination)))
+                        .toString()
+
+                is APIError ->
+                    format.encodeToString(ErrorMessage.serializer(), result.error)
+            }
+        } catch (e: Exception) {
+            logException(e)
+            e.message.toString()
+        }
+    }
+
     fun toJSONString(result: APIResult<*, ErrorMessage>): String {
-        try {
-            return when (result) {
+        return try {
+            when (result) {
                 is APISuccess ->
                     format.encodeToString(CryptrSerializer, result.value as CryptrResource)
 
@@ -499,7 +595,26 @@ open class Cryptr(
             }
         } catch (e: Exception) {
             logException(e)
-            return e.message.toString()
+            e.message.toString()
+        }
+    }
+
+
+    fun toJSONString(result: CryptrResource): String {
+        return try {
+            format.encodeToString(CryptrSerializer, result)
+        } catch (e: Exception) {
+            logException(e)
+            e.message.toString()
+        }
+    }
+
+    fun toJSONString(result: DeletedResource): String {
+        return try {
+            format.encodeToString(result)
+        } catch (e: Exception) {
+            logException(e)
+            e.message.toString()
         }
     }
 }
