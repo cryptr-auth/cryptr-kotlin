@@ -62,7 +62,7 @@ class Cryptr(
     fun retrieveApiKeyToken(): String? {
         val tokensFromProperties = setOf(
             System.getProperty("CRYPTR_API_KEY_TOKEN", "null"),
-            System.getProperty("CRYPTR_CURRENT_API_TOKEN", "null")
+            System.getProperty("CRYPTR_CURRENT_API_KEY_TOKEN", "null")
         )
         val tokenFromProperties = tokensFromProperties.firstOrNull { it !== "null" && it.length > 2 }
 
@@ -84,6 +84,7 @@ class Cryptr(
                 )
             val apiKeyToken = apiKeyTokenResponse.getString("access_token")
             if (apiKeyToken !== null) {
+                logDebug({ "APIKEY access_token generated: \n $apiKeyToken" })
                 System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
             }
             return apiKeyToken
