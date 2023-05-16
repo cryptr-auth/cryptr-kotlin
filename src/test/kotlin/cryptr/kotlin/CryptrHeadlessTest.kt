@@ -174,7 +174,7 @@ class CryptrHeadlessTest {
                 )
         )
         val resp = cryptr.consumeSSOSamlChallengeCallback("some-code")
-        assertEquals("sso-challenge-auth-code", resp?.getString("code"))
+        assertEquals("sso-challenge-auth-code", resp.getString("code"))
     }
 
     @Test
