@@ -88,7 +88,7 @@ tasks.named<Test>("test") {
 publishing {
     repositories {
         maven {
-            
+
         }
     }
     publications {
@@ -109,7 +109,7 @@ publishing {
                 }
                 developers {
                     developer {
-                        id.set("tuxtux59")
+                        id.set("tiboreno")
                         name.set("Thibaud RENAUX")
                         email.set("thibaud@cryptr.co")
                     }
