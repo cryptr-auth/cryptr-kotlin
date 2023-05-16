@@ -79,4 +79,4 @@ outTmp/
 /test.output
 /kotlin-native/dist
 kotlin-ide/
-lib/bin/
+bin/

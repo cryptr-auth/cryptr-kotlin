@@ -37,7 +37,7 @@ class CryptrTest {
     @Test
     fun retrieveApiKeyTokenWithPreviousFetchedTokenShouldReturnsIt() {
         System.clearProperty("CRYPTR_API_KEY_TOKEN")
-        System.setProperty("CRYPTR_CURRENT_API_TOKEN", "previous-fetched-api-key")
+        System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", "previous-fetched-api-key")
 
         assertEquals("previous-fetched-api-key", cryptr.retrieveApiKeyToken())
     }

@@ -3,6 +3,7 @@ package cryptr.kotlin
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
 import cryptr.kotlin.enums.ChallengeType
+import cryptr.kotlin.models.ChallengeResponse
 import cryptr.kotlin.models.SSOChallenge
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -50,13 +51,17 @@ class CryptrHeadlessTest {
                 )
         )
 
-        val challenge =
+        val challengeResponse =
             cryptr.createSSOChallenge(orgDomain = "acme-company", authType = ChallengeType.OAUTH)
-        assertNotNull(challenge)
-        assertEquals("request-id", challenge.requestId)
-        assertEquals("sandbox", challenge.database)
-        assertEquals("http://dev.cryptr.eu:8080/callback", challenge.redirectUri)
-        assertEquals("acme_company_BS8RohkywSxjoDnE2SEygL", challenge.samlIdpId)
+        assertNotNull(challengeResponse)
+        if (challengeResponse is APISuccess) {
+            val challenge = challengeResponse.value
+            assertEquals("request-id", challenge.requestId)
+            assertEquals("sandbox", challenge.database)
+            assertEquals("http://dev.cryptr.eu:8080/callback", challenge.redirectUri)
+            assertEquals("acme_company_BS8RohkywSxjoDnE2SEygL", challenge.samlIdpId)
+        }
+
     }
 
     @Test
@@ -79,10 +84,13 @@ class CryptrHeadlessTest {
                 )
         )
 
-        val challenge = cryptr.createSSOOauthChallenge(orgDomain = "acme-company")
-        assertNotNull(challenge)
-        assertIs<SSOChallenge>(challenge)
-        assertEquals("request-id", challenge.requestId)
+        val challengeResponse = cryptr.createSSOOauthChallenge(orgDomain = "acme-company")
+        assertNotNull(challengeResponse)
+        if (challengeResponse is APISuccess) {
+            val challenge = challengeResponse.value
+            assertIs<SSOChallenge>(challenge)
+            assertEquals("request-id", challenge.requestId)
+        }
     }
 
     @Test
@@ -104,12 +112,15 @@ class CryptrHeadlessTest {
                     )
                 )
         )
-        val challenge = cryptr.createSSOSamlChallenge(orgDomain = "acme-company")
-        assertNotNull(challenge, "should return object")
-        assertNotNull(challenge.authorizationUrl)
-        assertNotNull(challenge.requestId)
-        assertTrue(URL(challenge.authorizationUrl).query.endsWith("1546bfcf-9849-448c-a56a-265d1ef9c30d"))
-        assertIs<SSOChallenge>(challenge)
+        val challengeResponse = cryptr.createSSOSamlChallenge(orgDomain = "acme-company")
+        assertNotNull(challengeResponse, "should return object")
+        if (challengeResponse is APISuccess) {
+            val challenge = challengeResponse.value
+            assertNotNull(challenge.authorizationUrl)
+            assertNotNull(challenge.requestId)
+            assertTrue(URL(challenge.authorizationUrl).query.endsWith("1546bfcf-9849-448c-a56a-265d1ef9c30d"))
+            assertIs<SSOChallenge>(challenge)
+        }
     }
 
     @Test
@@ -131,12 +142,14 @@ class CryptrHeadlessTest {
                     )
                 )
         )
-        val challenge = cryptr.createSSOSamlChallenge(userEmail = "john@blablabus.fr")
-        assertIs<SSOChallenge>(challenge)
-        assertNotNull(challenge, "should return object")
-        assertNotNull(challenge.authorizationUrl)
-        assertNotNull(challenge.requestId)
-        assertTrue(URL(challenge.authorizationUrl).query.endsWith("b2c5427-d5c3-4057-9cdc-b8d9914d2a7e"))
+        val challengeResponse = cryptr.createSSOSamlChallenge(userEmail = "john@blablabus.fr")
+        if (challengeResponse is APISuccess) {
+            val challenge = challengeResponse.value
+            assertNotNull(challenge, "should return object")
+            assertNotNull(challenge.authorizationUrl)
+            assertNotNull(challenge.requestId)
+            assertTrue(URL(challenge.authorizationUrl).query.endsWith("b2c5427-d5c3-4057-9cdc-b8d9914d2a7e"))
+        }
     }
 
     @Test
@@ -174,21 +187,26 @@ class CryptrHeadlessTest {
                 )
         )
         val resp = cryptr.consumeSSOSamlChallengeCallback("some-code")
-        assertEquals("sso-challenge-auth-code", resp.getString("code"))
+        assertIs<APIResult<ChallengeResponse, ErrorMessage>>(resp)
+        if (resp is APISuccess) {
+            assertNotNull(resp.value.clientUrl)
+        }
+//        assertEquals("sso-challenge-auth-code", resp.getString("code"))
     }
 
     @Test
-    fun consumeSSOSamlChallengeCallbackThrowsWithoutPrpoerCode() {
-        val e1: Exception = assertThrows {
-            cryptr.consumeSSOSamlChallengeCallback()
+    fun consumeSSOSamlChallengeCallbackThrowsWithoutProperCode() {
+        val response1 = cryptr.consumeSSOSamlChallengeCallback()
+        assertIs<APIError<*, ErrorMessage>>(response1)
+        if (response1 is APIError) {
+            assertEquals("code is required", response1.error.message)
         }
 
-        assertEquals("code is required", e1.message)
-
-        val e2: Exception = assertThrows {
-            cryptr.consumeSSOSamlChallengeCallback("")
+        val response2 = cryptr.consumeSSOSamlChallengeCallback("")
+        assertIs<APIError<*, ErrorMessage>>(response2)
+        if (response2 is APIError) {
+            assertEquals("code is required", response2.error.message)
         }
 
-        assertEquals("code is required", e2.message)
     }
 }

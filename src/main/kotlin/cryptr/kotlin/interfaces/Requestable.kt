@@ -102,6 +102,7 @@ interface Requestable : URLable, Loggable {
                     return JSONObject(response.toString())
                 } catch (ej: JSONException) {
                     logException(ej)
+                    logError({ response.toString() })
                     return JSONObject().put("error", response.toString())
                 }
 

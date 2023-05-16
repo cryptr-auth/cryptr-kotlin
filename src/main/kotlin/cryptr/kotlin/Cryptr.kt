@@ -62,7 +62,7 @@ class Cryptr(
     fun retrieveApiKeyToken(): String? {
         val tokensFromProperties = setOf(
             System.getProperty("CRYPTR_API_KEY_TOKEN", "null"),
-            System.getProperty("CRYPTR_CURRENT_API_TOKEN", "null")
+            System.getProperty("CRYPTR_CURRENT_API_KEY_TOKEN", "null")
         )
         val tokenFromProperties = tokensFromProperties.firstOrNull { it !== "null" && it.length > 2 }
 
@@ -84,6 +84,7 @@ class Cryptr(
                 )
             val apiKeyToken = apiKeyTokenResponse.getString("access_token")
             if (apiKeyToken !== null) {
+                logDebug({ "APIKEY access_token generated: \n $apiKeyToken" })
                 System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
             }
             return apiKeyToken
@@ -108,7 +109,7 @@ class Cryptr(
         redirectUri: String = defaultRedirectUrl,
         orgDomain: String? = null,
         userEmail: String? = null
-    ): SSOChallenge {
+    ): APIResult<SSOChallenge, ErrorMessage> {
         return createSSOChallenge(redirectUri, orgDomain, userEmail)
     }
 
@@ -125,7 +126,7 @@ class Cryptr(
         redirectUri: String = defaultRedirectUrl,
         orgDomain: String? = null,
         userEmail: String? = null
-    ): SSOChallenge {
+    ): APIResult<SSOChallenge, ErrorMessage> {
         return createSSOChallenge(redirectUri, orgDomain, userEmail, ChallengeType.OAUTH)
     }
 
@@ -144,7 +145,7 @@ class Cryptr(
         orgDomain: String? = null,
         userEmail: String? = null,
         authType: ChallengeType? = ChallengeType.SAML
-    ): SSOChallenge {
+    ): APIResult<SSOChallenge, ErrorMessage> {
         if (orgDomain != null || userEmail != null) {
             val path = "api/v2/sso-${authType?.value}-challenges"
             val params = if (orgDomain !== null) mapOf(
@@ -152,7 +153,12 @@ class Cryptr(
                 "org_domain" to orgDomain
             ) else mapOf("redirect_uri" to redirectUri, "user_email" to userEmail)
             val response = makeRequest(path, baseUrl = baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
-            return format.decodeFromString<SSOChallenge>(response.toString())
+            return try {
+                APISuccess(format.decodeFromString<SSOChallenge>(response.toString()))
+            } catch (e: Exception) {
+                logException(e)
+                APIError(ErrorMessage(response.toString()))
+            }
         } else {
             throw Exception("requires either orgDomain or endUser value")
         }
@@ -161,31 +167,23 @@ class Cryptr(
     /**
      * Consumes the code value to retrieve authnetication payload containing end-user JWTs
      *
-     * @param code the query param received on your callbakc endpoint(redirectUri from create challentge fun)
+     * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
      * @return JSONObject containing end-user session JWTs
      */
-    fun consumeSSOSamlChallengeCallback(code: String? = ""): JSONObject {
+    fun consumeSSOSamlChallengeCallback(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
-            return makeRequest("oauth/token", baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+            val response = makeRequest("oauth/token", baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+            return try {
+                APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
+            } catch (e: Exception) {
+                logException(e)
+                APIError(ErrorMessage(response.toString()))
+            }
         } else {
-            throw Exception("code is required")
+            return APIError(ErrorMessage("code is required"))
         }
     }
-
-    /**
-     * RESOURCE MANAGEMENT
-     */
-
-
-//    private fun handleApiResponse(response: JSONObject): APIResult<CryptrResource, ErrorMessage> {
-//        return try {
-//            APISuccess(format.decodeFromString(response.toString()))
-//        } catch (e: Exception) {
-//            logException(e)
-//            APIError(ErrorMessage(response.toString()))
-//        }
-//    }
 
 
     /**
@@ -196,7 +194,6 @@ class Cryptr(
         val response =
             makeListRequest(buildOrganizationPath(), baseUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
         return try {
-            println(response.toString())
             APISuccess(format.decodeFromString<List<Organization>>(response.toString()))
         } catch (e: Exception) {
             logException(e)
@@ -258,7 +255,6 @@ class Cryptr(
         return try {
             format.decodeFromString<DeletedOrganization>(response.toString())
         } catch (e: Exception) {
-            println("handle APiResponse error")
             logException(e)
             return null
         }
@@ -382,7 +378,6 @@ class Cryptr(
         return try {
             format.decodeFromString<DeletedUser>(response.toString())
         } catch (e: Exception) {
-            println("handle APiResponse error")
             logException(e)
             return null
         }
@@ -406,8 +401,6 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<List<Application>>(response.toString()))
         } catch (e: Exception) {
-            println(e.message)
-            println(e.stackTrace)
             logException(e)
             APIError(ErrorMessage(response.toString()))
         }
@@ -470,7 +463,6 @@ class Cryptr(
         return try {
             format.decodeFromString<DeletedApplication>(response.toString())
         } catch (e: Exception) {
-            println("handle APiResponse error")
             logException(e)
             return null
 //            APIError(ErrorMessage(response.toString()))
@@ -617,6 +609,23 @@ class Cryptr(
         }
     }
 
+    fun toJSONString(result: ChallengeResponse): String {
+        return try {
+            format.encodeToString(ChallengeResponse.serializer(), result)
+        } catch (e: Exception) {
+            logException(e)
+            e.message.toString()
+        }
+    }
+
+    fun toJSONString(result: ErrorMessage): String {
+        return try {
+            format.encodeToString(ErrorMessage.serializer(), result)
+        } catch (e: Exception) {
+            logException(e)
+            e.message.toString()
+        }
+    }
 
     fun toJSONString(result: CryptrResource): String {
         return try {
