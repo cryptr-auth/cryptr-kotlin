@@ -31,6 +31,17 @@ interface Loggable {
         }
     }
 
+    fun logError(error: () -> Any?, logger: KLogger = KotlinLogging.logger {}) {
+        if (!isJUnitTest()) {
+            val currentLogger = currentLogger()
+            if (currentLogger.isErrorEnabled) {
+                logger.error(error().toString())
+            } else {
+                logger.warn("Sorry Debug level is not active, current: ${currentLogger.level}")
+            }
+        }
+    }
+
     fun logException(exception: java.lang.Exception, logger: KLogger = KotlinLogging.logger {}) {
         if (!isJUnitTest()) {
             logger.error("an exception occured:\n$exception")
