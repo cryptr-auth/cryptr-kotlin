@@ -5,12 +5,14 @@ import cryptr.kotlin.enums.ChallengeType
 import cryptr.kotlin.enums.CryptrApiPath
 import cryptr.kotlin.enums.CryptrEnvironment
 import cryptr.kotlin.interfaces.Requestable
+import cryptr.kotlin.interfaces.Tokenable
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
 import cryptr.kotlin.models.connections.SsoConnection
 import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedOrganization
 import cryptr.kotlin.models.deleted.DeletedUser
+import cryptr.kotlin.models.jwt.JWTToken
 import cryptr.kotlin.objects.Constants
 import cryptr.kotlin.objects.Constants.DEFAULT_BASE_URL
 import cryptr.kotlin.objects.Constants.DEFAULT_REDIRECT_URL
@@ -39,9 +41,13 @@ class Cryptr(
     ),
     protected val apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
     protected val apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
-) : Requestable {
+) : Requestable, Tokenable {
     @OptIn(ExperimentalSerializationApi::class)
     val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
+    private val ignoreIssChecking = System.getProperty("CRYPTR_IGNORE_ISS_CHECKING", "true") == "true"
+
+    val cryptrBaseUrl: String
+        get() = baseUrl
 
     init {
         if (!isJUnitTest()) {
@@ -65,9 +71,9 @@ class Cryptr(
             System.getProperty("CRYPTR_CURRENT_API_KEY_TOKEN", "null")
         )
         val tokenFromProperties = tokensFromProperties.firstOrNull { it !== "null" && it.length > 2 }
-
         if (tokenFromProperties !== null) {
-            return tokenFromProperties
+            val verification = verifyApiKeyToken(tokenFromProperties)
+            if (verification is JWTToken && verification.validIss) return tokenFromProperties
         } else {
             val params = mapOf(
                 "client_id" to apiKeyClientId,
@@ -83,12 +89,23 @@ class Cryptr(
                     params = params
                 )
             val apiKeyToken = apiKeyTokenResponse.getString("access_token")
-            if (apiKeyToken !== null) {
-                logDebug({ "APIKEY access_token generated: \n $apiKeyToken" })
-                System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
-            }
-            return apiKeyToken
+            val verification = verifyApiKeyToken(apiKeyToken, true)
+            logDebug({ "verification request $verification" })
+            if (verification is JWTToken && verification.validIss) return apiKeyToken
         }
+        logError({ "Error while retrieving api key token" })
+        return null
+    }
+
+    private fun verifyApiKeyToken(apiKeyToken: String, storeInProperties: Boolean? = false): JWTToken? {
+        val forceIss = ignoreIssChecking || isJUnitTest()
+        val jwtToken = verify(baseUrl, apiKeyToken, forceIss)
+
+        if (storeInProperties == true) {
+            System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
+        }
+
+        return jwtToken
     }
 
 

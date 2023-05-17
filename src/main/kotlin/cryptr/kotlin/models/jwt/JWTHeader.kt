@@ -16,7 +16,8 @@ data class JWTHeader(
         require(kid.isNotEmpty() && kid.isNotBlank()) { "kid not compliant" }
         require(iss.isNotEmpty() && iss.isNotBlank()) { "iss not compliant" }
         require(typ == "JWT") { "require JWT typ" }
-        require(alg == "RS256") { "only RS256 algo supported" }
+        val expectedAlg = System.getProperty("CRYPTR_JWT_ALG", "RS256")
+        require(alg == expectedAlg) { "only '$expectedAlg' alg value supported" }
     }
 
 }

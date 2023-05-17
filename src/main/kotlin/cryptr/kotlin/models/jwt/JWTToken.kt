@@ -11,8 +11,11 @@ data class JWTToken(
 
     var validIss = false
 
-    fun verifyIss(baseUrl: String): JWTToken {
-        this.validIss = header.iss.startsWith(baseUrl) && payload.iss.startsWith(baseUrl)
+    fun verifyIss(baseUrl: String, forceIss: Boolean? = false): JWTToken {
+        val tnt = payload.tnt
+        val issValues = setOf(header.iss, payload.iss)
+        val compatibleIss = issValues.all { it.startsWith(baseUrl) && it.endsWith(tnt) }
+        this.validIss = (forceIss == true) || compatibleIss
         return this
     }
 

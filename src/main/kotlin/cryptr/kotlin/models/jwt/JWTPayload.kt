@@ -7,10 +7,10 @@ import java.time.Instant
 @Serializable
 data class JWTPayload(
     @SerialName("scp") val scp: Set<String>,
-    @SerialName("aud") val aud: String?,
-    @SerialName("email") val email: String?,
-    @SerialName("ips") val ips: String?,
-    @SerialName("sci") val sci: String?,
+    @SerialName("aud") val aud: String? = null,
+    @SerialName("email") val email: String? = null,
+    @SerialName("ips") val ips: String? = null,
+    @SerialName("sci") val sci: String? = null,
     @SerialName("sub") val sub: String,
     @SerialName("ver") val ver: Int,
     @SerialName("dbs") val dbs: String,
