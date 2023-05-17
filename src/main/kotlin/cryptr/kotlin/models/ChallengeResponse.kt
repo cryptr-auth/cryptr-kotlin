@@ -1,12 +1,14 @@
 package cryptr.kotlin.models
 
+import cryptr.kotlin.interfaces.Tokenable
+import cryptr.kotlin.models.jwt.JWTToken
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class ChallengeResponse(
-    @SerialName("access_token") val accessToken: String?,
-    @SerialName("id_token") val idToken: String?,
+    @SerialName("access_token") val accessToken: String? = null,
+    @SerialName("id_token") val idToken: String? = null,
 
     @SerialName("refresh_retry") val refreshRetry: Int?,
     @SerialName("refresh_leeway") val refreshLeeway: Int?,
@@ -25,4 +27,14 @@ data class ChallengeResponse(
 
     @SerialName("expires_at") val expiresAt: String?,
     @SerialName("refresh_token_expires_at") val refreshTokenExpiresAt: String?,
-)
+) : Tokenable {
+    fun getIdClaims(baseUrl: String): JWTToken? {
+        val token: String = idToken.toString()
+        return verify(baseUrl, token)
+    }
+
+    fun getAccessClaims(baseUrl: String): JWTToken? {
+        val token: String = accessToken.toString()
+        return verify(baseUrl, token)
+    }
+}

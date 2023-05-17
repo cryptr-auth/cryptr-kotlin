@@ -21,6 +21,8 @@ data class JWTPayload(
     @SerialName("iat") val iat: Long,
     @SerialName("jti") val jti: String,
     @SerialName("cid") val cid: String,
+    @SerialName("family_name") val familyName: String? = null,
+    @SerialName("given_name") val givenName: String? = null,
     @SerialName("application_metadata") val applicationMetadata: Map<String, String>? = mapOf(),
     @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, String>? = mapOf(),
 ) {

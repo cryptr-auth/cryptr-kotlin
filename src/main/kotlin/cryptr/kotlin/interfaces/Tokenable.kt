@@ -12,7 +12,7 @@ interface Tokenable : Loggable {
         return try {
             val decoded = decodeToken(token)
             val sanitized: String = sanitize(decoded)
-            val jwtToken = Json.decodeFromString<JWTToken>(sanitized)
+            val jwtToken = Json{ignoreUnknownKeys = true}.decodeFromString<JWTToken>(sanitized)
             jwtToken.verifyIss(baseUrl, forceIss)
         } catch (e: Exception) {
             logException(e)
@@ -23,7 +23,6 @@ interface Tokenable : Loggable {
     }
 
     private fun sanitize(decoded: JSONObject): String {
-
         return try {
             val payload = decoded.getJSONObject("payload")
             if (payload.get("scp") is String) {
