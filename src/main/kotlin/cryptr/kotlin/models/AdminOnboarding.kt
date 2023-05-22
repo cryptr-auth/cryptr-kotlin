@@ -15,8 +15,11 @@ data class AdminOnboarding(
     @SerialName("tutorial_step") val tutorialStep: Int = 0,
     @SerialName("email_template_id") val emailTemplateId: String? = null,
     @SerialName("provider_type") val providerType: String? = null,
-    @SerialName("sso_admin_email") val ssoAdminEmail: String,
+    @SerialName("it_admin_email") val itAdminEmail: String,
     @SerialName("onboarding_type") val onboardingType: String = "sso-connection",
     @SerialName("updated_at") val updatedAt: String? = null,
     @SerialName("inserted_at") val insertedAt: String? = null,
+    @SerialName("invitation_sent_at") val invitationSentAt: String? = null,
+    @SerialName("organization") val organization: Organization? = null,
+    @SerialName("for") val forOnboardingType: String? = null
 ) : CryptrResource()
