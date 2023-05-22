@@ -11,16 +11,16 @@ group = "org.cryptr"
 version = "0.0.2"
 
 plugins {
+    `java-library`
     // Apply the org.jetbrains.kotlin.jvm Plugin to add support for Kotlin.
     id("org.jetbrains.kotlin.jvm") version "1.8.10"
 
     kotlin("plugin.serialization") version "1.8.10"
     id("org.jetbrains.kotlinx.kover") version "0.7.0-Beta"
 
-    signing
     // Apply the java-library plugin for API and implementation separation.
-    `java-library`
     `maven-publish`
+    signing
 }
 
 repositories {
