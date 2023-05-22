@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 @SerialName("Redirection")
 data class Redirection(
-    @SerialName("__type__") override val cryptrType: String = "SSOConnection",
+    @SerialName("__type__") override val cryptrType: String = "Redirection",
     @SerialName("__environment__") override val environment: String? = null,
     @SerialName("__domain__") override val resourceDomain: String? = null,
 
