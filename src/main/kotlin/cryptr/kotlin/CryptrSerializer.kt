@@ -11,6 +11,9 @@ import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import org.json.JSONObject
 
+/**
+ * @suppress
+ */
 object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(CryptrResource::class) {
     override fun selectDeserializer(element: JsonElement): DeserializationStrategy<CryptrResource> {
         val rootType = element.jsonObject["__type__"]?.jsonPrimitive?.content

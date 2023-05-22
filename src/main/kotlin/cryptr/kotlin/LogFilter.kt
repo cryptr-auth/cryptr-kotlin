@@ -4,6 +4,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent
 import ch.qos.logback.core.filter.AbstractMatcherFilter
 import ch.qos.logback.core.spi.FilterReply
 
+/**
+ * @suppress
+ */
 class LogFilter : AbstractMatcherFilter<ILoggingEvent?>() {
     var loggerName: String? = null
 

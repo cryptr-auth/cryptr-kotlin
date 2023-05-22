@@ -19,6 +19,7 @@ plugins {
 
     kotlin("plugin.serialization") version "1.8.10"
     id("org.jetbrains.kotlinx.kover") version "0.7.0-Beta"
+    id("org.jetbrains.dokka") version "1.8.10"
 
     // Apply the java-library plugin for API and implementation separation.
     `maven-publish`

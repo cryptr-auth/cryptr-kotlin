@@ -6,13 +6,23 @@ import kotlinx.serialization.json.Json
 import org.json.JSONObject
 import java.util.*
 
+/**
+ * Interface to manage Tokens
+ */
 interface Tokenable : Loggable {
 
+    /**
+     * Verify a Cryptr JWT token
+     *
+     * @param baseUrl [String] of the Cryptr Service URL
+     * @param token The JWT [String] token to verify
+     * @param forceIss (Optional) [Boolean] value to bypass iss claim check. Default: true
+     */
     fun verify(baseUrl: String, token: String, forceIss: Boolean? = true): JWTToken? {
         return try {
             val decoded = decodeToken(token)
             val sanitized: String = sanitize(decoded)
-            val jwtToken = Json{ignoreUnknownKeys = true}.decodeFromString<JWTToken>(sanitized)
+            val jwtToken = Json { ignoreUnknownKeys = true }.decodeFromString<JWTToken>(sanitized)
             jwtToken.verifyIss(baseUrl, forceIss)
         } catch (e: Exception) {
             logException(e)
