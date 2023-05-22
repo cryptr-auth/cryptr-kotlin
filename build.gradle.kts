@@ -1,4 +1,5 @@
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
+import org.jetbrains.dokka.gradle.DokkaTask
 import java.net.URI
 
 
@@ -56,6 +57,14 @@ dependencies {
     // Serialization
     api("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.8.1")
+
+    api("org.jetbrains.dokka:mathjax-plugin:1.8.10")
+
+    // Is applied for the single-module dokkaHtml task only
+    api("org.jetbrains.dokka:kotlin-as-java-plugin:1.8.10")
+
+    // Is applied for HTML format in multi-project builds
+    api("org.jetbrains.dokka:kotlin-as-java-plugin:1.8.10")
 }
 
 
@@ -77,6 +86,17 @@ tasks.jar {
             )
         )
     }
+}
+
+tasks.withType<DokkaTask>().configureEach {
+    val dokkaBaseConfiguration = """
+    {
+      "footerMessage": "© 2023 Cryptr",
+      "separateInheritedMembers" : false
+    }
+    """
+
+    pluginsMapConfiguration.set(mapOf("org.jetbrains.dokka.base.DokkaBase" to dokkaBaseConfiguration))
 }
 
 
