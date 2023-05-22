@@ -76,6 +76,9 @@ interface Requestable : URLable, Loggable {
             conn.useCaches = false
             if (requestMethod !== null) {
                 conn.requestMethod = requestMethod
+                logDebug(
+                    { conn.requestMethod.toString() }
+                )
             }
             conn.setRequestProperty("Content-Type", "application/x-www-form-urlencoded")
             conn.setRequestProperty("Accept", "application/json")

@@ -4,7 +4,7 @@ import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
-import cryptr.kotlin.models.connections.SsoConnection
+import cryptr.kotlin.models.connections.SSOConnection
 import cryptr.kotlin.models.deleted.DeletedUser
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -26,7 +26,10 @@ class CryptrSerializerTest {
         val apiKeyClientSecret = "my-api-key-client-secret"
         cryptr = Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
         format = cryptr.format
-        System.setProperty("CRYPTR_API_KEY_TOKEN", "eyJ0eXAiOiJKV1QiLCJpc3MiOiJodHRwOi8vZGV2LmNyeXB0ci5ldS90L3NoYXJrLWFjYWRlbXkiLCJraWQiOiIxMjM0NTY3ODc5IiwiYWxnIjoiSFMyNTYifQ.eyJjaWQiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJkYnMiOiJzYW5kYm94IiwiZXhwIjoxOTg0MzEwNjQzLCJpYXQiOjE2ODQzMDcwNDMsImlzcyI6Imh0dHA6Ly9kZXYuY3J5cHRyLmV1L3Qvc2hhcmstYWNhZGVteSIsImp0aSI6ImFhMTM3NDI5LTE1NDgtNDRmMC04ZTY4LTk3ZDAzYzFkMDBmNyIsImp0dCI6ImFwaV9rZXkiLCJzY3AiOiJyZWFkX21hbnk6c3NvX2Nvbm5lY3Rpb25zIHVwZGF0ZTpzc29fY29ubmVjdGlvbnMiLCJzdWIiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJ0bnQiOiJzaGFyay1hY2FkZW15IiwidmVyIjoxfQ.q20l-u-8gjsHDkW1IQUErVdgGykWrZmiGaojMMfrVD4")
+        System.setProperty(
+            "CRYPTR_API_KEY_TOKEN",
+            "eyJ0eXAiOiJKV1QiLCJpc3MiOiJodHRwOi8vZGV2LmNyeXB0ci5ldS90L3NoYXJrLWFjYWRlbXkiLCJraWQiOiIxMjM0NTY3ODc5IiwiYWxnIjoiSFMyNTYifQ.eyJjaWQiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJkYnMiOiJzYW5kYm94IiwiZXhwIjoxOTg0MzEwNjQzLCJpYXQiOjE2ODQzMDcwNDMsImlzcyI6Imh0dHA6Ly9kZXYuY3J5cHRyLmV1L3Qvc2hhcmstYWNhZGVteSIsImp0aSI6ImFhMTM3NDI5LTE1NDgtNDRmMC04ZTY4LTk3ZDAzYzFkMDBmNyIsImp0dCI6ImFwaV9rZXkiLCJzY3AiOiJyZWFkX21hbnk6c3NvX2Nvbm5lY3Rpb25zIHVwZGF0ZTpzc29fY29ubmVjdGlvbnMiLCJzdWIiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJ0bnQiOiJzaGFyay1hY2FkZW15IiwidmVyIjoxfQ.q20l-u-8gjsHDkW1IQUErVdgGykWrZmiGaojMMfrVD4"
+        )
     }
 
     @Test
@@ -46,6 +49,7 @@ class CryptrSerializerTest {
                 "    ],\n" +
                 "    \"inserted_at\": \"2023-04-27T13:50:29\",\n" +
                 "    \"name\": \"thibaud-java\",\n" +
+                "    \"allowed_email_domains\": [],\n" +
                 "    \"updated_at\": \"2023-04-27T13:50:49\"\n" +
                 "}"
 
@@ -437,7 +441,7 @@ class CryptrSerializerTest {
                 "    \"__domain__\": \"factor\",\n" +
                 "    \"__environment__\": \"production\",\n" +
                 "    \"__managed_by__\": \"shark-academy\",\n" +
-                "    \"__type__\": \"SsoConnection\",\n" +
+                "    \"__type__\": \"SSOConnection\",\n" +
                 "    \"active\": true,\n" +
                 "    \"default_redirection\": {\n" +
                 "        \"__access__\": \"all_organizations_of:shark-academy\",\n" +
@@ -465,7 +469,7 @@ class CryptrSerializerTest {
                 "        \"id\": \"a6216afe-53ef-4a8e-bd62-07f49c7c825f\",\n" +
                 "        \"inserted_at\": \"2023-05-11T11:35:58\",\n" +
                 "        \"provider_type\": null,\n" +
-                "        \"sso_admin_email\": \"thibaud@cryptr.co\",\n" +
+                "        \"it_admin_email\": \"thibaud@cryptr.co\",\n" +
                 "        \"state\": \"not_initialized\",\n" +
                 "        \"tutorial_step\": 0,\n" +
                 "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
@@ -477,8 +481,8 @@ class CryptrSerializerTest {
                 "    \"user_security_type\": \"none\"\n" +
                 "}"
 
-        val decoded = cryptr.format.decodeFromString<SsoConnection>(body)
-        assertIs<SsoConnection>(decoded)
+        val decoded = cryptr.format.decodeFromString<SSOConnection>(body)
+        assertIs<SSOConnection>(decoded)
     }
 
     @Test
@@ -493,7 +497,7 @@ class CryptrSerializerTest {
                 "        \"id\": \"a6216afe-53ef-4a8e-bd62-07f49c7c825f\",\n" +
                 "        \"inserted_at\": \"2023-05-11T11:35:58\",\n" +
                 "        \"provider_type\": null,\n" +
-                "        \"sso_admin_email\": \"thibaud@cryptr.co\",\n" +
+                "        \"it_admin_email\": \"thibaud@cryptr.co\",\n" +
                 "        \"state\": \"not_initialized\",\n" +
                 "        \"tutorial_step\": 0,\n" +
                 "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
@@ -506,9 +510,9 @@ class CryptrSerializerTest {
     @Test
     fun serializeOutput() {
         val body =
-            "{\"__access__\":\"limited_to:factor\",\"__domain__\":\"factor\",\"__environment__\":\"production\",\"__managed_by__\":\"shark-academy\",\"__type__\":\"SsoConnection\",\"active\":true,\"default_redirection\":null,\"id\":\"factor_i8TQXJHEuMkFMoFaUCzxAA\",\"inserted_at\":\"2023-05-11T13:37:34\",\"metadata\":null,\"onboarding\":null,\"provider_type\":\"okta\",\"seats_limit\":null,\"sp_id\":\"shark_academy_MgF6Z9maZKriEBbLM9KZJj\",\"updated_at\":\"2023-05-11T13:37:34\",\"user_security_type\":\"none\"}"
+            "{\"__access__\":\"limited_to:factor\",\"__domain__\":\"factor\",\"__environment__\":\"production\",\"__managed_by__\":\"shark-academy\",\"__type__\":\"SSOConnection\",\"active\":true,\"default_redirection\":null,\"id\":\"factor_i8TQXJHEuMkFMoFaUCzxAA\",\"inserted_at\":\"2023-05-11T13:37:34\",\"metadata\":null,\"onboarding\":null,\"provider_type\":\"okta\",\"seats_limit\":null,\"sp_id\":\"shark_academy_MgF6Z9maZKriEBbLM9KZJj\",\"updated_at\":\"2023-05-11T13:37:34\",\"user_security_type\":\"none\"}"
 
-        val decoded = cryptr.format.decodeFromString<SsoConnection>(body)
-        assertIs<SsoConnection>(decoded)
+        val decoded = cryptr.format.decodeFromString<SSOConnection>(body)
+        assertIs<SSOConnection>(decoded)
     }
 }
