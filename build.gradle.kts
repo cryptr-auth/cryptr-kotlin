@@ -44,7 +44,7 @@ dependencies {
     implementation("com.google.guava:guava:31.1-jre")
 
     //JSON
-    api("org.json:json:20220320")
+    api("org.json:json:20230227")
 
     // Logging
     implementation("io.github.oshai:kotlin-logging-jvm:4.0.0-beta-22")
