@@ -7,8 +7,8 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SsoConnection(
-    @SerialName("__type__") override val cryptrType: String = "SsoConnection",
+data class SSOConnection(
+    @SerialName("__type__") override val cryptrType: String = "SSOConnection",
     @SerialName("__environment__") override val environment: String? = null,
     @SerialName("__domain__") override val resourceDomain: String? = null,
 
