@@ -187,7 +187,7 @@ class Cryptr(
      * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
      * @return JSONObject containing end-user session JWTs
      */
-    fun consumeSSOSamlChallengeCallback(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
+    fun validateSSOChallenge(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
             val response = makeRequest("oauth/token", baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
