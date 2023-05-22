@@ -113,7 +113,7 @@ class CryptrTest {
         val jsonString = cryptr.toJSONString(apiSuccess)
         assertEquals(
             "{\"__type__\":\"Organization\",\"domain\":\"my-domain\"," +
-                    "\"updated_at\":null,\"name\":\"my Domain\",\"inserted_at\":null,\"environments\":[]}",
+                    "\"updated_at\":null,\"name\":\"my Domain\",\"inserted_at\":null,\"environments\":[], \"allowed_email_domains\":[]}",
             jsonString
         )
     }

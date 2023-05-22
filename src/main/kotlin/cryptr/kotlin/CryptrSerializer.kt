@@ -2,7 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
-import cryptr.kotlin.models.connections.SsoConnection
+import cryptr.kotlin.models.connections.SSOConnection
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.json.JsonContentPolymorphicSerializer
@@ -24,6 +24,7 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
         return listItemSerializer(rootType)
     }
 
+
     private fun listItemSerializer(itemType: String?): KSerializer<out CryptrResource> {
         return when (itemType) {
             "Address" -> Address.serializer()
@@ -31,7 +32,7 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
             "Organization" -> Organization.serializer()
             "Profile" -> Profile.serializer()
             "User" -> User.serializer()
-            "SsoConnection" -> SsoConnection.serializer()
+            "SSOConnection" -> SSOConnection.serializer()
             "Redirection" -> Redirection.serializer()
             else -> throw Exception("Error serializer not found for $itemType")
         }
