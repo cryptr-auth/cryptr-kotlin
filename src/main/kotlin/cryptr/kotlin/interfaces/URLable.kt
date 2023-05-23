@@ -78,40 +78,40 @@ interface URLable {
      * @suppress
      */
     fun buildOrganizationResourcePath(
-        organizationDomain: String,
+        orgDomain: String,
         resourceName: String,
         resourceId: String?
     ): String {
         val baseApiOrgResourcePath =
-            Constants.API_BASE_BATH + "/" + Constants.API_VERSION + "/org/" + organizationDomain + "/" + resourceName
+            Constants.API_BASE_BATH + "/" + Constants.API_VERSION + "/org/" + orgDomain + "/" + resourceName
         return if (resourceId !== null && resourceId.isNotEmpty()) "$baseApiOrgResourcePath/$resourceId" else baseApiOrgResourcePath
     }
 
     /**
      * @suppress
      */
-    fun buildUserPath(organizationDomain: String, resourceId: String? = null): String {
-        return buildOrganizationResourcePath(organizationDomain, User.apiResourceName, resourceId)
+    fun buildUserPath(orgDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(orgDomain, User.apiResourceName, resourceId)
     }
 
     /**
      * @suppress
      */
-    fun buildApplicationPath(organizationDomain: String, resourceId: String? = null): String {
-        return buildOrganizationResourcePath(organizationDomain, Application.apiResourceName, resourceId)
+    fun buildApplicationPath(orgDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(orgDomain, Application.apiResourceName, resourceId)
     }
 
     /**
      * @suppress
      */
-    fun buildSSOConnectionPath(organizationDomain: String, resourceId: String? = null): String {
-        return buildOrganizationResourcePath(organizationDomain, "sso-connections", resourceId)
+    fun buildSSOConnectionPath(orgDomain: String, resourceId: String? = null): String {
+        return buildOrganizationResourcePath(orgDomain, "sso-connections", resourceId)
     }
 
     /**
      * @suppress
      */
-    fun buildAdminOnboardingUrl(organizationDomain: String, onboardingType: String): String {
-        return buildOrganizationResourcePath(organizationDomain, "admin-onboarding", onboardingType)
+    fun buildAdminOnboardingUrl(orgDomain: String, onboardingType: String): String {
+        return buildOrganizationResourcePath(orgDomain, "admin-onboarding", onboardingType)
     }
 }
