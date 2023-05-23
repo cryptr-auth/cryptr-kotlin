@@ -91,7 +91,7 @@ tasks.jar {
 tasks.withType<DokkaTask>().configureEach {
     val dokkaBaseConfiguration = """
     {
-      "footerMessage": "© 2023 Cryptr",
+      "footerMessage": "© 2023 <a target=\"_blank\" href=\"https://cryptr.co\">Cryptr</a>",
       "separateInheritedMembers" : false
     }
     """
