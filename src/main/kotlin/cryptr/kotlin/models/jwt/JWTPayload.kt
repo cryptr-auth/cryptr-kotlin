@@ -45,6 +45,10 @@ data class JWTPayload(
      */
     @SerialName("jtt") val jtt: String,
     /**
+     * The nonce of token. Should be an UUID
+     */
+    @SerialName("nonce") val nonce: String? = null,
+    /**
      * The Organization that owns the resource owner
      */
     @SerialName("tnt") val tnt: String,

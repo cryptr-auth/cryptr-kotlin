@@ -42,7 +42,7 @@ data class ChallengeResponse(
      * URL of the client
      */
     @SerialName("client_url") val clientUrl: String?,
-    @SerialName("nonce") val nonce: Set<String>? = setOf(),
+    @SerialName("nonce") val nonce: String? = null,
     /** TEMP comment need to rollback asap **/
 //    @SerialName("nonce") val nonce: String?,
     /**
