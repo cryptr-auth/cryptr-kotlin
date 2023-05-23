@@ -11,6 +11,7 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 ### Apache Maven
 
 ```xml
+
 <dependency>
     <groupId>co.cryptr</groupId>
     <artifactId>cryptr-kotlin</artifactId>
@@ -66,7 +67,8 @@ You can also define your Configuration through [System properties](#system-prope
 
 ### SSO SAML Headless process
 
-This process allows you to generate a challenge to start a SSO SAML authentication process without using a front-end for the
+This process allows you to generate a challenge to start a SSO SAML authentication process without using a front-end for
+the
 entire process
 
 ```kotlin
@@ -97,7 +99,7 @@ if (challengeValidation is APISuccess) {
 
 | key                              | Required | Default value          | sample value                      | purpose                                                      |
 |----------------------------------|----------|------------------------|-----------------------------------|--------------------------------------------------------------|
-| **CRYPTR_TENANT_DOMAIN**         | true     | None                   | `your-tenant-domain`              | Your Account domain                                          |
+| **CRYPTR_ACCOUNT_DOMAIN**        | true     | None                   | `your-tenant-domain`              | Your Account domain                                          |
 | **CRYPTR_BASE_URL**              | false    | https://auth.cryptr.eu | `https://company.authent.me`      | Your Cryptr service URL                                      |
 | **CRYPTR_DEFAULT_REDIRECT_URL**  |          |                        | `https://localhost:8080/callback` | The URL where to redirect end-user after SSO authent process |
 | **CRYPTR_API_KEY_CLIENT_ID**     | true     | None                   | `xxx`                             | Your API Key client ID                                       |

@@ -28,5 +28,5 @@ enum class CryptrEnvironment {
     /**
      * Key to store your Account tenant domain
      */
-    CRYPTR_TENANT_DOMAIN
+    CRYPTR_ACCOUNT_DOMAIN
 }

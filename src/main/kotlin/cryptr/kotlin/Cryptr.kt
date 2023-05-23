@@ -26,14 +26,14 @@ import org.json.JSONObject
 /**
  * Instantiate Cryptr SDK
  *
- * @param tenantDomain Your account value `domain`
+ * @param accountDomain Your account value `domain`
  * @param serviceUrl The URL of your Cryptr Service
  * @param defaultRedirectUrl Where you want to redirect te end-user after dev.cryptr.eu process
  * @param apiKeyClientId The ID of your API KEY
  * @param apiKeyClientSecret The secret of your API KEY
  */
 class Cryptr(
-    protected val tenantDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_TENANT_DOMAIN.toString()),
+    protected val accountDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_ACCOUNT_DOMAIN.toString()),
     protected val serviceUrl: String = System.getProperty(
         CryptrEnvironment.CRYPTR_BASE_URL.toString(),
         DEFAULT_BASE_URL
@@ -64,7 +64,7 @@ class Cryptr(
         }
         logInfo({
             """Cryptr intialized with:
-                |- tenantDomain: $tenantDomain
+                |- accountDomain: $accountDomain
                 |- baseUrl: $serviceUrl
                 |- defaultRedirection: $defaultRedirectUrl
                 |- apiKeyClientId: $apiKeyClientId
@@ -103,7 +103,7 @@ class Cryptr(
             val params = mapOf(
                 "client_id" to apiKeyClientId,
                 "client_secret" to apiKeyClientSecret,
-                "tenant_domain" to tenantDomain,
+                "tenant_domain" to accountDomain,
                 "grant_type" to "client_credentials"
             )
             Constants.API_BASE_BATH
