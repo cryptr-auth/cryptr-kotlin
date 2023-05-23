@@ -28,7 +28,7 @@ import org.json.JSONObject
  *
  * @param accountDomain Your account value `domain`
  * @param serviceUrl The URL of your Cryptr Service
- * @param defaultRedirectUrl Where you want to redirect te end-user after dev.cryptr.eu process
+ * @param defaultRedirectUri Where you want to redirect te end-user after dev.cryptr.eu process
  * @param apiKeyClientId The ID of your API KEY
  * @param apiKeyClientSecret The secret of your API KEY
  */
@@ -38,7 +38,7 @@ class Cryptr(
         CryptrEnvironment.CRYPTR_BASE_URL.toString(),
         DEFAULT_BASE_URL
     ),
-    protected val defaultRedirectUrl: String = System.getProperty(
+    protected val defaultRedirectUri: String = System.getProperty(
         CryptrEnvironment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
         DEFAULT_REDIRECT_URL
     ),
@@ -66,7 +66,7 @@ class Cryptr(
             """Cryptr intialized with:
                 |- accountDomain: $accountDomain
                 |- baseUrl: $serviceUrl
-                |- defaultRedirection: $defaultRedirectUrl
+                |- defaultRedirectUri: $defaultRedirectUri
                 |- apiKeyClientId: $apiKeyClientId
                 |- apiKeyClientSecret: $apiKeyClientSecret
             """.trimMargin()
@@ -152,7 +152,7 @@ class Cryptr(
      * @return a JSONObject with `authorization_url`that end-user has to open to do his authententication process
      */
     fun createSSOSamlChallenge(
-        redirectUri: String = defaultRedirectUrl,
+        redirectUri: String = defaultRedirectUri,
         orgDomain: String? = null,
         userEmail: String? = null
     ): APIResult<SSOChallenge, ErrorMessage> {
@@ -169,7 +169,7 @@ class Cryptr(
      * @return a JSONObject with `authorization_url`that end-user has to open to do his authententication process
      */
     fun createSSOOauthChallenge(
-        redirectUri: String = defaultRedirectUrl,
+        redirectUri: String = defaultRedirectUri,
         orgDomain: String? = null,
         userEmail: String? = null
     ): APIResult<SSOChallenge, ErrorMessage> {
@@ -187,7 +187,7 @@ class Cryptr(
      * @return a [SSOChallenge] with `authorization_url`that end-user has to open to do his authententication process
      */
     fun createSSOChallenge(
-        redirectUri: String = defaultRedirectUrl,
+        redirectUri: String = defaultRedirectUri,
         orgDomain: String? = null,
         userEmail: String? = null,
         authType: ChallengeType? = ChallengeType.SAML

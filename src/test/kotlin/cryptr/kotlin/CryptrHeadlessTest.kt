@@ -23,11 +23,11 @@ class CryptrHeadlessTest {
     fun init() {
         val tenantDomain = "shark-academy"
         val baseUrl = "http://dev.cryptr.eu"
-        val defaultRedirectUrl = "http://dev.cryptr.eu:8080/callback"
+        val defaultRedirectUri = "http://dev.cryptr.eu:8080/callback"
         val apiKeyClientId = "my-api-key-client-id"
         val apiKeyClientSecret = "my-api-key-client-secret"
         cryptr =
-            Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
+            Cryptr(tenantDomain, baseUrl, defaultRedirectUri, apiKeyClientId, apiKeyClientSecret)
         System.setProperty("CRYPTR_JWT_ALG", "HS256")
         System.setProperty(
             "CRYPTR_API_KEY_TOKEN",

@@ -21,10 +21,10 @@ class CryptrSerializerTest {
     fun init() {
         val tenantDomain = "shark-academy"
         val baseUrl = "http://dev.cryptr.eu"
-        val defaultRedirectUrl = "http://localhost:8080/callback"
+        val defaultRedirectUri = "http://localhost:8080/callback"
         val apiKeyClientId = "my-api-key-client-id"
         val apiKeyClientSecret = "my-api-key-client-secret"
-        cryptr = Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
+        cryptr = Cryptr(tenantDomain, baseUrl, defaultRedirectUri, apiKeyClientId, apiKeyClientSecret)
         format = cryptr.format
         System.setProperty(
             "CRYPTR_API_KEY_TOKEN",
