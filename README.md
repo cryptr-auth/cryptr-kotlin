@@ -89,7 +89,7 @@ if (ssoSamlChallengePayload is APISuccess) {
 
 // 3. handle the redirection on the chosen enpoint (here '/some-callback-endpoint)
 // on this enpoint you get a `code` parameter
-val challengeValidation = cryptr.validateSSOChallenge(call.parameters.get("code"))
+val challengeValidation = cryptr.validateSsoChallenge(call.parameters.get("code"))
 if (challengeValidation is APISuccess) {
     val endUserAccessToken = challengeValidation.value.accessToken
 }
