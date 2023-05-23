@@ -600,7 +600,7 @@ class Cryptr(
      *
      * @return [APIResult] of the creation result
      */
-    fun createSSOAdminOnboarding(
+    fun createSsoAdminOnboarding(
         orgDomain: String,
         itAdminEmail: String? = null,
         providerType: String? = null,
@@ -673,12 +673,12 @@ class Cryptr(
      *
      * @param orgDomain [String] of Organization's domain
      *
-     * @see Cryptr.getAdminOnboarding(orgDomain, "sso-connection")
+     * @see Cryptr.retrieveAdminOnboarding(orgDomain, "sso-connection")
      *
      * @return [APIResult] of type [AdminOnboarding]
      */
-    fun getSSOAdminOnboarding(orgDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
-        return getAdminOnboarding(orgDomain, "sso-connection")
+    fun retrieveSsoAdminOnboarding(orgDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
+        return retrieveAdminOnboarding(orgDomain, "sso-connection")
     }
 
 
@@ -690,7 +690,7 @@ class Cryptr(
      *
      * @return [APIResult] of type [AdminOnboarding]
      */
-    fun getAdminOnboarding(
+    fun retrieveAdminOnboarding(
         orgDomain: String,
         onboardingType: String
     ): APIResult<AdminOnboarding, ErrorMessage> {
@@ -705,7 +705,7 @@ class Cryptr(
     }
 
     /**
-     * Invite IT Admin by email for the related [Organization] SSO AdminOnboarding
+     * Invite IT Admin by email for the related [Organization] SsoAdminOnboarding
      *
      *  @param orgDomain [String] of the targeted Organization's domain
      *  @param itAdminEmail (Optional) [String] of the (new) IT admin email
@@ -713,7 +713,7 @@ class Cryptr(
      *  @return [APIResult] of [AdminOnboarding]
      */
 
-    fun inviteSSOAdminOnboarding(
+    fun inviteSsoAdminOnboarding(
         orgDomain: String,
         itAdminEmail: String? = null
     ): APIResult<AdminOnboarding, ErrorMessage> {
@@ -748,6 +748,62 @@ class Cryptr(
         }
     }
 
+    fun updateSsoAdminOnboarding(
+        orgDomain: String,
+        itAdminEmail: String? = null,
+        providerType: String? = null,
+        emailTemplateId: String? = null,
+        sendEmail: Boolean? = true,
+        applicationId: String? = null,
+    ): APIResult<AdminOnboarding, ErrorMessage> {
+        val customParams = mapOf(
+            "provider_type" to providerType,
+            "application_id" to applicationId
+        )
+        return updateAdminOnboarding(
+            orgDomain, "sso-connection", itAdminEmail, emailTemplateId, sendEmail, customParams
+        )
+    }
+
+    fun updateAdminOnboarding(
+        orgDomain: String,
+        onboardingType: String,
+        itAdminEmail: String? = null,
+        emailTemplateId: String? = null,
+        sendEmail: Boolean? = true,
+        customParams: Map<String, Any?>? = mapOf<String, Any?>()
+    ): APIResult<AdminOnboarding, ErrorMessage> {
+        val path = buildAdminOnboardingUrl(orgDomain, onboardingType)
+        var basicParams: Map<String, Any?> = mapOf(
+            "it_admin_email" to itAdminEmail,
+            "email_template_id" to emailTemplateId,
+            "send_email" to sendEmail,
+            "onboarding_type" to onboardingType
+        )
+        val params = basicParams.toMutableMap()
+        try {
+            customParams?.map { params.put(it.key, it.value) }
+        } catch (pe: Exception) {
+            logException(pe)
+            logError({ pe.message })
+        }
+        logDebug({ params.toString() })
+        val response = makeRequest(
+            path,
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken(),
+            requestMethod = "PUT"
+        )
+        return try {
+            APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            logError({ e.message.toString() })
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
     /**
      * Reset SSO [AdminOnboarding] for the related [Organization]
      *
@@ -755,7 +811,7 @@ class Cryptr(
      *
      *  @return [APIResult] of resetted [AdminOnboarding]
      */
-    fun resetSSOAdminOnboarding(orgDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
+    fun resetSsoAdminOnboarding(orgDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
         return resetAdminOnboarding(orgDomain, "sso-connection")
     }
 
