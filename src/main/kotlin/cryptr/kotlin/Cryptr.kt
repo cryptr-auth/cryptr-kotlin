@@ -78,9 +78,11 @@ class Cryptr(
      * If not, the SDK will generate one depending on {@link Cryptr#apiKeyClientId} {@link #apiKeyClientId}  and **apiKeyClientSecret**
      * and store it until it's expired
      *
+     *
+     *
      * @return The api Key token [String] if succeeded
      */
-    fun retrieveApiKeyToken(): String? {
+    fun retrieveApiKeyToken(iteration: String? = "1"): String? {
         val tokensFromProperties = setOf(
             System.getProperty("CRYPTR_API_KEY_TOKEN", "null"),
             System.getProperty("CRYPTR_CURRENT_API_KEY_TOKEN", "null")
@@ -88,7 +90,12 @@ class Cryptr(
         val tokenFromProperties = tokensFromProperties.firstOrNull { it !== "null" && it.length > 2 }
         if (tokenFromProperties !== null) {
             val verification = verifyApiKeyToken(tokenFromProperties)
-            if (verification is JWTToken && verification.validIss) return tokenFromProperties
+            if (verification is JWTToken && verification.validIss) {
+                return tokenFromProperties
+            } else {
+                System.clearProperty("CRYPTR_CURRENT_API_KEY_TOKEN")
+                if (iteration != "2") return retrieveApiKeyToken("2")
+            }
         } else {
             val params = mapOf(
                 "client_id" to apiKeyClientId,
@@ -106,7 +113,11 @@ class Cryptr(
             val apiKeyToken = apiKeyTokenResponse.getString("access_token")
             val verification = verifyApiKeyToken(apiKeyToken, true)
             logDebug({ "verification request $verification" })
-            if (verification is JWTToken && verification.validIss) return apiKeyToken
+            if (verification is JWTToken && verification.validIss) {
+                return apiKeyToken
+            } else {
+                System.clearProperty("CRYPTR_CURRENT_API_KEY_TOKEN")
+            }
         }
         logError({ "Error while retrieving api key token" })
         return null
