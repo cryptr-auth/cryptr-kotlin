@@ -11,11 +11,10 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 ### Apache Maven
 
 ```xml
-
 <dependency>
     <groupId>co.cryptr</groupId>
     <artifactId>cryptr-kotlin</artifactId>
-    <version>0.0.2</version>
+    <version>0.1.0</version>
 </dependency>
 
 ```
@@ -25,7 +24,7 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 ```groovy
 
 dependencies {
-    implementation 'co.cryptr:cryptr-kotlin:0.0.2'
+    implementation 'co.cryptr:cryptr-kotlin:0.1.0'
 }
 
 ```
@@ -34,7 +33,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("co.cryptr:cryptr-kotlin:0.0.2")
+    implementation("co.cryptr:cryptr-kotlin:0.1.0")
 }
 ```
 
@@ -67,8 +66,7 @@ You can also define your Configuration through [System properties](#system-prope
 
 ### SSO SAML Headless process
 
-This process allows you to generate a challenge to start a SSO SAML authentication process without using a front-end for
-the
+This process allows you to generate a challenge to start a SSO SAML authentication process without using a front-end for the
 entire process
 
 ```kotlin
