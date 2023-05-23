@@ -10,9 +10,15 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+/**
+ * @suppress
+ */
 interface Requestable : URLable, Loggable {
 
 
+    /**
+     * @suppress
+     */
     fun paginationQuery(
         perPage: Int? = 10,
         currentPage: Int? = 1
@@ -22,6 +28,9 @@ interface Requestable : URLable, Loggable {
         return if (map.isEmpty()) "" else "?" + mapToFormData(map)
     }
 
+    /**
+     * @suppress
+     */
     fun makeListRequest(
         path: String,
         baseUrl: String = System.getProperty(
@@ -40,6 +49,9 @@ interface Requestable : URLable, Loggable {
         )
     }
 
+    /**
+     * @suppress
+     */
     fun makeDeleteRequest(
         path: String,
         baseUrl: String = System.getProperty(
@@ -51,6 +63,9 @@ interface Requestable : URLable, Loggable {
         return makeRequest(path = path, baseUrl = baseUrl, apiKeyToken = apiKeyToken, requestMethod = "DELETE")
     }
 
+    /**
+     * @suppress
+     */
     fun makeUpdateRequest(
         path: String,
         baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), Constants.DEFAULT_BASE_URL),
@@ -60,6 +75,9 @@ interface Requestable : URLable, Loggable {
         return makeRequest(path, baseUrl, params = params, apiKeyToken = apiKeyToken, requestMethod = "PUT")
     }
 
+    /**
+     * @suppress
+     */
     fun makeRequest(
         path: String,
         baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), Constants.DEFAULT_BASE_URL),

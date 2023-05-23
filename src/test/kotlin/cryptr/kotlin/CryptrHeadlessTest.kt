@@ -29,7 +29,10 @@ class CryptrHeadlessTest {
         cryptr =
             Cryptr(tenantDomain, baseUrl, defaultRedirectUrl, apiKeyClientId, apiKeyClientSecret)
         System.setProperty("CRYPTR_JWT_ALG", "HS256")
-        System.setProperty("CRYPTR_API_KEY_TOKEN", "eyJ0eXAiOiJKV1QiLCJpc3MiOiJodHRwOi8vZGV2LmNyeXB0ci5ldS90L3NoYXJrLWFjYWRlbXkiLCJraWQiOiIxMjM0NTY3ODc5IiwiYWxnIjoiSFMyNTYifQ.eyJjaWQiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJkYnMiOiJzYW5kYm94IiwiZXhwIjoxOTg0MzEwNjQzLCJpYXQiOjE2ODQzMDcwNDMsImlzcyI6Imh0dHA6Ly9kZXYuY3J5cHRyLmV1L3Qvc2hhcmstYWNhZGVteSIsImp0aSI6ImFhMTM3NDI5LTE1NDgtNDRmMC04ZTY4LTk3ZDAzYzFkMDBmNyIsImp0dCI6ImFwaV9rZXkiLCJzY3AiOiJyZWFkX21hbnk6c3NvX2Nvbm5lY3Rpb25zIHVwZGF0ZTpzc29fY29ubmVjdGlvbnMiLCJzdWIiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJ0bnQiOiJzaGFyay1hY2FkZW15IiwidmVyIjoxfQ.q20l-u-8gjsHDkW1IQUErVdgGykWrZmiGaojMMfrVD4")
+        System.setProperty(
+            "CRYPTR_API_KEY_TOKEN",
+            "eyJ0eXAiOiJKV1QiLCJpc3MiOiJodHRwOi8vZGV2LmNyeXB0ci5ldS90L3NoYXJrLWFjYWRlbXkiLCJraWQiOiIxMjM0NTY3ODc5IiwiYWxnIjoiSFMyNTYifQ.eyJjaWQiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJkYnMiOiJzYW5kYm94IiwiZXhwIjoxOTg0MzEwNjQzLCJpYXQiOjE2ODQzMDcwNDMsImlzcyI6Imh0dHA6Ly9kZXYuY3J5cHRyLmV1L3Qvc2hhcmstYWNhZGVteSIsImp0aSI6ImFhMTM3NDI5LTE1NDgtNDRmMC04ZTY4LTk3ZDAzYzFkMDBmNyIsImp0dCI6ImFwaV9rZXkiLCJzY3AiOiJyZWFkX21hbnk6c3NvX2Nvbm5lY3Rpb25zIHVwZGF0ZTpzc29fY29ubmVjdGlvbnMiLCJzdWIiOiJmZDNjOTFjYy1mODc0LTRiZTAtYjQxOS0xYjU5ODk2ODY4MjAiLCJ0bnQiOiJzaGFyay1hY2FkZW15IiwidmVyIjoxfQ.q20l-u-8gjsHDkW1IQUErVdgGykWrZmiGaojMMfrVD4"
+        )
     }
 
     @Test
@@ -187,7 +190,7 @@ class CryptrHeadlessTest {
                     )
                 )
         )
-        val resp = cryptr.consumeSSOSamlChallengeCallback("some-code")
+        val resp = cryptr.validateSSOChallenge("some-code")
         assertIs<APIResult<ChallengeResponse, ErrorMessage>>(resp)
         if (resp is APISuccess) {
             assertNotNull(resp.value.clientUrl)
@@ -197,13 +200,13 @@ class CryptrHeadlessTest {
 
     @Test
     fun consumeSSOSamlChallengeCallbackThrowsWithoutProperCode() {
-        val response1 = cryptr.consumeSSOSamlChallengeCallback()
+        val response1 = cryptr.validateSSOChallenge()
         assertIs<APIError<*, ErrorMessage>>(response1)
         if (response1 is APIError) {
             assertEquals("code is required", response1.error.message)
         }
 
-        val response2 = cryptr.consumeSSOSamlChallengeCallback("")
+        val response2 = cryptr.validateSSOChallenge("")
         assertIs<APIError<*, ErrorMessage>>(response2)
         if (response2 is APIError) {
             assertEquals("code is required", response2.error.message)

@@ -8,7 +8,13 @@ import io.github.oshai.KLogger
 import io.github.oshai.KotlinLogging
 import org.slf4j.LoggerFactory
 
+/**
+ * Interface to manage logging of Cryptr processes
+ */
 interface Loggable {
+    /**
+     * @suppress
+     */
     fun logInfo(info: () -> Any?, logger: KLogger = KotlinLogging.logger {}) {
         if (!isJUnitTest()) {
             val currentLogger = currentLogger()
@@ -20,6 +26,9 @@ interface Loggable {
         }
     }
 
+    /**
+     * @suppress
+     */
     fun logDebug(debug: () -> Any?, logger: KLogger = KotlinLogging.logger {}) {
         if (!isJUnitTest()) {
             val currentLogger = currentLogger()
@@ -31,6 +40,9 @@ interface Loggable {
         }
     }
 
+    /**
+     * @suppress
+     */
     fun logError(error: () -> Any?, logger: KLogger = KotlinLogging.logger {}) {
         if (!isJUnitTest()) {
             val currentLogger = currentLogger()
@@ -42,23 +54,38 @@ interface Loggable {
         }
     }
 
+    /**
+     * @suppress
+     */
     fun logException(exception: java.lang.Exception, logger: KLogger = KotlinLogging.logger {}) {
         if (!isJUnitTest()) {
             logger.error("an exception occured:\n$exception")
         }
     }
 
+    /**
+     * Define the log level for current Cryptr SDK instantiation
+     *
+     * @param logLevel [String] of desired log level (ex: `ERROR`, `DEBUG` ...)
+     *
+     */
     fun setLogLevel(logLevel: String) {
         val logger = currentLogger()
         logger.level = Level.toLevel(logLevel)
     }
 
+    /**
+     * @suppress
+     */
     private fun currentLogger(): Logger {
         val loggerContext: LoggerContext = LoggerFactory.getILoggerFactory() as LoggerContext
         val packageName = Cryptr::javaClass.name
         return loggerContext.getLogger(packageName)
     }
 
+    /**
+     * @suppress
+     */
     fun isJUnitTest(): Boolean {
         for (element in Thread.currentThread().stackTrace) {
             if (element.className.startsWith("org.junit.")) {

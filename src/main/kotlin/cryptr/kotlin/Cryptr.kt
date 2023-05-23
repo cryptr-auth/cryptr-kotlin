@@ -24,7 +24,7 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 /**
- * Instantiate Cryptr
+ * Instantiate Cryptr SDK
  *
  * @param tenantDomain Your account value `domain`
  * @param baseUrl The URL of your Cryptr Service
@@ -42,10 +42,16 @@ class Cryptr(
     protected val apiKeyClientId: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_ID.toString()),
     protected val apiKeyClientSecret: String = System.getProperty(CryptrEnvironment.CRYPTR_API_KEY_CLIENT_SECRET.toString())
 ) : Requestable, Tokenable {
+    /**
+     * @suppress
+     */
     @OptIn(ExperimentalSerializationApi::class)
     val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
     private val ignoreIssChecking = System.getProperty("CRYPTR_IGNORE_ISS_CHECKING", "true") == "true"
 
+    /**
+     * Retrieve the current base URL
+     */
     val cryptrBaseUrl: String
         get() = baseUrl
 
@@ -65,6 +71,15 @@ class Cryptr(
     }
 
 
+    /**
+     * Retrieve the current token using API KEY configuration.
+     *
+     * You can setup a static using `CRYPTR_API_KEY_TOKEN` property.
+     * If not, the SDK will generate one depending on {@link Cryptr#apiKeyClientId} {@link #apiKeyClientId}  and **apiKeyClientSecret**
+     * and store it until it's expired
+     *
+     * @return The api Key token [String] if succeeded
+     */
     fun retrieveApiKeyToken(): String? {
         val tokensFromProperties = setOf(
             System.getProperty("CRYPTR_API_KEY_TOKEN", "null"),
@@ -187,7 +202,7 @@ class Cryptr(
      * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
      * @return JSONObject containing end-user session JWTs
      */
-    fun consumeSSOSamlChallengeCallback(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
+    fun validateSSOChallenge(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
             val response = makeRequest("oauth/token", baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
@@ -219,9 +234,9 @@ class Cryptr(
     }
 
     /**
-     * Get Organization from its id
+     * Get Organization from its domain
      *
-     * @param domain The id reference of requested Organization
+     * @param domain The domain reference of requested Organization
      *
      * @return the requested [Organization]
      */
@@ -236,6 +251,14 @@ class Cryptr(
         }
     }
 
+    /**
+     * Creates an [Organization] based on given parameters
+     *
+     * @param organizationName The desired name for Organization to create
+     * @param allowedEmailDomains (Optional) email domains for end-user
+     *
+     * @return the created [Organization]
+     */
     fun createOrganization(
         organizationName: String,
         allowedEmailDomains: Set<String>? = null
@@ -249,7 +272,7 @@ class Cryptr(
 
 
     /**
-     * Creates an [Organization] based on given parameters
+     * Creates an [Organization] based on given Organization Structure
      *
      * @param organization The desired [Organization] to create
      *
@@ -349,6 +372,14 @@ class Cryptr(
         return createUser(organizationDomain, user = User(email = userEmail))
     }
 
+    /**
+     * Creates a [User] based on given structure and domain
+     *
+     * @param organizationDomain The domain of user's organization
+     * @param user The [User] structure
+     *
+     * @return the created [User]
+     */
     fun createUser(organizationDomain: String, user: User): APIResult<User, ErrorMessage> {
         val params = JSONObject(format.encodeToString(user)).toMap()
         val response = makeRequest(
@@ -434,6 +465,14 @@ class Cryptr(
         }
     }
 
+    /**
+     * Retrieves an [Application] based on its Organization's domain and ID
+     *
+     * @param organizationDomain The [Organization] domain
+     * @param applicationId The ID of the requested [Application]
+     *
+     * @return [Application]
+     */
     fun getApplication(organizationDomain: String, applicationId: String): APIResult<Application, ErrorMessage> {
         val response =
             makeRequest(
@@ -528,7 +567,17 @@ class Cryptr(
     }
 
     /**
-     * Creates AdminOnbording
+     * Creates [APIResult]  of [AdminOnboarding] type `sso-connection`
+     *
+     * @param organizationDomain The domain of the targeted [Organization]
+     * @param ssoAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
+     * @param providerType (Optional) [String] provider type for the SSO to setup (ex : Okta, ADFS...)
+     * @param emailTemplateId (Optional) [String] ID of the email template to use for email send to IT Admin
+     * @param sendEmail (Optional) [Boolean] to send immediately email to IT Admin or not (default: true)
+     * @param applicationId (Optional) [String] ID of the frontend CLient application to redirect end-user to after SSO
+     * authentication
+     *
+     * @return [APIResult] of the creation result
      */
     fun createSSOAdminOnboarding(
         organizationDomain: String,
@@ -547,6 +596,18 @@ class Cryptr(
         )
     }
 
+    /**
+     * Creates [APIResult]  of [AdminOnboarding] according to provided params
+     *
+     * @param organizationDomain The domain of the targeted [Organization]
+     * @param onboardingType [String] representing type of onboarding (ex: `sso-connection`)
+     * @param ssoAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
+     * @param emailTemplateId (Optional) [String] ID of the email template to use for email send to IT Admin
+     * @param sendEmail (Optional) [Boolean] to send immediately email to IT Admin or not (default: true)
+     * @param customParams (Optional) [Map] of custom attributes related to onboardingType
+     *
+     * @return [APIResult] of the creation result
+     */
     fun createAdminOnboarding(
         organizationDomain: String,
         onboardingType: String,
@@ -586,15 +647,32 @@ class Cryptr(
         }
     }
 
-    fun getSSOAdminOnboarding(organizationDomain: String): APIResult<CryptrResource, ErrorMessage> {
+    /**
+     * Retrieve an [APIResult] of type [AdminOnboarding] for `sso-connection` onboarding type
+     *
+     * @param organizationDomain [String] of Organization's domain
+     *
+     * @see Cryptr.getAdminOnboarding(organizationDomain, "sso-connection")
+     *
+     * @return [APIResult] of type [AdminOnboarding]
+     */
+    fun getSSOAdminOnboarding(organizationDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
         return getAdminOnboarding(organizationDomain, "sso-connection")
     }
 
 
+    /**
+     * Retrieve an Admin onboarding based on given parameters
+     *
+     * @param organizationDomain [String] targeted Organization's domain
+     * @param onboardingType [String] targeted onboarding type (ex: `sso-connection`)
+     *
+     * @return [APIResult] of type [AdminOnboarding]
+     */
     fun getAdminOnboarding(
         organizationDomain: String,
         onboardingType: String
-    ): APIResult<CryptrResource, ErrorMessage> {
+    ): APIResult<AdminOnboarding, ErrorMessage> {
         val path = buildAdminOnboardingUrl(organizationDomain, onboardingType)
         val response = makeRequest(path, apiKeyToken = retrieveApiKeyToken(), requestMethod = "GET")
         return try {
@@ -605,6 +683,15 @@ class Cryptr(
         }
     }
 
+    /**
+     * Invite IT Admin by email for the related [Organization] SSO AdminOnboarding
+     *
+     *  @param organizationDomain [String] of the targeted Organization's domain
+     *  @param itAdminEmail (Optional) [String] of the (new) IT admin email
+     *
+     *  @return [APIResult] of [AdminOnboarding]
+     */
+
     fun inviteSSOAdminOnboarding(
         organizationDomain: String,
         itAdminEmail: String? = null
@@ -612,6 +699,15 @@ class Cryptr(
         return inviteAdminOnboarding(organizationDomain, "sso-connection", itAdminEmail)
     }
 
+    /**
+     * Invite IT Admin by email for the related [Organization] AdminOnboarding
+     *
+     *  @param organizationDomain [String] of the targeted Organization's domain
+     *  @param onboardingType The type of targeted AdminOnboarding (ex: 'sso-connection')
+     *  @param itAdminEmail (Optional) [String] of the (new) IT admin email
+     *
+     *  @return [APIResult] of [AdminOnboarding]
+     */
     fun inviteAdminOnboarding(
         organizationDomain: String,
         onboardingType: String,
@@ -631,10 +727,25 @@ class Cryptr(
         }
     }
 
+    /**
+     * Reset SSO [AdminOnboarding] for the related [Organization]
+     *
+     *  @param organizationDomain [String] of the targeted Organization's domain
+     *
+     *  @return [APIResult] of resetted [AdminOnboarding]
+     */
     fun resetSSOAdminOnboarding(organizationDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
         return resetAdminOnboarding(organizationDomain, "sso-connection")
     }
 
+    /**
+     * Reset [AdminOnboarding] for the related [Organization]
+     *
+     *  @param organizationDomain [String] of the targeted Organization's domain
+     *  @param onobardingType The type of AdminOnboarding to reset (ex: 'sso-connection')
+     *
+     *  @return [APIResult] of resetted [AdminOnboarding]
+     */
     fun resetAdminOnboarding(
         organizationDomain: String,
         onboardingType: String
@@ -654,7 +765,7 @@ class Cryptr(
     }
 
     /**
-     * OTHER
+     * @suppress
      */
     fun toJSONListString(result: APIResult<List<CryptrResource>, ErrorMessage>): String {
         return try {
@@ -678,6 +789,13 @@ class Cryptr(
         }
     }
 
+    /**
+     * Format to JSON String
+     *
+     * @param result the [APIResult] to format to JSON String
+     *
+     * @return JSON [String] depending on result is success or error
+     */
     fun toJSONString(result: APIResult<*, ErrorMessage>): String {
         return try {
             when (result) {
@@ -693,6 +811,13 @@ class Cryptr(
         }
     }
 
+    /**
+     * Format  ChallengeResponse to JSON String
+     *
+     * @param result the [ChallengeResponse] to format to JSON String
+     *
+     * @return JSON [String] depending on provided ChallengeResponse
+     */
     fun toJSONString(result: ChallengeResponse): String {
         return try {
             format.encodeToString(ChallengeResponse.serializer(), result)
@@ -702,6 +827,14 @@ class Cryptr(
         }
     }
 
+    /**
+     * Format  ErrorMessage to JSON String
+     *
+     * @param result the [ErrorMessage] to format to JSON String
+     *
+     * @return JSON [String] depending on provided ErrorMessage
+     *
+     */
     fun toJSONString(result: ErrorMessage): String {
         return try {
             format.encodeToString(ErrorMessage.serializer(), result)
@@ -711,6 +844,14 @@ class Cryptr(
         }
     }
 
+    /**
+     * Format the [CryptrResource] (User, AdminOnboarding, Organization...) to JSON String
+     *
+     * @param result the [CryptrResource] to format to JSON String
+     *
+     * @return JSON [String] depending on provided CryptrResource
+     *
+     */
     fun toJSONString(result: CryptrResource): String {
         return try {
             format.encodeToString(CryptrSerializer, result)
@@ -720,6 +861,14 @@ class Cryptr(
         }
     }
 
+    /**
+     * Format the [DeletedResource] (DeletedOrganization...) to JSON String
+     *
+     * @param result the [DeletedResource] to format to JSON String
+     *
+     * @return JSON [String] depending on provided DeletedResource
+     *
+     */
     fun toJSONString(result: DeletedResource): String {
         return try {
             format.encodeToString(result)
