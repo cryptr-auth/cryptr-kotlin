@@ -56,7 +56,7 @@ class CryptrHeadlessTest {
         )
 
         val challengeResponse =
-            cryptr.createSSOChallenge(orgDomain = "acme-company", authType = ChallengeType.OAUTH)
+            cryptr.createSsoChallenge(orgDomain = "acme-company", authType = ChallengeType.OAUTH)
         assertNotNull(challengeResponse)
         if (challengeResponse is APISuccess) {
             val challenge = challengeResponse.value
@@ -88,7 +88,7 @@ class CryptrHeadlessTest {
                 )
         )
 
-        val challengeResponse = cryptr.createSSOOauthChallenge(orgDomain = "acme-company")
+        val challengeResponse = cryptr.createSsoOauthChallenge(orgDomain = "acme-company")
         assertNotNull(challengeResponse)
         if (challengeResponse is APISuccess) {
             val challenge = challengeResponse.value
@@ -116,7 +116,7 @@ class CryptrHeadlessTest {
                     )
                 )
         )
-        val challengeResponse = cryptr.createSSOSamlChallenge(orgDomain = "acme-company")
+        val challengeResponse = cryptr.createSsoSamlChallenge(orgDomain = "acme-company")
         assertNotNull(challengeResponse, "should return object")
         if (challengeResponse is APISuccess) {
             val challenge = challengeResponse.value
@@ -146,7 +146,7 @@ class CryptrHeadlessTest {
                     )
                 )
         )
-        val challengeResponse = cryptr.createSSOSamlChallenge(userEmail = "john@blablabus.fr")
+        val challengeResponse = cryptr.createSsoSamlChallenge(userEmail = "john@blablabus.fr")
         if (challengeResponse is APISuccess) {
             val challenge = challengeResponse.value
             assertNotNull(challenge, "should return object")
@@ -159,7 +159,7 @@ class CryptrHeadlessTest {
     @Test
     fun createSSOChallengeThrowsIfNoOrgOrEmail() {
         val e: Exception = assertThrows {
-            cryptr.createSSOChallenge()
+            cryptr.createSsoChallenge()
         }
 
         assertEquals("requires either orgDomain or endUser value", e.message)
@@ -190,7 +190,7 @@ class CryptrHeadlessTest {
                     )
                 )
         )
-        val resp = cryptr.validateSSOChallenge("some-code")
+        val resp = cryptr.validateSsoChallenge("some-code")
         assertIs<APIResult<ChallengeResponse, ErrorMessage>>(resp)
         if (resp is APISuccess) {
             assertNotNull(resp.value.clientUrl)
@@ -200,13 +200,13 @@ class CryptrHeadlessTest {
 
     @Test
     fun consumeSSOSamlChallengeCallbackThrowsWithoutProperCode() {
-        val response1 = cryptr.validateSSOChallenge()
+        val response1 = cryptr.validateSsoChallenge()
         assertIs<APIError<*, ErrorMessage>>(response1)
         if (response1 is APIError) {
             assertEquals("code is required", response1.error.message)
         }
 
-        val response2 = cryptr.validateSSOChallenge("")
+        val response2 = cryptr.validateSsoChallenge("")
         assertIs<APIError<*, ErrorMessage>>(response2)
         if (response2 is APIError) {
             assertEquals("code is required", response2.error.message)

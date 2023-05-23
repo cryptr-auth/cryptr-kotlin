@@ -104,7 +104,7 @@ interface URLable {
     /**
      * @suppress
      */
-    fun buildSSOConnectionPath(orgDomain: String, resourceId: String? = null): String {
+    fun buildSsoConnectionPath(orgDomain: String, resourceId: String? = null): String {
         return buildOrganizationResourcePath(orgDomain, "sso-connections", resourceId)
     }
 

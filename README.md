@@ -75,7 +75,7 @@ entire process
 
 // 1. generate a challenge from any point of your app (requires network) and retrieve authorization URL
 val ssoSamlChallengePayload =
-    cryptr.createSSOSamlChallenge(
+    cryptr.createSsoSamlChallenge(
         redirectUri = "https://localhost:8080/some-callback-endpoint",
         orgDomain = orgDomain,
         userEmail = userEmail

@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * Types for [SSOChallenge]
  *
  *
- * @see Cryptr.createSSOChallenge(authType = ChallengeType.SAML)
+ * @see Cryptr.createSsoChallenge(authType = ChallengeType.SAML)
  */
 @Serializable
 enum class ChallengeType(val value: String) {

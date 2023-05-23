@@ -151,12 +151,12 @@ class Cryptr(
      * @param userEmail End-User email linked to the SSO Connection
      * @return a JSONObject with `authorization_url`that end-user has to open to do his authententication process
      */
-    fun createSSOSamlChallenge(
+    fun createSsoSamlChallenge(
         redirectUri: String = defaultRedirectUri,
         orgDomain: String? = null,
         userEmail: String? = null
     ): APIResult<SSOChallenge, ErrorMessage> {
-        return createSSOChallenge(redirectUri, orgDomain, userEmail)
+        return createSsoChallenge(redirectUri, orgDomain, userEmail)
     }
 
     /**
@@ -168,12 +168,12 @@ class Cryptr(
      * @param userEmail End-User email linked to the SSO Connection
      * @return a JSONObject with `authorization_url`that end-user has to open to do his authententication process
      */
-    fun createSSOOauthChallenge(
+    fun createSsoOauthChallenge(
         redirectUri: String = defaultRedirectUri,
         orgDomain: String? = null,
         userEmail: String? = null
     ): APIResult<SSOChallenge, ErrorMessage> {
-        return createSSOChallenge(redirectUri, orgDomain, userEmail, ChallengeType.OAUTH)
+        return createSsoChallenge(redirectUri, orgDomain, userEmail, ChallengeType.OAUTH)
     }
 
     /**
@@ -186,7 +186,7 @@ class Cryptr(
      * @param authType (Optional, Default: SAML)
      * @return a [SSOChallenge] with `authorization_url`that end-user has to open to do his authententication process
      */
-    fun createSSOChallenge(
+    fun createSsoChallenge(
         redirectUri: String = defaultRedirectUri,
         orgDomain: String? = null,
         userEmail: String? = null,
@@ -217,7 +217,7 @@ class Cryptr(
      * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
      * @return JSONObject containing end-user session JWTs
      */
-    fun validateSSOChallenge(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
+    fun validateSsoChallenge(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
             val response = makeRequest("oauth/token", serviceUrl, params = params, apiKeyToken = retrieveApiKeyToken())
@@ -560,7 +560,7 @@ class Cryptr(
     /** Creates a [SSOConnection]
      *
      */
-    fun createSSOConnection(
+    fun createSsoConnection(
         orgDomain: String,
         providerType: String? = null,
         applicationId: String? = null,
@@ -574,7 +574,7 @@ class Cryptr(
             "send_email" to sendEmail
         )
         val response = makeRequest(
-            buildSSOConnectionPath(orgDomain),
+            buildSsoConnectionPath(orgDomain),
             serviceUrl = serviceUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken()
