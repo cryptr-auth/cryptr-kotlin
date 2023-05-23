@@ -27,14 +27,17 @@ import org.json.JSONObject
  * Instantiate Cryptr SDK
  *
  * @param tenantDomain Your account value `domain`
- * @param baseUrl The URL of your Cryptr Service
+ * @param serviceUrl The URL of your Cryptr Service
  * @param defaultRedirectUrl Where you want to redirect te end-user after dev.cryptr.eu process
  * @param apiKeyClientId The ID of your API KEY
  * @param apiKeyClientSecret The secret of your API KEY
  */
 class Cryptr(
     protected val tenantDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_TENANT_DOMAIN.toString()),
-    protected val baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), DEFAULT_BASE_URL),
+    protected val serviceUrl: String = System.getProperty(
+        CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+        DEFAULT_BASE_URL
+    ),
     protected val defaultRedirectUrl: String = System.getProperty(
         CryptrEnvironment.CRYPTR_DEFAULT_REDIRECT_URL.toString(),
         DEFAULT_REDIRECT_URL
@@ -52,8 +55,8 @@ class Cryptr(
     /**
      * Retrieve the current base URL
      */
-    val cryptrBaseUrl: String
-        get() = baseUrl
+    val cryptrServiceUrl: String
+        get() = serviceUrl
 
     init {
         if (!isJUnitTest()) {
@@ -62,7 +65,7 @@ class Cryptr(
         logInfo({
             """Cryptr intialized with:
                 |- tenantDomain: $tenantDomain
-                |- baseUrl: $baseUrl
+                |- baseUrl: $serviceUrl
                 |- defaultRedirection: $defaultRedirectUrl
                 |- apiKeyClientId: $apiKeyClientId
                 |- apiKeyClientSecret: $apiKeyClientSecret
@@ -107,7 +110,7 @@ class Cryptr(
             val apiKeyTokenResponse =
                 makeRequest(
                     "${Constants.API_BASE_BATH}/${Constants.API_VERSION}${CryptrApiPath.API_KEY_TOKEN.pathValue}",
-                    baseUrl = baseUrl,
+                    serviceUrl = serviceUrl,
                     params = params
                 )
             val apiKeyToken = apiKeyTokenResponse.getString("access_token")
@@ -125,7 +128,7 @@ class Cryptr(
 
     private fun verifyApiKeyToken(apiKeyToken: String, storeInProperties: Boolean? = false): JWTToken? {
         val forceIss = ignoreIssChecking || isJUnitTest()
-        val jwtToken = verify(baseUrl, apiKeyToken, forceIss)
+        val jwtToken = verify(serviceUrl, apiKeyToken, forceIss)
 
         if (storeInProperties == true) {
             System.setProperty("CRYPTR_CURRENT_API_KEY_TOKEN", apiKeyToken)
@@ -195,7 +198,8 @@ class Cryptr(
                 "redirect_uri" to redirectUri,
                 "org_domain" to orgDomain
             ) else mapOf("redirect_uri" to redirectUri, "user_email" to userEmail)
-            val response = makeRequest(path, baseUrl = baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+            val response =
+                makeRequest(path, serviceUrl = serviceUrl, params = params, apiKeyToken = retrieveApiKeyToken())
             return try {
                 APISuccess(format.decodeFromString<SSOChallenge>(response.toString()))
             } catch (e: Exception) {
@@ -216,7 +220,7 @@ class Cryptr(
     fun validateSSOChallenge(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
-            val response = makeRequest("oauth/token", baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+            val response = makeRequest("oauth/token", serviceUrl, params = params, apiKeyToken = retrieveApiKeyToken())
             return try {
                 APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
             } catch (e: Exception) {
@@ -235,7 +239,13 @@ class Cryptr(
 
     fun listOrganizations(perPage: Int? = 10, currentPage: Int? = 1): APIResult<List<Organization>, ErrorMessage> {
         val response =
-            makeListRequest(buildOrganizationPath(), baseUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
+            makeListRequest(
+                buildOrganizationPath(),
+                serviceUrl,
+                apiKeyToken = retrieveApiKeyToken(),
+                perPage,
+                currentPage
+            )
         return try {
             APISuccess(format.decodeFromString<List<Organization>>(response.toString()))
         } catch (e: Exception) {
@@ -253,7 +263,7 @@ class Cryptr(
      */
     fun getOrganization(domain: String): APIResult<Organization, ErrorMessage> {
         val response =
-            makeRequest(buildOrganizationPath(domain), baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken())
+            makeRequest(buildOrganizationPath(domain), serviceUrl = serviceUrl, apiKeyToken = retrieveApiKeyToken())
         return try {
             APISuccess(format.decodeFromString<Organization>(response.toString()))
         } catch (e: Exception) {
@@ -292,7 +302,7 @@ class Cryptr(
     fun createOrganization(organization: Organization): APIResult<Organization, ErrorMessage> {
         val params = JSONObject(format.encodeToString(organization)).toMap()
         val response =
-            makeRequest(buildOrganizationPath(), baseUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+            makeRequest(buildOrganizationPath(), serviceUrl, params = params, apiKeyToken = retrieveApiKeyToken())
         return try {
             APISuccess(format.decodeFromString<Organization>(response.toString()))
         } catch (e: Exception) {
@@ -311,7 +321,7 @@ class Cryptr(
     fun deleteOrganization(organization: Organization): DeletedOrganization? {
         val response = makeDeleteRequest(
             buildOrganizationPath(organization.domain),
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             apiKeyToken = retrieveApiKeyToken()
         )
         return try {
@@ -336,7 +346,7 @@ class Cryptr(
         val response =
             makeListRequest(
                 buildUserPath(organizationDomain),
-                baseUrl = baseUrl,
+                serviceUrl = serviceUrl,
                 apiKeyToken = retrieveApiKeyToken(),
                 perPage,
                 currentPage
@@ -360,7 +370,7 @@ class Cryptr(
     fun getUser(organizationDomain: String, userId: String): APIResult<User, ErrorMessage> {
         val response = makeRequest(
             buildUserPath(organizationDomain, userId),
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             apiKeyToken = retrieveApiKeyToken()
         )
         return try {
@@ -395,7 +405,7 @@ class Cryptr(
         val params = JSONObject(format.encodeToString(user)).toMap()
         val response = makeRequest(
             buildUserPath(organizationDomain),
-            baseUrl,
+            serviceUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken()
         )
@@ -419,7 +429,7 @@ class Cryptr(
         val params = JSONObject(format.encodeToString(userToUpdate)).toMap()
         val response = makeUpdateRequest(
             buildUserPath(userToUpdate.resourceDomain.toString(), userToUpdate.id),
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken()
         )
@@ -442,7 +452,7 @@ class Cryptr(
     fun deleteUser(user: User): DeletedUser? {
         val response = makeDeleteRequest(
             buildUserPath(user.resourceDomain.toString(), user.id),
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             retrieveApiKeyToken()
         )
         return try {
@@ -467,7 +477,7 @@ class Cryptr(
     ): APIResult<List<Application>, ErrorMessage> {
         val path = buildApplicationPath(organizationDomain)
         val response =
-            makeListRequest(path, baseUrl = baseUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
+            makeListRequest(path, serviceUrl = serviceUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
         return try {
             APISuccess(format.decodeFromString<List<Application>>(response.toString()))
         } catch (e: Exception) {
@@ -488,7 +498,7 @@ class Cryptr(
         val response =
             makeRequest(
                 buildApplicationPath(organizationDomain, applicationId),
-                baseUrl = baseUrl,
+                serviceUrl = serviceUrl,
                 apiKeyToken = retrieveApiKeyToken()
             )
         return try {
@@ -512,7 +522,7 @@ class Cryptr(
         val response =
             makeRequest(
                 buildApplicationPath(organizationDomain),
-                baseUrl = baseUrl,
+                serviceUrl = serviceUrl,
                 params = params,
                 apiKeyToken = retrieveApiKeyToken()
             )
@@ -535,7 +545,7 @@ class Cryptr(
     fun deleteApplication(application: Application): DeletedApplication? {
         val response = makeDeleteRequest(
             buildApplicationPath(application.resourceDomain.toString(), application.id),
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             retrieveApiKeyToken()
         )
         return try {
@@ -565,7 +575,7 @@ class Cryptr(
         )
         val response = makeRequest(
             buildSSOConnectionPath(organizationDomain),
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken()
         )
@@ -644,7 +654,7 @@ class Cryptr(
         logDebug({ params.toString() })
         val response = makeRequest(
             path,
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken(),
             requestMethod = "POST"

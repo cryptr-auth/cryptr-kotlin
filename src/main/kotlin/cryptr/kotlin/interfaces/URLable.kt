@@ -14,13 +14,13 @@ interface URLable {
     /**
      * Basic helper to build Cryptr URL
      *
-     * @param baseUrl The Cryptr service base URL
-     * @param path The path to append to baseUrl
+     * @param serviceUrl The Cryptr service base URL
+     * @param path The path to append to serviceUrl
      *
      * @return the concatenated URL [String]
      */
-    fun buildCryptrUrl(baseUrl: String, path: String): String {
-        return if (path.startsWith("/")) "$baseUrl$path" else "$baseUrl/$path"
+    fun buildCryptrUrl(serviceUrl: String, path: String): String {
+        return if (path.startsWith("/")) "$serviceUrl$path" else "$serviceUrl/$path"
     }
 
     /**
