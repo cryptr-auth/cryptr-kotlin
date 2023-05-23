@@ -12,9 +12,9 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 
 ```xml
 <dependency>
-  <groupId>co.cryptr</groupId>
-  <artifactId>cryptr-kotlin</artifactId>
-  <version>0.0.2</version>
+    <groupId>co.cryptr</groupId>
+    <artifactId>cryptr-kotlin</artifactId>
+    <version>0.1.0</version>
 </dependency>
 
 ```
@@ -24,7 +24,7 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 ```groovy
 
 dependencies {
-    implementation 'co.cryptr:cryptr-kotlin:0.0.2'
+    implementation 'co.cryptr:cryptr-kotlin:0.1.0'
 }
 
 ```
@@ -33,7 +33,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("co.cryptr:cryptr-kotlin:0.0.2")
+    implementation("co.cryptr:cryptr-kotlin:0.1.0")
 }
 ```
 
@@ -63,9 +63,10 @@ val cryptr = Cryptr(
 ```
 
 You can also define your Configuration through [System properties](#system-property-keys)
+
 ### SSO SAML Headless process
 
-This process allows you to generate a challenge to start a SSO SAML authent process without using a front-end for the
+This process allows you to generate a challenge to start a SSO SAML authentication process without using a front-end for the
 entire process
 
 ```kotlin
@@ -78,7 +79,7 @@ val ssoSamlChallengePayload =
         userEmail = userEmail
     )
 
-if(ssoSamlChallengePayload is APISuccess) {
+if (ssoSamlChallengePayload is APISuccess) {
     val authorizationUrl = ssoSamlChallengePayload.value.authorizationUrl
 }
 
@@ -87,8 +88,8 @@ if(ssoSamlChallengePayload is APISuccess) {
 // 3. handle the redirection on the chosen enpoint (here '/some-callback-endpoint)
 // on this enpoint you get a `code` parameter
 val challengeValidation = cryptr.validateSSOChallenge(call.parameters.get("code"))
-if(challengeValidation is APISuccess) {
-val endUserAccessToken = challengeValidation.value.accessToken
+if (challengeValidation is APISuccess) {
+    val endUserAccessToken = challengeValidation.value.accessToken
 }
 ```
 
