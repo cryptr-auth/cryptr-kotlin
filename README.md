@@ -11,29 +11,29 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 ### Apache Maven
 
 ```xml
-
 <dependency>
-    <groupId>org.cryptr</groupId>
-    <artifactId>lib</artifactId>
-    <version>VERSION</version>
+  <groupId>co.cryptr</groupId>
+  <artifactId>cryptr-kotlin</artifactId>
+  <version>0.0.2</version>
 </dependency>
-
 
 ```
 
 ### Gradle (Groovy DSL)
 
 ```groovy
+
 dependencies {
-    implementation 'org.cryptr:lib:VERSION'
+    implementation 'co.cryptr:cryptr-kotlin:0.0.2'
 }
+
 ```
 
 ### Gradle (Kotlin DSL)
 
 ```kotlin
 dependencies {
-    implementation("org.cryptr:lib:VERSION")
+    implementation("co.cryptr:cryptr-kotlin:0.0.2")
 }
 ```
 
@@ -62,6 +62,7 @@ val cryptr = Cryptr(
 )
 ```
 
+You can also define your Configuration through [System properties](#system-property-keys)
 ### SSO SAML Headless process
 
 This process allows you to generate a challenge to start a SSO SAML authent process without using a front-end for the
@@ -70,21 +71,25 @@ entire process
 ```kotlin
 
 // 1. generate a challenge from any point of your app (requires network) and retrieve authorization URL
-val createSSOSamlChallengePayload =
+val ssoSamlChallengePayload =
     cryptr.createSSOSamlChallenge(
         redirectUri = "https://localhost:8080/some-callback-endpoint",
         orgDomain = orgDomain,
         userEmail = userEmail
     )
 
-val authorizationUrl = createSSOSamlChallengePayload.get("authorization_url")
+if(ssoSamlChallengePayload is APISuccess) {
+    val authorizationUrl = ssoSamlChallengePayload.value.authorizationUrl
+}
 
 // 2. Give this authorization URL to the end-user (ex: by email or just by a redirection)
 
 // 3. handle the redirection on the chosen enpoint (here '/some-callback-endpoint)
 // on this enpoint you get a `code` parameter
-val callbackResp = cryptr.consumeSSOSamlChallengeCallback(call.parameters.get("code"))
-val endUserAccessToken = callbackResp.get("access_token")
+val challengeValidation = cryptr.validateSSOChallenge(call.parameters.get("code"))
+if(challengeValidation is APISuccess) {
+val endUserAccessToken = challengeValidation.value.accessToken
+}
 ```
 
 ## System property keys
