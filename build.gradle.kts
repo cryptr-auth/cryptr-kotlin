@@ -65,6 +65,7 @@ dependencies {
 
     // Is applied for HTML format in multi-project builds
     api("org.jetbrains.dokka:kotlin-as-java-plugin:1.8.10")
+    dokkaHtmlPlugin("org.jetbrains.dokka:versioning-plugin:1.8.10")
 }
 
 
@@ -92,11 +93,27 @@ tasks.withType<DokkaTask>().configureEach {
     val dokkaBaseConfiguration = """
     {
       "footerMessage": "© 2023 <a target=\"_blank\" href=\"https://cryptr.co\">Cryptr</a>",
+      "customStyleSheets": ["${file("cryptr-doc.css")}"],
+       "customAssets": ["${file("cryptr_logo_icon.svg")}"],
       "separateInheritedMembers" : false
     }
     """
 
-    pluginsMapConfiguration.set(mapOf("org.jetbrains.dokka.base.DokkaBase" to dokkaBaseConfiguration))
+    val versioningConfiguration = """
+    {
+      "version": "$version",
+      "versionsOrdering": ["$version", "0.0.2"],
+      "olderVersionsDir": "documentation/version",
+      "renderVersionsNavigationOnAllPages": true
+    }
+    """
+
+    pluginsMapConfiguration.set(
+        mapOf(
+            "org.jetbrains.dokka.versioning.VersioningPlugin" to versioningConfiguration,
+            "org.jetbrains.dokka.base.DokkaBase" to dokkaBaseConfiguration
+        )
+    )
 }
 
 
