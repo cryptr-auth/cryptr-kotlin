@@ -275,19 +275,19 @@ class Cryptr(
     /**
      * Creates an [Organization] based on given parameters
      *
-     * @param organizationName The desired name for Organization to create
+     * @param name The desired name for Organization to create
      * @param allowedEmailDomains (Optional) email domains for end-user
      *
      * @return the created [Organization]
      */
     fun createOrganization(
-        organizationName: String,
+        name: String,
         allowedEmailDomains: Set<String>? = null
     ): APIResult<Organization, ErrorMessage> {
         return if (allowedEmailDomains.isNullOrEmpty()) {
-            createOrganization(Organization(name = organizationName))
+            createOrganization(Organization(name = name))
         } else {
-            createOrganization(Organization(name = organizationName, allowedEmailDomains = allowedEmailDomains))
+            createOrganization(Organization(name = name, allowedEmailDomains = allowedEmailDomains))
         }
     }
 
