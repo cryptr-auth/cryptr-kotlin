@@ -65,7 +65,7 @@ class Cryptr(
         logInfo({
             """Cryptr intialized with:
                 |- accountDomain: $accountDomain
-                |- baseUrl: $serviceUrl
+                |- serviceUrl: $serviceUrl
                 |- defaultRedirectUri: $defaultRedirectUri
                 |- apiKeyClientId: $apiKeyClientId
                 |- apiKeyClientSecret: $apiKeyClientSecret
