@@ -9,4 +9,5 @@ object Constants {
 
     const val DEFAULT_BASE_URL = "https://auth.cryptr.eu"
     const val DEFAULT_REDIRECT_URL = "http://localhost:8080/callback"
+    const val CRYPTR_COMPATIBLE_VERSION = 25
 }
