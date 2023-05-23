@@ -11,7 +11,7 @@ import java.net.URI
  * User Manual available at https://docs.gradle.org/8.1.1/userguide/building_java_projects.html
  */
 group = "co.cryptr"
-version = "0.1.0"
+version = "0.1.1"
 
 plugins {
     `java-library`
