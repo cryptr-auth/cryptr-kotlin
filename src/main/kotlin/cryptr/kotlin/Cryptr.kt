@@ -564,13 +564,13 @@ class Cryptr(
         organizationDomain: String,
         providerType: String? = null,
         applicationId: String? = null,
-        ssoAdminEmail: String? = null,
+        itAdminEmail: String? = null,
         sendEmail: Boolean? = true
     ): APIResult<SSOConnection, ErrorMessage> {
         val params = mapOf(
             "provider_type" to providerType,
             "application_id" to applicationId,
-            "sso_admin_email" to ssoAdminEmail,
+            "sso_admin_email" to itAdminEmail,
             "send_email" to sendEmail
         )
         val response = makeRequest(
@@ -591,7 +591,7 @@ class Cryptr(
      * Creates [APIResult]  of [AdminOnboarding] type `sso-connection`
      *
      * @param organizationDomain The domain of the targeted [Organization]
-     * @param ssoAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
+     * @param itAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
      * @param providerType (Optional) [String] provider type for the SSO to setup (ex : Okta, ADFS...)
      * @param emailTemplateId (Optional) [String] ID of the email template to use for email send to IT Admin
      * @param sendEmail (Optional) [Boolean] to send immediately email to IT Admin or not (default: true)
@@ -602,7 +602,7 @@ class Cryptr(
      */
     fun createSSOAdminOnboarding(
         organizationDomain: String,
-        ssoAdminEmail: String? = null,
+        itAdminEmail: String? = null,
         providerType: String? = null,
         emailTemplateId: String? = null,
         sendEmail: Boolean? = true,
@@ -613,7 +613,7 @@ class Cryptr(
             "application_id" to applicationId
         )
         return createAdminOnboarding(
-            organizationDomain, "sso-connection", ssoAdminEmail, emailTemplateId, sendEmail, customParams
+            organizationDomain, "sso-connection", itAdminEmail, emailTemplateId, sendEmail, customParams
         )
     }
 
@@ -622,7 +622,7 @@ class Cryptr(
      *
      * @param organizationDomain The domain of the targeted [Organization]
      * @param onboardingType [String] representing type of onboarding (ex: `sso-connection`)
-     * @param ssoAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
+     * @param itAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
      * @param emailTemplateId (Optional) [String] ID of the email template to use for email send to IT Admin
      * @param sendEmail (Optional) [Boolean] to send immediately email to IT Admin or not (default: true)
      * @param customParams (Optional) [Map] of custom attributes related to onboardingType
@@ -632,14 +632,14 @@ class Cryptr(
     fun createAdminOnboarding(
         organizationDomain: String,
         onboardingType: String,
-        ssoAdminEmail: String? = null,
+        itAdminEmail: String? = null,
         emailTemplateId: String? = null,
         sendEmail: Boolean? = true,
         customParams: Map<String, Any?>? = mapOf<String, Any?>()
     ): APIResult<AdminOnboarding, ErrorMessage> {
         val path = buildAdminOnboardingUrl(organizationDomain, onboardingType)
         var basicParams: Map<String, Any?> = mapOf(
-            "it_admin_email" to ssoAdminEmail,
+            "it_admin_email" to itAdminEmail,
             "email_template_id" to emailTemplateId,
             "send_email" to sendEmail,
             "onboarding_type" to onboardingType
