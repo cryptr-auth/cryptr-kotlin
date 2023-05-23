@@ -11,11 +11,6 @@ data class Organization(
     @SerialName("__type__")
     override val cryptrType: String = "Organization",
     /**
-     * No value for [Organization]
-     */
-    @SerialName("__environment__")
-    override val environment: String? = null,
-    /**
      * Unique identifier created from the slugifierd name
      */
     val domain: String? = null,
