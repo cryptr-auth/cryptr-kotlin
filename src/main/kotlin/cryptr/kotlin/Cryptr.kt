@@ -261,7 +261,7 @@ class Cryptr(
      *
      * @return the requested [Organization]
      */
-    fun getOrganization(domain: String): APIResult<Organization, ErrorMessage> {
+    fun retrieveOrganization(domain: String): APIResult<Organization, ErrorMessage> {
         val response =
             makeRequest(buildOrganizationPath(domain), serviceUrl = serviceUrl, apiKeyToken = retrieveApiKeyToken())
         return try {
@@ -367,7 +367,7 @@ class Cryptr(
      *
      * @return The requested [User]
      */
-    fun getUser(orgDomain: String, userId: String): APIResult<User, ErrorMessage> {
+    fun retrieveUser(orgDomain: String, userId: String): APIResult<User, ErrorMessage> {
         val response = makeRequest(
             buildUserPath(orgDomain, userId),
             serviceUrl = serviceUrl,
@@ -494,7 +494,7 @@ class Cryptr(
      *
      * @return [Application]
      */
-    fun getApplication(orgDomain: String, applicationId: String): APIResult<Application, ErrorMessage> {
+    fun retrieveApplication(orgDomain: String, applicationId: String): APIResult<Application, ErrorMessage> {
         val response =
             makeRequest(
                 buildApplicationPath(orgDomain, applicationId),
