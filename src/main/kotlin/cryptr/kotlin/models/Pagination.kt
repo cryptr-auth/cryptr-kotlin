@@ -16,7 +16,7 @@ data class Pagination(
      * Current surrounding pages if you would like to display the navigation.
      * Ex: [2,3,4,5,6]
      */
-    @SerialName("current_pages") val currentPages: Set<Int> = setOf(),
+//    @SerialName("current_pages") val currentPages: Set<Int> = setOf(),
     /**
      * Next available page.
      * If you are on your last page value will be `null`.

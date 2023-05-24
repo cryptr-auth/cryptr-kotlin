@@ -5,7 +5,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Response of the [Cryptr.createSSOChallenge] when succeeded
+ * Response of the [Cryptr.createSsoChallenge] when succeeded
  */
 @Serializable
 data class SSOChallenge(
@@ -24,7 +24,7 @@ data class SSOChallenge(
      */
     @SerialName("expired_at") val expiredAt: Int,
     /**
-     * Chosen redirect URI given in [Cryptr.createSSOChallenge]
+     * Chosen redirect URI given in [Cryptr.createSsoChallenge]
      */
     @SerialName("redirect_uri") val redirectUri: String,
     /**

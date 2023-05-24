@@ -72,9 +72,9 @@ data class ChallengeResponse(
      *
      * @see idToken
      */
-    fun getIdClaims(baseUrl: String): JWTToken? {
+    fun getIdClaims(serviceUrl: String): JWTToken? {
         val token: String = idToken.toString()
-        return verify(baseUrl, token)
+        return verify(serviceUrl, token)
     }
 
     /**
@@ -82,8 +82,8 @@ data class ChallengeResponse(
      *
      * @see accessToken
      */
-    fun getAccessClaims(baseUrl: String): JWTToken? {
+    fun getAccessClaims(serviceUrl: String): JWTToken? {
         val token: String = accessToken.toString()
-        return verify(baseUrl, token)
+        return verify(serviceUrl, token)
     }
 }

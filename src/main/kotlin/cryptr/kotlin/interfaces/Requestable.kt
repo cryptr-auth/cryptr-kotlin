@@ -33,7 +33,7 @@ interface Requestable : URLable, Loggable {
      */
     fun makeListRequest(
         path: String,
-        baseUrl: String = System.getProperty(
+        serviceUrl: String = System.getProperty(
             CryptrEnvironment.CRYPTR_BASE_URL.toString(),
             Constants.DEFAULT_BASE_URL
         ),
@@ -43,7 +43,7 @@ interface Requestable : URLable, Loggable {
     ): JSONObject {
         return makeRequest(
             path = path + paginationQuery(perPage, currentPage),
-            baseUrl = baseUrl,
+            serviceUrl = serviceUrl,
             apiKeyToken = apiKeyToken,
             requestMethod = "GET"
         )
@@ -54,13 +54,13 @@ interface Requestable : URLable, Loggable {
      */
     fun makeDeleteRequest(
         path: String,
-        baseUrl: String = System.getProperty(
+        serviceUrl: String = System.getProperty(
             CryptrEnvironment.CRYPTR_BASE_URL.toString(),
             Constants.DEFAULT_BASE_URL
         ),
         apiKeyToken: String? = ""
     ): JSONObject {
-        return makeRequest(path = path, baseUrl = baseUrl, apiKeyToken = apiKeyToken, requestMethod = "DELETE")
+        return makeRequest(path = path, serviceUrl = serviceUrl, apiKeyToken = apiKeyToken, requestMethod = "DELETE")
     }
 
     /**
@@ -68,11 +68,14 @@ interface Requestable : URLable, Loggable {
      */
     fun makeUpdateRequest(
         path: String,
-        baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), Constants.DEFAULT_BASE_URL),
+        serviceUrl: String = System.getProperty(
+            CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+            Constants.DEFAULT_BASE_URL
+        ),
         params: Map<String, Any?>? = null,
         apiKeyToken: String? = ""
     ): JSONObject {
-        return makeRequest(path, baseUrl, params = params, apiKeyToken = apiKeyToken, requestMethod = "PUT")
+        return makeRequest(path, serviceUrl, params = params, apiKeyToken = apiKeyToken, requestMethod = "PUT")
     }
 
     /**
@@ -80,13 +83,16 @@ interface Requestable : URLable, Loggable {
      */
     fun makeRequest(
         path: String,
-        baseUrl: String = System.getProperty(CryptrEnvironment.CRYPTR_BASE_URL.toString(), Constants.DEFAULT_BASE_URL),
+        serviceUrl: String = System.getProperty(
+            CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+            Constants.DEFAULT_BASE_URL
+        ),
         params: Map<String, Any?>? = null,
         apiKeyToken: String? = "",
         requestMethod: String? = null,
     ): JSONObject {
         try {
-            val url = URL(buildCryptrUrl(baseUrl, path))
+            val url = URL(buildCryptrUrl(serviceUrl, path))
             val conn = url.openConnection() as HttpURLConnection
             logDebug(debug = { url.toString() })
 
