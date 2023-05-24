@@ -574,7 +574,7 @@ class Cryptr(
             "send_email" to sendEmail
         )
         val response = makeRequest(
-            buildSsoConnectionPath(orgDomain),
+            buildOrganizationResourcePath(orgDomain, resourceName = "sso-connection"),
             serviceUrl = serviceUrl,
             params = params,
             apiKeyToken = retrieveApiKeyToken()
