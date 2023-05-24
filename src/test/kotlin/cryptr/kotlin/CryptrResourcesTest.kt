@@ -172,7 +172,7 @@ class CryptrResourcesTest {
                 )
 
         )
-        val resp = cryptr.getOrganization("thibaud-java")
+        val resp = cryptr.retrieveOrganization("thibaud-java")
         if (resp is APISuccess) {
             assertEquals(
                 Organization(
@@ -427,7 +427,7 @@ class CryptrResourcesTest {
                 )
         )
 
-        val resp = cryptr.getUser("acme-company", "61254d31-3a33-4b10-bc22-f410f4927d42")
+        val resp = cryptr.retrieveUser("acme-company", "61254d31-3a33-4b10-bc22-f410f4927d42")
         assertNotNull(resp)
         if (resp is APISuccess) {
             val user = resp.value
@@ -769,7 +769,7 @@ class CryptrResourcesTest {
                 )
         )
 
-        val appResponse = cryptr.getApplication("acme-company", "bc3583eb-59e3-4edf-83c4-96bd308430cc")
+        val appResponse = cryptr.retrieveApplication("acme-company", "bc3583eb-59e3-4edf-83c4-96bd308430cc")
         assertNotNull(appResponse)
         if (appResponse is APISuccess) {
             val app = appResponse.value

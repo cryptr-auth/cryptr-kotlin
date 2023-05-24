@@ -80,7 +80,7 @@ interface URLable {
     fun buildOrganizationResourcePath(
         orgDomain: String,
         resourceName: String,
-        resourceId: String?
+        resourceId: String? = null
     ): String {
         val baseApiOrgResourcePath =
             Constants.API_BASE_BATH + "/" + Constants.API_VERSION + "/org/" + orgDomain + "/" + resourceName
