@@ -35,7 +35,7 @@ data class SSOConnection(
     /**
      * Represent if the SSOConnection is enabled or not
      */
-    @SerialName("active") val active: Boolean = true,
+    @SerialName("active") val active: Boolean? = null,
     /**
      * The Default [Redirection] used after the end-user succeeded his SSO authnetication process
      */
@@ -83,5 +83,10 @@ data class SSOConnection(
     /**
      * Associated [AdminOnboarding] To follow and allow organization's IT admin to configure current SSOConnection
      */
-    @SerialName("onboarding") val onboarding: AdminOnboarding?
+    @SerialName("admin_onboarding") val onboarding: AdminOnboarding?,
+    /**
+     * SAML Configuration
+     * @since 0.1.3
+     */
+    @SerialName("saml_config") val samlConfig: SAMLConfig? = null,
 ) : CryptrResource()
