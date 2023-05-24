@@ -588,6 +588,80 @@ class Cryptr(
     }
 
     /**
+     * List all your SSOConnections
+     *
+     * @param perPage How many item desired in le listing
+     * @param currentPage Desired current page
+     *
+     * @since 0.1.3
+     */
+    fun listSsoConnections(
+        perPage: Int? = null,
+        currentPage: Int? = null
+    ): APIResult<List<SSOConnection>, ErrorMessage> {
+        val response = makeListRequest(
+            buildApiPath("sso-connections"),
+            serviceUrl = serviceUrl,
+            apiKeyToken = retrieveApiKeyToken(),
+            perPage, currentPage
+        )
+        return try {
+            APISuccess(format.decodeFromString<List<SSOConnection>>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * retrieve the [SSOConnection] of an [Organization]
+     *
+     * @param orgDomain The domain of the organization
+     *
+     * @since 0.1.3
+     */
+    fun retrieveSsoConnection(orgDomain: String): APIResult<SSOConnection, ErrorMessage> {
+        val response = makeRequest(
+            buildOrganizationResourcePath(orgDomain, "sso-connection"),
+            serviceUrl = serviceUrl,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+
+        return try {
+            APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Update an SSOConnection for desired [Orgnaization]
+     *
+     * @param orgDomain The domain of the Organization
+     * @param params Map of desired changes for the Organization's SSOConnection
+     *
+     * @since 0.1.3
+     */
+    fun updateSsoConnection(
+        orgDomain: String,
+        params: Map<String, Any>,
+    ): APIResult<SSOConnection, ErrorMessage> {
+        val response = makeUpdateRequest(
+            buildOrganizationResourcePath(orgDomain, "sso-connection"),
+            serviceUrl = serviceUrl,
+            apiKeyToken = retrieveApiKeyToken(),
+            params = params
+        )
+        return try {
+            APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
      * Creates [APIResult]  of [AdminOnboarding] type `sso-connection`
      *
      * @param orgDomain The domain of the targeted [Organization]
