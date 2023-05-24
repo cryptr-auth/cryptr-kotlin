@@ -83,7 +83,7 @@ data class SSOConnection(
     /**
      * Associated [AdminOnboarding] To follow and allow organization's IT admin to configure current SSOConnection
      */
-    @SerialName("admin_onboarding") val onboarding: AdminOnboarding?,
+    @SerialName("admin_onboarding") val onboarding: AdminOnboarding? = null,
     /**
      * SAML Configuration
      * @since 0.1.3
