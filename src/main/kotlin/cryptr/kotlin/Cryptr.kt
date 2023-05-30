@@ -676,7 +676,7 @@ class Cryptr(
      */
     fun createSsoAdminOnboarding(
         orgDomain: String,
-        itAdminEmail: String? = null,
+        itAdminEmail: String,
         providerType: String? = null,
         emailTemplateId: String? = null,
         sendEmail: Boolean? = true,
