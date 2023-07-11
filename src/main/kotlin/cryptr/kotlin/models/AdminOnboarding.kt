@@ -60,5 +60,4 @@ data class AdminOnboarding(
     /**
      * @see onboardingType
      */
-    @SerialName("for") val forOnboardingType: String? = null
 ) : CryptrResource()
