@@ -8,6 +8,7 @@ import cryptr.kotlin.interfaces.Requestable
 import cryptr.kotlin.interfaces.Tokenable
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.connections.PasswordConnection
 import cryptr.kotlin.models.connections.SSOConnection
 import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedOrganization
@@ -581,6 +582,25 @@ class Cryptr(
         )
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /** Creates a [PasswordConnection]
+     * @param orgDomain The domain of the organization
+     */
+    fun createPasswordConnection(orgDomain: String): APIResult<PasswordConnection, ErrorMessage> {
+        val params = mapOf("min_length" to 12)
+        val response = makeRequest(
+            buildOrganizationResourcePath(orgDomain, resourceName = "password-connection"),
+            serviceUrl = serviceUrl,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+
+        return try {
+            APISuccess(format.decodeFromString(response.toString()))
         } catch (e: Exception) {
             logException(e)
             APIError(ErrorMessage(response.toString()))
