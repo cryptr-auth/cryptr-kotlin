@@ -8,6 +8,7 @@ import cryptr.kotlin.interfaces.Requestable
 import cryptr.kotlin.interfaces.Tokenable
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.connections.PasswordConnection
 import cryptr.kotlin.models.connections.SSOConnection
 import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedOrganization
@@ -210,6 +211,161 @@ class Cryptr(
             throw Exception("requires either orgDomain or endUser value")
         }
     }
+
+    /**
+     * Generate a Password Challenge and given parameters
+     * orgDomain and userEmail values are required
+     *
+     * @param orgDomain Organization's domain linked to the password connection
+     * @param userEmail End-User's email
+     * @param plaintText the plaint text to authenticate
+     */
+    fun createPasswordChallenge(
+        orgDomain: String,
+        email: String,
+        plaintText: String? = null,
+    ): APIResult<PasswordChallenge, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to email,
+            "plain_text" to plaintText
+        )
+        val response = makeRequest(
+            path = "api/v2/password-challenge",
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<PasswordChallenge>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Gets tokens from [PasswordChallenge]'s code
+     * @param passwordCode PasswordChallenge code after success
+     */
+    fun getPasswordChallengeTokens(passwordCode: String? = null): APIResult<PasswordChallengeResponse, ErrorMessage> {
+        if (passwordCode.isNullOrEmpty()) {
+            return APIError(ErrorMessage("password challenge code missing"))
+        }
+        val params = mapOf(
+            "grant_type" to "authorization_code",
+            "code" to passwordCode
+        )
+        val response = makeRequest(
+            path = "/api/v2/oauth/token",
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<PasswordChallengeResponse>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    fun createPasswordRequest(
+        userEmail: String,
+        redirectUri: String,
+        orgDomain: String
+    ): APIResult<CryptrResource, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to userEmail,
+            "redirect_uri" to redirectUri
+        )
+        val response = makeRequest(
+            path = buildApiPath("password-request"),
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    fun createPassword(
+        passwordCode: String,
+        plaintText: String
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "password_code" to passwordCode,
+            "plain_text" to plaintText
+        )
+        val response = makeRequest(
+            path = buildApiPath("password"),
+            serviceUrl,
+            params,
+            retrieveApiKeyToken()
+        )
+
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    fun createPassword(
+        userEmail: String,
+        plaintText: String,
+        passwordCode: String,
+        orgDomain: String
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to userEmail,
+            "plain_text" to plaintText,
+            "password_code" to passwordCode
+        )
+
+        val response = makeRequest(path = buildApiPath("password"), serviceUrl, params, retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    fun createPasswordWithoutEmailVerification(
+        userEmail: String,
+        plaintText: String,
+        orgDomain: String,
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "user_email" to userEmail,
+            "plain_text" to plaintText,
+            "org_domain" to orgDomain,
+        )
+        val response = makeRequest(path = buildApiPath("password"), serviceUrl, params, retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Gets tokens from [PasswordChallenge]
+     * @param passwordChallenge PasswordChallenge
+     */
+    fun getPasswordChallengeTokens(passwordChallenge: PasswordChallenge): APIResult<PasswordChallengeResponse, ErrorMessage> {
+        return getPasswordChallengeTokens(passwordChallenge.code)
+    }
+
 
     /**
      * Consumes the code value to retrieve authnetication payload containing end-user JWTs
@@ -581,6 +737,25 @@ class Cryptr(
         )
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /** Creates a [PasswordConnection]
+     * @param orgDomain The domain of the organization
+     */
+    fun createPasswordConnection(orgDomain: String): APIResult<PasswordConnection, ErrorMessage> {
+        val params = mapOf("min_length" to 12)
+        val response = makeRequest(
+            buildOrganizationResourcePath(orgDomain, resourceName = "password-connection"),
+            serviceUrl = serviceUrl,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+
+        return try {
+            APISuccess(format.decodeFromString(response.toString()))
         } catch (e: Exception) {
             logException(e)
             APIError(ErrorMessage(response.toString()))
@@ -1026,6 +1201,14 @@ class Cryptr(
         } catch (e: Exception) {
             logException(e)
             e.message.toString()
+        }
+    }
+
+    fun toJSONString(result: PasswordChallengeResponse): String {
+        return try {
+            format.encodeToString(result)
+        } catch (e: Exception) {
+            e.message.toString();
         }
     }
 }
