@@ -295,6 +295,29 @@ class Cryptr(
     }
 
     fun createPassword(
+        passwordCode: String,
+        plaintText: String
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "password_code" to passwordCode,
+            "plain_text" to plaintText
+        )
+        val response = makeRequest(
+            path = buildApiPath("password"),
+            serviceUrl,
+            params,
+            retrieveApiKeyToken()
+        )
+
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    fun createPassword(
         userEmail: String,
         plaintText: String,
         passwordCode: String,
@@ -307,6 +330,25 @@ class Cryptr(
             "password_code" to passwordCode
         )
 
+        val response = makeRequest(path = buildApiPath("password"), serviceUrl, params, retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    fun createPasswordWithoutEmailVerification(
+        userEmail: String,
+        plaintText: String,
+        orgDomain: String,
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "user_email" to userEmail,
+            "plain_text" to plaintText,
+            "org_domain" to orgDomain,
+        )
         val response = makeRequest(path = buildApiPath("password"), serviceUrl, params, retrieveApiKeyToken())
         return try {
             APISuccess(format.decodeFromString<Password>(response.toString()))
