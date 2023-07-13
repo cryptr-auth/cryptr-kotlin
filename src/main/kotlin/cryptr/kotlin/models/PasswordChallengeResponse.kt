@@ -22,7 +22,7 @@ data class PasswordChallengeResponse(
     /**
      * Authorized scope of these generated tokens
      */
-    @SerialName("scopes") val scope: Set<String>? = setOf(),
+    @SerialName("scope") val scope: Set<String>? = setOf(),
     @SerialName("token_type") val tokenType: String? = "Bearer",
 
     /**
