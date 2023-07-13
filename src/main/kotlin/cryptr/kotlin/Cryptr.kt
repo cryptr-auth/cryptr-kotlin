@@ -213,6 +213,73 @@ class Cryptr(
     }
 
     /**
+     * Generate a Password Challenge and given parameters
+     * orgDomain and userEmail values are required
+     *
+     * @param orgDomain Organization's domain linked to the password connection
+     * @param userEmail End-User's email
+     * @param plaintText the plaint text to authenticate
+     */
+    fun createPasswordChallenge(
+        orgDomain: String,
+        email: String,
+        plaintText: String? = null,
+    ): APIResult<PasswordChallenge, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to email,
+            "plain_text" to plaintText
+        )
+        val response = makeRequest(
+            path = "api/v2/password-challenge",
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<PasswordChallenge>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Gets tokens from [PasswordChallenge]'s code
+     * @param passwordCode PasswordChallenge code after success
+     */
+    fun getPasswordChallengeTokens(passwordCode: String? = null): APIResult<PasswordChallengeResponse, ErrorMessage> {
+        if (passwordCode.isNullOrEmpty()) {
+            return APIError(ErrorMessage("password challenge code missing"))
+        }
+        val params = mapOf(
+            "grant_type" to "authorization_code",
+            "code" to passwordCode
+        )
+        val response = makeRequest(
+            path = "/api/v2/oauth/token",
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<PasswordChallengeResponse>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Gets tokens from [PasswordChallenge]
+     * @param passwordChallenge PasswordChallenge
+     */
+    fun getPasswordChallengeTokens(passwordChallenge: PasswordChallenge): APIResult<PasswordChallengeResponse, ErrorMessage> {
+        return getPasswordChallengeTokens(passwordChallenge.code)
+    }
+
+
+    /**
      * Consumes the code value to retrieve authnetication payload containing end-user JWTs
      *
      * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
@@ -1046,6 +1113,14 @@ class Cryptr(
         } catch (e: Exception) {
             logException(e)
             e.message.toString()
+        }
+    }
+
+    fun toJSONString(result: PasswordChallengeResponse): String {
+        return try {
+            format.encodeToString(result)
+        } catch (e: Exception) {
+            e.message.toString();
         }
     }
 }
