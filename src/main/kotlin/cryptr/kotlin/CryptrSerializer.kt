@@ -37,6 +37,8 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
             "User" -> User.serializer()
             "SSOConnection" -> SSOConnection.serializer()
             "Redirection" -> Redirection.serializer()
+            "Password" -> Password.serializer()
+            "PasswordRequest" -> PasswordRequest.serializer()
             else -> throw Exception("Error serializer not found for $itemType")
         }
     }

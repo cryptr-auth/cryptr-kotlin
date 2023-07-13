@@ -270,6 +270,52 @@ class Cryptr(
         }
     }
 
+    fun createPasswordRequest(
+        userEmail: String,
+        redirectUri: String,
+        orgDomain: String
+    ): APIResult<CryptrResource, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to userEmail,
+            "redirect_uri" to redirectUri
+        )
+        val response = makeRequest(
+            path = buildApiPath("password-request"),
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    fun createPassword(
+        userEmail: String,
+        plaintText: String,
+        passwordCode: String,
+        orgDomain: String
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to userEmail,
+            "plain_text" to plaintText,
+            "password_code" to passwordCode
+        )
+
+        val response = makeRequest(path = buildApiPath("password"), serviceUrl, params, retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
     /**
      * Gets tokens from [PasswordChallenge]
      * @param passwordChallenge PasswordChallenge
