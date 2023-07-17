@@ -185,7 +185,7 @@ class Cryptr(
      * @param orgDomain Organization domain linked to the targeted SSO Connection
      * @param userEmail End-User email linked to the SSO Connection
      * @param authType (Optional, Default: SAML)
-     * @return a [SSOChallenge] with `authorization_url`that end-user has to open to do his authententication process
+     * @return a [SSOChallenge] with `authorization_url`that end-user has to open to do his authentication process
      */
     fun createSsoChallenge(
         redirectUri: String = defaultRedirectUri,
@@ -219,6 +219,8 @@ class Cryptr(
      * @param orgDomain Organization's domain linked to the password connection
      * @param userEmail End-User's email
      * @param plaintText the plaint text to authenticate
+     *
+     * @return [APIResult] with the created [PasswordChallenge]
      */
     fun createPasswordChallenge(
         orgDomain: String,
@@ -247,6 +249,8 @@ class Cryptr(
     /**
      * Gets tokens from [PasswordChallenge]'s code
      * @param passwordCode PasswordChallenge code after success
+     *
+     * @return [APIResult] of [PasswordChallengeResponse] containing generated tokens
      */
     fun getPasswordChallengeTokens(passwordCode: String? = null): APIResult<PasswordChallengeResponse, ErrorMessage> {
         if (passwordCode.isNullOrEmpty()) {
@@ -270,6 +274,16 @@ class Cryptr(
         }
     }
 
+    /**
+     * Creates a password request for the email end-user owner thats redirects to the desired redirect URI
+     *
+     * @param userEmail The end-user for whom you want to generate the password request
+     * @param redirectUri Where you want to redirect the user after his magic link click. Endpoint requires to handle
+     * the response
+     * @param orgDomain The domain of the [Organization] that owns the user
+     *
+     * @return an [APIResult] of the successful request
+     */
     fun createPasswordRequest(
         userEmail: String,
         redirectUri: String,
@@ -294,6 +308,13 @@ class Cryptr(
         }
     }
 
+    /**
+     * Creates a password for a given passwordCode and plainText
+     * @param passwordCode String given by Cryptr to allow the password update
+     * @param plaintText New password value
+     *
+     * @return an [APIResult] with the created [Password]
+     */
     fun createPassword(
         passwordCode: String,
         plaintText: String
@@ -317,6 +338,16 @@ class Cryptr(
         }
     }
 
+    /**
+     * Creates a password depending on given parameters
+     * @param userEmail End-user's email
+     * @param plaintText Password string value
+     * @param passwordCode String to allow password creation
+     * @param orgDomain Domain of [Organization] that owns the user
+     *
+     * @return an [APIResult] with the created [Password]
+     *
+     */
     fun createPassword(
         userEmail: String,
         plaintText: String,
@@ -339,6 +370,16 @@ class Cryptr(
         }
     }
 
+    /**
+     * Creates a Password without using the email verification process. CAUTION  this process is not recommended
+     *
+     * @param userEmail email address of end-user
+     * @param plaintText password string value
+     * @param orgDomain domain of [Organization] that owns the end-user
+     *
+     * @return [APIResult] with created [Password]
+     *
+     */
     fun createPasswordWithoutEmailVerification(
         userEmail: String,
         plaintText: String,
@@ -997,6 +1038,18 @@ class Cryptr(
         }
     }
 
+    /**
+     * Updates the[AdminOnboarding] for the given organization and providerType
+     * @param orgDomain The domain of the targeted [Organization]
+     * @param itAdminEmail the desired email address of the IT Admin able to handle the Onboarding
+     * @param providerType the type of the provider (ex: Azure AD, OKTA...)
+     * @param emailTemplateId the desired email template to use to send the [AdminOnboarding] to the Admin. If not
+     * provided, default one will be used
+     * @param sendEmail If you would like to send the email to the IT admin after update
+     * @param applicationId the ClientID of the [Application] for the redirection
+     *
+     * @return an [APIResult] with the updated [AdminOnboarding]
+     */
     fun updateSsoAdminOnboarding(
         orgDomain: String,
         itAdminEmail: String? = null,
@@ -1014,6 +1067,17 @@ class Cryptr(
         )
     }
 
+    /**
+     * Updates the[AdminOnboarding] for the given organization and providerType
+     * @param orgDomain The domain of the targeted [Organization]
+     * @param itAdminEmail the desired email address of the IT Admin able to handle the Onboarding
+     * @param emailTemplateId the desired email template to use to send the [AdminOnboarding] to the Admin. If not
+     * provided, default one will be used
+     * @param sendEmail If you would like to send the email to the IT admin after update
+     * @param customParams Map of any other desired parameter for the update
+     *
+     * @return an [APIResult] with the updated [AdminOnboarding]
+     */
     fun updateAdminOnboarding(
         orgDomain: String,
         onboardingType: String,
@@ -1204,6 +1268,12 @@ class Cryptr(
         }
     }
 
+    /**
+     * Formats the [PasswordChallengeResponse] to JSON string
+     * @param result the [PasswordChallengeResponse] to format to JSON string
+     *
+     * @return JSON [String] encode of provided [PasswordChallengeResponse]
+     */
     fun toJSONString(result: PasswordChallengeResponse): String {
         return try {
             format.encodeToString(result)
