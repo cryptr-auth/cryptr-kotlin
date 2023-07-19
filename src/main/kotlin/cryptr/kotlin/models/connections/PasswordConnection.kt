@@ -1,6 +1,7 @@
 package cryptr.kotlin.models.connections
 
 import cryptr.kotlin.models.CryptrResource
+import cryptr.kotlin.models.Organization
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -8,12 +9,16 @@ import kotlinx.serialization.Serializable
  * Represents a Password connection
  */
 @Serializable
-class PasswordConnection(
+data class PasswordConnection(
     /**
-     * Cryptr resource type SHOULD be "PasswordConnection"
+     * Cryptr Type = "PasswordConnection"
      */
     @SerialName("__type__") override val cryptrType: String = "PasswordConnection",
     @SerialName("__environment__") override val environment: String? = null,
+
+    /**
+     * [Organization]'s domain to whom the SSOConnection is associated to
+     */
     @SerialName("__domain__") override val resourceDomain: String? = null,
 
     /**
