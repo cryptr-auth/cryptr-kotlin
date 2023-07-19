@@ -785,18 +785,29 @@ class Cryptr(
     }
 
     /** Creates a [PasswordConnection]
-     * @param orgDomain The domain of the organization
+     * @param orgDomain REQUIRED domain of the organization
      */
-    fun createPasswordConnection(orgDomain: String): APIResult<PasswordConnection, ErrorMessage> {
-        val params = mapOf("min_length" to 12)
+    fun createPasswordConnection(
+        orgDomain: String,
+        plainTextMinLength: Int? = null,
+        plainTextMaxLength: Int? = null,
+        forgotPasswordTemplateId: String? = null,
+        pepperRotationPeriod: Int? = null,
+    ): APIResult<PasswordConnection, ErrorMessage> {
+        val params = mapOf(
+            "plain_text_min_length" to plainTextMinLength,
+            "plain_text_max_length" to plainTextMaxLength,
+            "forgot_password_template_id" to forgotPasswordTemplateId,
+            "pepper_rotation_period" to pepperRotationPeriod,
+        ).filterValues { it != null }
         val response = makeRequest(
             buildOrganizationResourcePath(orgDomain, resourceName = "password-connection"),
             serviceUrl = serviceUrl,
+            params = params,
             apiKeyToken = retrieveApiKeyToken()
         )
-
         return try {
-            APISuccess(format.decodeFromString(response.toString()))
+            APISuccess(format.decodeFromString<PasswordConnection>(response.toString()))
         } catch (e: Exception) {
             logException(e)
             APIError(ErrorMessage(response.toString()))
