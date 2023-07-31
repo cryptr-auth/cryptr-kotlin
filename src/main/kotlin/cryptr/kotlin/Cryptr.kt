@@ -8,6 +8,7 @@ import cryptr.kotlin.interfaces.Requestable
 import cryptr.kotlin.interfaces.Tokenable
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.connections.MagicLinkConnection
 import cryptr.kotlin.models.connections.PasswordConnection
 import cryptr.kotlin.models.connections.SSOConnection
 import cryptr.kotlin.models.deleted.DeletedApplication
@@ -224,12 +225,12 @@ class Cryptr(
      */
     fun createPasswordChallenge(
         orgDomain: String,
-        email: String,
+        userEmail: String,
         plaintText: String? = null,
     ): APIResult<PasswordChallenge, ErrorMessage> {
         val params = mapOf(
             "org_domain" to orgDomain,
-            "user_email" to email,
+            "user_email" to userEmail,
             "plain_text" to plaintText
         )
         val response = makeRequest(
@@ -240,6 +241,34 @@ class Cryptr(
         )
         return try {
             APISuccess(format.decodeFromString<PasswordChallenge>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Generate a Magic Link Challenge
+     * @param userEmail End-User's email
+     * @param redirectUri . Endpoint where to redirect user after magic link click
+     *
+     * @return [APIResult] with the created [MagicLinkChallenge]
+     */
+    fun createMagicLinkChallenge(
+        userEmail: String,
+        redirectUri: String,
+        orgDomain: String? = null
+    ): APIResult<MagicLinkChallenge, ErrorMessage> {
+        val params = mapOf(
+            "userEmail" to userEmail,
+            "redirect_uri" to redirectUri,
+            "org_domain" to orgDomain
+        ).filterValues { it != null }
+
+        val path = buildApiPath("magic-link-challenge")
+        val response = makeRequest(path, serviceUrl, params, apiKeyToken = retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<MagicLinkChallenge>(response.toString()))
         } catch (e: Exception) {
             logException(e)
             APIError(ErrorMessage(response.toString()))
@@ -810,6 +839,38 @@ class Cryptr(
             val createdPasswordConn = format.decodeFromString<PasswordConnection>(response.toString())
             if (createdPasswordConn.id !== null) {
                 APISuccess(createdPasswordConn)
+            } else {
+                APIError(ErrorMessage(response.toString()))
+            }
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Create a Magic link Connection
+     */
+    fun createMagicLinkConnection(
+        orgDomain: String,
+        findOrCreateUser: Boolean? = null,
+        signInTemplateId: String? = null
+    ): APIResult<MagicLinkConnection, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "find_or_create_user" to findOrCreateUser,
+            "sign_in_template_id" to signInTemplateId
+        ).filterValues { it != null }
+        //val path = buildApiPath("magic-link-connection")
+        val path = buildOrganizationResourcePath(orgDomain, resourceName = "magic-link-connection")
+        logDebug({ path })
+        val response = makeRequest(
+            path, serviceUrl, params, apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            val createdMagicLinkConnection = format.decodeFromString<MagicLinkConnection>(response.toString())
+            if (createdMagicLinkConnection.id !== null) {
+                APISuccess(createdMagicLinkConnection)
             } else {
                 APIError(ErrorMessage(response.toString()))
             }
