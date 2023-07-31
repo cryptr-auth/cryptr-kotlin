@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.connections.PasswordConnection
 import cryptr.kotlin.models.connections.SSOConnection
 import kotlinx.serialization.DeserializationStrategy
 import kotlinx.serialization.KSerializer
@@ -37,6 +38,10 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
             "User" -> User.serializer()
             "SSOConnection" -> SSOConnection.serializer()
             "Redirection" -> Redirection.serializer()
+            "Password" -> Password.serializer()
+            "PasswordRequest" -> PasswordRequest.serializer()
+            "PasswordChallenge" -> PasswordChallenge.serializer()
+            "PasswordConnection" -> PasswordConnection.serializer()
             else -> throw Exception("Error serializer not found for $itemType")
         }
     }
