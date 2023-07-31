@@ -807,7 +807,12 @@ class Cryptr(
             apiKeyToken = retrieveApiKeyToken()
         )
         return try {
-            APISuccess(format.decodeFromString<PasswordConnection>(response.toString()))
+            val createdPasswordConn = format.decodeFromString<PasswordConnection>(response.toString())
+            if (createdPasswordConn.id !== null) {
+                APISuccess(createdPasswordConn)
+            } else {
+                APIError(ErrorMessage(response.toString()))
+            }
         } catch (e: Exception) {
             logException(e)
             APIError(ErrorMessage(response.toString()))

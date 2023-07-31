@@ -6,6 +6,7 @@ import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.connections.PasswordConnection
 import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedUser
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -928,5 +929,58 @@ class CryptrResourcesTest {
             assertEquals("Some Angular app", app.name)
             assertEquals("2023-05-03T16:29:32", app.updatedAt)
         }
+    }
+
+    @Test
+    fun successfulCreatePasswordConnection() {
+        stubFor(
+            post("/api/v2/org/acme-company/password-connection")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok(
+                        "{\n" +
+                                "  \"__domain__\": \"acme-company\",\n" +
+                                "  \"__type__\": \"PasswordConnection\",\n" +
+                                "  \"id\": \"b6f3da01-b571-48c3-a630-6f1fddf5af31\",\n" +
+                                "  \"inserted_at\": \"2023-06-08T13:47:41\",\n" +
+                                "  \"pepper_rotation_period\": 86400,\n" +
+                                "  \"plain_text_max_length\": 40,\n" +
+                                "  \"plain_text_min_length\": 8,\n" +
+                                "  \"updated_at\": \"2023-06-08T13:47:41\"\n" +
+                                "}"
+                    )
+                )
+        )
+
+        val passwordConnectionResponse = cryptr.createPasswordConnection("acme-company")
+        assertNotNull(passwordConnectionResponse)
+        if (passwordConnectionResponse is APISuccess) {
+            val createdPasswordConnection = passwordConnectionResponse.value
+            assertIs<PasswordConnection>(createdPasswordConnection)
+            assertEquals("PasswordConnection", createdPasswordConnection.cryptrType)
+            assertNotNull(createdPasswordConnection.id)
+            assertEquals("acme-company", createdPasswordConnection.resourceDomain)
+            assertTrue { createdPasswordConnection.plainTextMinLength!! > 0 }
+            assertTrue { createdPasswordConnection.plainTextMaxLength!! >= createdPasswordConnection.plainTextMinLength!! }
+            assertEquals(40, createdPasswordConnection.plainTextMaxLength)
+            assertEquals(8, createdPasswordConnection.plainTextMinLength)
+        }
+    }
+
+    @Test
+    fun failedCreatePasswordConnection() {
+        stubFor(
+            post("/api/v2/org/acme-company/password-connection")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok("{\"error\":\"internal_server_error\",\"error_description\":\"incompatible_connection\"}")
+                )
+        )
+
+        val passwordConnectionResponse = cryptr.createPasswordConnection("acme-company")
+        assertNotNull(passwordConnectionResponse)
+
+        assertFalse { passwordConnectionResponse is APISuccess }
+        assertTrue { passwordConnectionResponse is APIError }
     }
 }
