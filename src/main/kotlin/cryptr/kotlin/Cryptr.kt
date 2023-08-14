@@ -196,10 +196,11 @@ class Cryptr(
     ): APIResult<SSOChallenge, ErrorMessage> {
         if (orgDomain != null || userEmail != null) {
             val path = "api/v2/sso-${authType?.value}-challenges"
-            val params = if (orgDomain !== null) mapOf(
+            val params = mapOf(
                 "redirect_uri" to redirectUri,
-                "org_domain" to orgDomain
-            ) else mapOf("redirect_uri" to redirectUri, "user_email" to userEmail)
+                "org_domain" to orgDomain,
+                "user_email" to userEmail
+            ).filterValues { it != null }
             val response =
                 makeRequest(path, serviceUrl = serviceUrl, params = params, apiKeyToken = retrieveApiKeyToken())
             return try {
@@ -260,7 +261,7 @@ class Cryptr(
         orgDomain: String? = null
     ): APIResult<MagicLinkChallenge, ErrorMessage> {
         val params = mapOf(
-            "userEmail" to userEmail,
+            "user_email" to userEmail,
             "redirect_uri" to redirectUri,
             "org_domain" to orgDomain
         ).filterValues { it != null }
@@ -276,27 +277,51 @@ class Cryptr(
     }
 
     /**
+     * Gets tokens from [PasswordChallenge]
+     * @param passwordChallenge PasswordChallenge
+     */
+    fun getPasswordChallengeTokens(
+        passwordChallenge: PasswordChallenge
+    ): APIResult<HeadlessChallengeResponse, ErrorMessage> {
+        return getPasswordChallengeTokens(passwordChallenge.code)
+    }
+
+    /**
      * Gets tokens from [PasswordChallenge]'s code
      * @param passwordCode PasswordChallenge code after success
      *
-     * @return [APIResult] of [PasswordChallengeResponse] containing generated tokens
+     * @return [APIResult] of [HeadlessChallengeResponse] containing generated tokens
      */
-    fun getPasswordChallengeTokens(passwordCode: String? = null): APIResult<PasswordChallengeResponse, ErrorMessage> {
-        if (passwordCode.isNullOrEmpty()) {
-            return APIError(ErrorMessage("password challenge code missing"))
-        }
+    fun getPasswordChallengeTokens(passwordCode: String? = null): APIResult<HeadlessChallengeResponse, ErrorMessage> {
+        return getChallengeTokens(passwordCode)
+    }
+
+    /**
+     * Gets tokens from any authentication code
+     * @param code
+     *
+     * @return [APIResult] of the generated tokens
+     */
+    private fun getChallengeTokensAsJSONObject(code: String? = null): JSONObject {
         val params = mapOf(
             "grant_type" to "authorization_code",
-            "code" to passwordCode
+            "code" to code
         )
-        val response = makeRequest(
-            path = "/api/v2/oauth/token",
-            serviceUrl = serviceUrl,
-            params = params,
-            apiKeyToken = retrieveApiKeyToken()
-        )
+
+        return makeRequest(path = "/api/v2/oauth/token", serviceUrl, params, apiKeyToken = retrieveApiKeyToken())
+    }
+
+
+    /**
+     * Gets tokens from any authentication code
+     * @param code
+     *
+     * @return [APIResult] of the generated tokens
+     */
+    fun getChallengeTokens(code: String? = null): APIResult<HeadlessChallengeResponse, ErrorMessage> {
+        val response = getChallengeTokensAsJSONObject(code)
         return try {
-            APISuccess(format.decodeFromString<PasswordChallengeResponse>(response.toString()))
+            APISuccess(format.decodeFromString<HeadlessChallengeResponse>(response.toString()))
         } catch (e: Exception) {
             logException(e)
             APIError(ErrorMessage(response.toString()))
@@ -427,15 +452,6 @@ class Cryptr(
             APIError(ErrorMessage(response.toString()))
         }
     }
-
-    /**
-     * Gets tokens from [PasswordChallenge]
-     * @param passwordChallenge PasswordChallenge
-     */
-    fun getPasswordChallengeTokens(passwordChallenge: PasswordChallenge): APIResult<PasswordChallengeResponse, ErrorMessage> {
-        return getPasswordChallengeTokens(passwordChallenge.code)
-    }
-
 
     /**
      * Consumes the code value to retrieve authnetication payload containing end-user JWTs
@@ -1346,12 +1362,12 @@ class Cryptr(
     }
 
     /**
-     * Formats the [PasswordChallengeResponse] to JSON string
-     * @param result the [PasswordChallengeResponse] to format to JSON string
+     * Formats the [HeadlessChallengeResponse] to JSON string
+     * @param result the [HeadlessChallengeResponse] to format to JSON string
      *
-     * @return JSON [String] encode of provided [PasswordChallengeResponse]
+     * @return JSON [String] encode of provided [HeadlessChallengeResponse]
      */
-    fun toJSONString(result: PasswordChallengeResponse): String {
+    fun toJSONString(result: HeadlessChallengeResponse): String {
         return try {
             format.encodeToString(result)
         } catch (e: Exception) {
