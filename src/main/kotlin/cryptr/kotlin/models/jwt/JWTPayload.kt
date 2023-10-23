@@ -2,6 +2,7 @@ package cryptr.kotlin.models.jwt
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
 import java.time.Instant
 
 /**
@@ -12,7 +13,7 @@ data class JWTPayload(
     /**
      * Represents scopes allowed while using this JWT
      */
-    @SerialName("scp") val scp: Set<String>,
+    @SerialName("scp") val scp: Set<String>? = null,
     /**
      * Represents the audience where the token can be used from
      */
@@ -35,11 +36,11 @@ data class JWTPayload(
     /**
      * The resource owner database
      */
-    @SerialName("dbs") val dbs: String,
+    @SerialName("dbs") val dbs: String? = null,
     /**
      * The issuer that generated the token
      */
-    @SerialName("iss") val iss: String,
+    @SerialName("iss") val iss: String? = null,
     /**
      * The Type of token. Should be `JWT`
      */
@@ -51,7 +52,7 @@ data class JWTPayload(
     /**
      * The Organization that owns the resource owner
      */
-    @SerialName("tnt") val tnt: String,
+    @SerialName("tnt") val tnt: String? = null,
     /**
      * The Expiration date of the token
      */
@@ -67,7 +68,7 @@ data class JWTPayload(
     /**
      * The client id of the application responsible for the issuance of this token
      */
-    @SerialName("cid") val cid: String,
+    @SerialName("cid") val cid: String? = null,
     /**
      * The Resource owner family name
      */
@@ -83,19 +84,47 @@ data class JWTPayload(
     /**
      * The metadata associated to the resource owner
      */
+    @SerialName("meta_data") val metaData: Map<String, String>? = mapOf(),
+    /**
+     * The metadata associated to the resource owner
+     */
     @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, String>? = mapOf(),
+
+    /**
+     * Current environment (v2)
+     */
+    @SerialName("env") val env: String? = null,
+    /**
+     * Current organization (v2)
+     */
+    @SerialName("org") val org: String? = null,
+
+    /**
+     * Current profile (openid v2)
+     */
+    @SerialName("profile") val profile: Map<String, JsonElement>? = mapOf(),
 ) {
 
     init {
-        require(ver == 1) { "only version '1' allowed" }
-        require(scp.isNotEmpty()) { "scp cannot be empty" }
+        println("JWTPayload -->");
+        println("ver: $ver")
+        require((1..2).contains(ver)) { "only versions 1 & 2 are allowed" }
+        //basic validations
         require(sub.isNotEmpty() && sub.isNotBlank()) { "sub cannot be empty" }
-        require(dbs.isNotEmpty() && dbs.isNotBlank()) { "dbs cannot be empty" }
-        require(iss.isNotEmpty() && iss.isNotBlank()) { "iss cannot be empty" }
         require(jtt.isNotEmpty() && jtt.isNotBlank()) { "jtt cannot be empty" }
         require(jti.isNotEmpty() && jti.isNotBlank()) { "jti cannot be empty" }
-        require(cid.isNotEmpty() && cid.isNotBlank()) { "cid cannot be empty" }
         require(exp > 0 && Instant.ofEpochSecond(exp).isAfter(Instant.now())) { "exp should be in the future" }
         require(iat > 0 && Instant.ofEpochSecond(iat).isBefore(Instant.now())) { "iat should be in the past" }
+
+        // ver is only 1 or 2
+        if (ver == 1) {
+            require(dbs!!.isNotEmpty() && dbs.isNotBlank()) { "dbs cannot be empty" }
+            require(iss!!.isNotEmpty() && iss.isNotBlank()) { "iss cannot be empty" }
+            require(cid!!.isNotEmpty() && cid.isNotBlank()) { "cid cannot be empty" }
+        } else {
+            // v2
+            require(org!!.isNotEmpty() && org.isNotBlank()) { "org cannot be empty" }
+            require(env!!.isNotEmpty() && env.isNotBlank()) { "env cannot be empty" }
+        }
     }
 }
