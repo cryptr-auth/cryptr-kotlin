@@ -42,6 +42,7 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
             "PasswordRequest" -> PasswordRequest.serializer()
             "PasswordChallenge" -> PasswordChallenge.serializer()
             "PasswordConnection" -> PasswordConnection.serializer()
+            "MagicLinkChallenge" -> MagicLinkChallenge.serializer()
             else -> throw Exception("Error serializer not found for $itemType")
         }
     }
