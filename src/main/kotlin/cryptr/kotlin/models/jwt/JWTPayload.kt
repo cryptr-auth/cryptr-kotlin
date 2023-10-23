@@ -37,7 +37,7 @@ data class JWTPayload(
     /**
      * The resource owner database
      */
-    @SerialName("dbs") val dbs: String? = null,
+    val dbs: String? = null,
     /**
      * The issuer that generated the token
      */
