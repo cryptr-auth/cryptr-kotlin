@@ -3,6 +3,7 @@ package cryptr.kotlin.models.jwt
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNames
 import java.time.Instant
 
 /**
@@ -13,8 +14,7 @@ data class JWTPayload(
     /**
      * Represents scopes allowed while using this JWT
      */
-    @SerialName("scp") val scp: Set<String>? = null,
-    @SerialName("scope") val scope: JsonElement? = null,
+    @JsonNames("scp") val scope: JsonElement? = null,
     /**
      * Represents the audience where the token can be used from
      */
