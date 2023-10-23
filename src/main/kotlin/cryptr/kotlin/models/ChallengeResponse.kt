@@ -6,7 +6,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Represents a successful response of (SSO) Challenge Headless Authenticatino process
+ * Represents a successful response of (SSO) Challenge Headless Authentication process
  */
 @Serializable
 data class ChallengeResponse(
