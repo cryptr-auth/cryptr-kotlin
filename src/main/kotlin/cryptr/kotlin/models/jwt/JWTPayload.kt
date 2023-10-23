@@ -106,6 +106,11 @@ data class JWTPayload(
     @SerialName("profile") val profile: Map<String, JsonElement>? = null,
     @SerialName("azp") val azp: String? = null,
     @SerialName("client_id") val clientId: String? = null,
+    //val scopes: JsonElement? = scp ?: scope,
+    val at_hash: String? = null,
+    val c_hash: String? = null,
+    val email_verified: JsonElement? = null,
+    val phone_number_verified: JsonElement? = null,
 ) {
 
     init {
