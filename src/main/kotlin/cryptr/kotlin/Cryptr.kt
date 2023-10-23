@@ -250,12 +250,12 @@ class Cryptr(
 
     /**
      * Generates a Magic Link Challenge from given parameters
-     * userEmail and redirectUri are required where orgDomain is optional 
-     * 
+     * userEmail and redirectUri are required where orgDomain is optional
+     *
      * @param userEmail End-user's email
      * @param redirectUri The endpoint where you will consume after successfull authnetication
-     * @orgDomain Organization's domain linked to the magioc link connection (useful when multiple orgs on same email domain)
-     * 
+     * @param orgDomain Organization's domain linked to the magioc link connection (useful when multiple orgs on same email domain)
+     *
      * @return [ApiResult] with the created [MagicLinkChallenge]
      */
     fun createMagicLinkChallenge(
@@ -445,7 +445,7 @@ class Cryptr(
 
 
     /**
-     * Consumes the code value to retrieve authnetication payload containing end-user JWTs
+     * Consumes the code value to retrieve authentication payload containing end-user JWTs
      *
      * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
      * @return JSONObject containing end-user session JWTs
@@ -465,6 +465,12 @@ class Cryptr(
         }
     }
 
+    /**
+     * Consumes the code value to retrieve authentication payload containing end-user JWTs
+     *
+     * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
+     * @return [ChallengeResponse] containing end-user session JWTs
+     */
     fun validateMagicLinkChallenge(code: String? = null): APIResult<ChallengeResponse, ErrorMessage> {
         if (code !== null && code.isNotEmpty() && code.isNotBlank()) {
             val params = mapOf(

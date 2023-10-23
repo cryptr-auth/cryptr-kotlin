@@ -4,6 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
+/**
+ * Response of [Cryptr.createMagicLinkChallenge] when succeeded
+ */
 @Serializable
 class MagicLinkChallenge(
     @SerialName("__type__") override val cryptrType: String = "MagicLinkChallenge",
