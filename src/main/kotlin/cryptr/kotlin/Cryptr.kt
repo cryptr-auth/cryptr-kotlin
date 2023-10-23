@@ -129,8 +129,6 @@ class Cryptr(
 
     private fun verifyApiKeyToken(apiKeyToken: String, storeInProperties: Boolean? = false): JWTToken? {
         val forceIss = ignoreIssChecking || isJUnitTest()
-        logDebug({ "apiKeyToken" })
-        logDebug({ apiKeyToken })
         val jwtToken = verify(serviceUrl, apiKeyToken, forceIss)
 
         if (storeInProperties == true) {
