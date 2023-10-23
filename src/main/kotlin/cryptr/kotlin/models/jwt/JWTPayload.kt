@@ -14,10 +14,11 @@ data class JWTPayload(
      * Represents scopes allowed while using this JWT
      */
     @SerialName("scp") val scp: Set<String>? = null,
+    @SerialName("scope") val scope: JsonElement? = null,
     /**
      * Represents the audience where the token can be used from
      */
-    @SerialName("aud") val aud: String? = null,
+    @SerialName("aud") val aud: JsonElement? = null,
     /**
      * Represents the resource owner email to whom this token is attached to
      */
@@ -80,16 +81,17 @@ data class JWTPayload(
     /**
      * The metadata associated to the application
      */
-    @SerialName("application_metadata") val applicationMetadata: Map<String, String>? = mapOf(),
+    @SerialName("application_metadata") val applicationMetadata: Map<String, JsonElement>? = mapOf(),
     /**
      * The metadata associated to the resource owner
      */
-    @SerialName("meta_data") val metaData: Map<String, String>? = mapOf(),
+    @SerialName("meta_data") val metaData: Map<String, JsonElement>? = mapOf(),
     /**
      * The metadata associated to the resource owner
      */
-    @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, String>? = mapOf(),
+    @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, JsonElement>? = mapOf(),
 
+    //V2
     /**
      * Current environment (v2)
      */
@@ -103,6 +105,9 @@ data class JWTPayload(
      * Current profile (openid v2)
      */
     @SerialName("profile") val profile: Map<String, JsonElement>? = mapOf(),
+
+    @SerialName("azp") val azp: String? = null,
+    @SerialName("client_id") val clientId: String? = null,
 ) {
 
     init {
