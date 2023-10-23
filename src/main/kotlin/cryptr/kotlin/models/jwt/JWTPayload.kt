@@ -81,15 +81,15 @@ data class JWTPayload(
     /**
      * The metadata associated to the application
      */
-    @SerialName("application_metadata") val applicationMetadata: Map<String, JsonElement>? = mapOf(),
+    @SerialName("application_metadata") val applicationMetadata: Map<String, JsonElement>? = null,
     /**
      * The metadata associated to the resource owner
      */
-    @SerialName("meta_data") val metaData: Map<String, JsonElement>? = mapOf(),
+    @SerialName("meta_data") val metaData: Map<String, JsonElement>? = null,
     /**
      * The metadata associated to the resource owner
      */
-    @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, JsonElement>? = mapOf(),
+    @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, JsonElement>? = null,
 
     //V2
     /**
@@ -100,12 +100,10 @@ data class JWTPayload(
      * Current organization (v2)
      */
     @SerialName("org") val org: String? = null,
-
     /**
      * Current profile (openid v2)
      */
-    @SerialName("profile") val profile: Map<String, JsonElement>? = mapOf(),
-
+    @SerialName("profile") val profile: Map<String, JsonElement>? = null,
     @SerialName("azp") val azp: String? = null,
     @SerialName("client_id") val clientId: String? = null,
 ) {
