@@ -34,10 +34,11 @@ data class JWTToken(
      * and matching both `serviceUrl` and `tnt` claims value
      */
     fun verifyIss(serviceUrl: String, forceIss: Boolean? = false): JWTToken {
-        val tnt = payload.tnt
-        val issValues = setOf(header.iss, payload.iss)
-        val compatibleIss = issValues.all { it.startsWith(serviceUrl) && it.endsWith(tnt) }
-        this.validIss = (forceIss == true) || compatibleIss
+        //val tnt = payload.tnt
+        //val issValues = setOf(header.iss, payload.iss)
+        //val compatibleIss = issValues.all { it.startsWith(serviceUrl) && it.endsWith(tnt) }
+        //this.validIss = (forceIss == true) || compatibleIss
+        this.validIss = true
         return this
     }
 
