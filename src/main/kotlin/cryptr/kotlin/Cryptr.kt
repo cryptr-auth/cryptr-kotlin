@@ -50,7 +50,7 @@ class Cryptr(
      * @suppress
      */
     @OptIn(ExperimentalSerializationApi::class)
-    val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
+    val format = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = false }
     private val ignoreIssChecking = System.getProperty("CRYPTR_IGNORE_ISS_CHECKING", "true") == "true"
 
     /**
@@ -129,6 +129,8 @@ class Cryptr(
 
     private fun verifyApiKeyToken(apiKeyToken: String, storeInProperties: Boolean? = false): JWTToken? {
         val forceIss = ignoreIssChecking || isJUnitTest()
+        logDebug({ "apiKeyToken" })
+        logDebug({ apiKeyToken })
         val jwtToken = verify(serviceUrl, apiKeyToken, forceIss)
 
         if (storeInProperties == true) {
@@ -417,6 +419,7 @@ class Cryptr(
     fun validateSsoChallenge(code: String? = ""): APIResult<ChallengeResponse, ErrorMessage> {
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
+            val apiKeyTok = retrieveApiKeyToken()
             val response = makeRequest("oauth/token", serviceUrl, params = params, apiKeyToken = retrieveApiKeyToken())
             return try {
                 APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
