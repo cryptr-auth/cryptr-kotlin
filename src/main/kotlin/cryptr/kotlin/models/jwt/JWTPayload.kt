@@ -106,8 +106,6 @@ data class JWTPayload(
 ) {
 
     init {
-        println("JWTPayload -->");
-        println("ver: $ver")
         require((1..2).contains(ver)) { "only versions 1 & 2 are allowed" }
         //basic validations
         require(sub.isNotEmpty() && sub.isNotBlank()) { "sub cannot be empty" }
