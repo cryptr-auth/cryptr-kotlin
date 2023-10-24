@@ -35,7 +35,7 @@ interface Tokenable : Loggable {
     private fun sanitize(decoded: JSONObject): String {
         return try {
             val payload = decoded.getJSONObject("payload")
-            if (payload.get("scp") is String) {
+            if (payload.has("scp") && payload.get("scp") is String) {
                 payload.put("scp", payload.getString("scp").split(" "))
             }
             decoded.put("payload", payload)

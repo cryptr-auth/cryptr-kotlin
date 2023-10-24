@@ -50,6 +50,7 @@ class Cryptr(
      * @suppress
      */
     @OptIn(ExperimentalSerializationApi::class)
+    val formatNoNulNoDefaults = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = false }
     val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
     private val ignoreIssChecking = System.getProperty("CRYPTR_IGNORE_ISS_CHECKING", "true") == "true"
 
@@ -224,12 +225,12 @@ class Cryptr(
      */
     fun createPasswordChallenge(
         orgDomain: String,
-        email: String,
+        userEmail: String,
         plaintText: String? = null,
     ): APIResult<PasswordChallenge, ErrorMessage> {
         val params = mapOf(
             "org_domain" to orgDomain,
-            "user_email" to email,
+            "user_email" to userEmail,
             "plain_text" to plaintText
         )
         val response = makeRequest(
@@ -240,6 +241,40 @@ class Cryptr(
         )
         return try {
             APISuccess(format.decodeFromString<PasswordChallenge>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(ErrorMessage(response.toString()))
+        }
+    }
+
+    /**
+     * Generates a Magic Link Challenge from given parameters
+     * userEmail and redirectUri are required where orgDomain is optional
+     *
+     * @param userEmail End-user's email
+     * @param redirectUri The endpoint where you will consume after successfull authnetication
+     * @param orgDomain Organization's domain linked to the magioc link connection (useful when multiple orgs on same email domain)
+     *
+     * @return [ApiResult] with the created [MagicLinkChallenge]
+     */
+    fun createMagicLinkChallenge(
+        userEmail: String,
+        redirectUri: String,
+        orgDomain: String? = null
+    ): APIResult<MagicLinkChallenge, ErrorMessage> {
+        logDebug({ "createMagicLinkChallenge" })
+        val params = mapOf(
+            "user_email" to userEmail,
+            "redirect_uri" to redirectUri,
+            "org_domain" to orgDomain
+        )
+
+        val response = makeRequest(
+            path = "api/v2/magic-link-challenge",
+            serviceUrl, params, apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<MagicLinkChallenge>(response.toString()))
         } catch (e: Exception) {
             logException(e)
             APIError(ErrorMessage(response.toString()))
@@ -409,7 +444,7 @@ class Cryptr(
 
 
     /**
-     * Consumes the code value to retrieve authnetication payload containing end-user JWTs
+     * Consumes the code value to retrieve authentication payload containing end-user JWTs
      *
      * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
      * @return JSONObject containing end-user session JWTs
@@ -418,6 +453,30 @@ class Cryptr(
         if (code !== "" && code !== null) {
             val params = mapOf("code" to code)
             val response = makeRequest("oauth/token", serviceUrl, params = params, apiKeyToken = retrieveApiKeyToken())
+            return try {
+                APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
+            } catch (e: Exception) {
+                logException(e)
+                println(e.localizedMessage)
+                APIError(ErrorMessage(response.toString()))
+            }
+        } else {
+            return APIError(ErrorMessage("code is required"))
+        }
+    }
+
+
+    /**
+     * Consumes the code value to retrieve authentication payload containing end-user JWTs
+     *
+     * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
+     * @return [ChallengeResponse] containing end-user session JWTs
+     */
+    fun validateChallenge(code: String? = null): APIResult<ChallengeResponse, ErrorMessage> {
+        if (code !== null && code.isNotEmpty() && code.isNotBlank()) {
+            val params = mapOf("code" to code, "grant_type" to "authorization_code")
+            val response =
+                makeRequest(path = "api/v2/oauth/token", serviceUrl, params, apiKeyToken = retrieveApiKeyToken())
             return try {
                 APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
             } catch (e: Exception) {
