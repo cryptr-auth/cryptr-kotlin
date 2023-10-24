@@ -55,7 +55,7 @@ data class ChallengeResponse(
     /**
      * Type of token
      */
-    @SerialName("token_type") val tokenType: String?,
+    @SerialName("token_type") val tokenType: String? = null,
 
     /**
      * Expiration date as [String]
