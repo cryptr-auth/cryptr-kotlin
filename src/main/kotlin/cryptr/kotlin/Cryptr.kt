@@ -50,7 +50,7 @@ class Cryptr(
      * @suppress
      */
     @OptIn(ExperimentalSerializationApi::class)
-    // val format = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = false }
+    val formatNoNulNoDefaults = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = false }
     val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
     private val ignoreIssChecking = System.getProperty("CRYPTR_IGNORE_ISS_CHECKING", "true") == "true"
 
