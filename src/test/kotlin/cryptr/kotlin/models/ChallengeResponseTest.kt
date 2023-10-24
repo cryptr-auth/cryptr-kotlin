@@ -27,8 +27,8 @@ class ChallengeResponseTest {
         val challengeResponse = ChallengeResponse(accessToken = v2AccessToken, idToken = v2IdToken)
         val idToken = challengeResponse.getIdToken(serviceUrl)
         val accessToken = challengeResponse.getAccessToken(serviceUrl)
+        assertTrue(idToken?.validIss!!)
         assertIs<JWTToken>(idToken)
-        assertTrue(idToken.validIss)
         assertIs<JWTToken>(accessToken)
         assertTrue(accessToken.validIss)
 
