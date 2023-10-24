@@ -486,34 +486,6 @@ class Cryptr(
         }
     }
 
-    /**
-     * Consumes the code value to retrieve authentication payload containing end-user JWTs
-     *
-     * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
-     * @return [ChallengeResponse] containing end-user session JWTs
-     */
-    fun validateMagicLinkChallenge(code: String? = null): APIResult<ChallengeResponse, ErrorMessage> {
-        if (code !== null && code.isNotEmpty() && code.isNotBlank()) {
-            val params = mapOf(
-                "code" to code,
-                "grant_type" to "authorization_code"
-            )
-            val response = makeRequest(
-                path = "api/v2/oauth/token",
-                serviceUrl, params,
-                apiKeyToken = retrieveApiKeyToken()
-            )
-            return try {
-                APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
-            } catch (e: Exception) {
-                logException(e)
-                APIError(ErrorMessage(response.toString()))
-            }
-        } else {
-            return APIError(ErrorMessage("code is required"))
-        }
-    }
-
 
     /**
      * List all [Organization] records according toused API Key
