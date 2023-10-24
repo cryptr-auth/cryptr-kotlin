@@ -23,7 +23,9 @@ data class JWTPayload(
      * Represents the resource owner email to whom this token is attached to
      */
     @SerialName("email") val email: String? = null,
+    /** (When generated from SSO) The SSO provider (ex: `okta`) */
     @SerialName("ips") val ips: String? = null,
+    /** (When generated from SSO) The SSO Connection ID (ex: `nasa_1234`) */
     @SerialName("sci") val sci: String? = null,
     /**
      * Represents the resource owner unique ID to whom this token is attached to
@@ -85,11 +87,9 @@ data class JWTPayload(
     /**
      * The metadata associated to the resource owner
      */
-    @SerialName("meta_data") val metaData: Map<String, JsonElement>? = null,
-    /**
-     * The metadata associated to the resource owner
-     */
-    @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, JsonElement>? = null,
+    @JsonNames("meta_data", "resource_owner_metadata")
+    @SerialName("meta_data")
+    val metaData: Map<String, JsonElement>? = null,
 
     //V2
     /**
@@ -104,17 +104,34 @@ data class JWTPayload(
      * Current profile (openid v2)
      */
     @SerialName("profile") val profile: Map<String, JsonElement>? = null,
+    /** (Openid) Authorized party */
     @SerialName("azp") val azp: String? = null,
+    /**
+     * The client id of the application responsible for the issuance of this token
+     */
     @SerialName("client_id") val clientId: String? = null,
     //val scopes: JsonElement? = scp ?: scope,
+    /** (When `openid`) For validating Access token */
     val at_hash: String? = null,
+    /** (When `openid`) For validatio */
     val c_hash: String? = null,
+    /** Is the email has been verified */
     val email_verified: JsonElement? = null,
+    /** Is the phone number has been verified */
     val phone_number_verified: JsonElement? = null,
 ) {
 
+    /**
+     * domain of the organization handle the resource_owner
+     */
     val domain: String
         get() = (org ?: tnt)!!
+
+    /**
+     * Current resource owner ID of the token
+     */
+    val subjectId: String
+        get() = sub.split("|").last()
 
     init {
         require((1..2).contains(ver)) { "only versions 1 & 2 are allowed" }
