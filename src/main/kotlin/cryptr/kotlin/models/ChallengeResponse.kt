@@ -1,6 +1,7 @@
 package cryptr.kotlin.models
 
 import cryptr.kotlin.interfaces.Tokenable
+import cryptr.kotlin.models.jwt.JWTPayload
 import cryptr.kotlin.models.jwt.JWTToken
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -71,9 +72,13 @@ data class ChallengeResponse(
      *
      * @see idToken
      */
-    fun getIdClaims(serviceUrl: String): JWTToken? {
+    fun getIdToken(serviceUrl: String): JWTToken? {
         val token: String = idToken.toString()
-        return verify(serviceUrl, token)
+        return verify(serviceUrl, token, false)
+    }
+
+    fun getIdClaims(serviceUrl: String): JWTPayload? {
+        return getIdToken(serviceUrl)?.claims()
     }
 
     /**
@@ -81,8 +86,12 @@ data class ChallengeResponse(
      *
      * @see accessToken
      */
-    fun getAccessClaims(serviceUrl: String): JWTToken? {
+    fun getAccessToken(serviceUrl: String): JWTToken? {
         val token: String = accessToken.toString()
         return verify(serviceUrl, token)
+    }
+
+    fun getAccessClaims(serviceUrl: String): JWTPayload? {
+        return getAccessToken(serviceUrl)?.claims()
     }
 }

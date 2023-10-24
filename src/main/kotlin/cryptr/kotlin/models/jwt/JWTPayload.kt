@@ -113,6 +113,9 @@ data class JWTPayload(
     val phone_number_verified: JsonElement? = null,
 ) {
 
+    val domain: String
+        get() = (org ?: tnt)!!
+
     init {
         require((1..2).contains(ver)) { "only versions 1 & 2 are allowed" }
         //basic validations
