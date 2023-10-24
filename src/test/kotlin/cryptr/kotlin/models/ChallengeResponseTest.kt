@@ -3,10 +3,7 @@ package cryptr.kotlin.models
 import cryptr.kotlin.models.jwt.JWTPayload
 import cryptr.kotlin.models.jwt.JWTToken
 import org.junit.jupiter.api.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertIs
-import kotlin.test.assertNull
-import kotlin.test.assertTrue
+import kotlin.test.*
 
 class ChallengeResponseTest {
 
@@ -27,6 +24,8 @@ class ChallengeResponseTest {
         val challengeResponse = ChallengeResponse(accessToken = v2AccessToken, idToken = v2IdToken)
         val idToken = challengeResponse.getIdToken(serviceUrl)
         val accessToken = challengeResponse.getAccessToken(serviceUrl)
+        assertNotNull(idToken)
+        assertNotNull(accessToken)
         assertTrue(idToken?.validIss!!)
         assertIs<JWTToken>(idToken)
         assertIs<JWTToken>(accessToken)
