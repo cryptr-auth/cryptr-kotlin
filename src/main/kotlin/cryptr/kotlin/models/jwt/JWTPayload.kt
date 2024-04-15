@@ -1,5 +1,6 @@
 package cryptr.kotlin.models.jwt
 
+import cryptr.kotlin.models.Identity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
@@ -23,10 +24,10 @@ data class JWTPayload(
      * Represents the resource owner email to whom this token is attached to
      */
     @SerialName("email") val email: String? = null,
-    /** [ver 1] (When generated from SSO) The SSO provider (ex: `okta`) */
-    @SerialName("ips") val ips: String? = null,
-    /** [ver 1] (When generated from SSO) The SSO Connection ID (ex: `nasa_1234`) */
-    @SerialName("sci") val sci: String? = null,
+    ///** (When generated from SSO) The SSO provider (ex: `okta`) */
+    //@SerialName("ips") val ips: String? = null,
+    ///** (When generated from SSO) The SSO Connection ID (ex: `nasa_1234`) */
+    //@SerialName("sci") val sci: String? = null,
     /**
      * Represents the resource owner unique ID to whom this token is attached to
      */
@@ -104,8 +105,8 @@ data class JWTPayload(
      * Current profile (openid v2)
      */
     @SerialName("profile") val profile: Map<String, JsonElement>? = null,
-    /** [ver 1] (Openid) Authorized party */
-    @SerialName("azp") val azp: String? = null,
+    ///** (Openid) Authorized party */
+    //@SerialName("azp") val azp: String? = null,
     /**
      * The client id of the application responsible for the issuance of this token
      */
@@ -119,6 +120,9 @@ data class JWTPayload(
     val email_verified: JsonElement? = null,
     /** Is the phone number has been verified */
     val phone_number_verified: JsonElement? = null,
+
+    /** Identities representing used providers */
+    val identities: Set<Identity>? = null
 ) {
 
     /**
