@@ -33,7 +33,7 @@ data class JWTPayload(
     @SerialName("sub") val sub: String,
     /**
      * Version of the current token.
-     * SHOULD equals to `1`
+     * SHOULD be superior or equals to `1`
      */
     @SerialName("ver") val ver: Int,
     /**
