@@ -31,12 +31,12 @@ data class JWTPayload(
     /**
      * Represents the resource owner unique ID to whom this token is attached to
      */
-    @SerialName("sub") val sub: String,
+    @SerialName("sub") val sub: String? = null,
     /**
      * Version of the current token.
      * SHOULD be superior or equals to `1`
      */
-    @SerialName("ver") val ver: Int,
+    @SerialName("ver") val ver: Int? = null,
     /**
      * The resource owner database
      */
@@ -48,7 +48,7 @@ data class JWTPayload(
     /**
      * The Type of token. Should be `JWT`
      */
-    @SerialName("jtt") val jtt: String,
+    @SerialName("jtt") val jtt: String? = null,
     /**
      * The nonce of token. Should be an UUID
      */
@@ -68,7 +68,7 @@ data class JWTPayload(
     /**
      * The token unique identifier
      */
-    @SerialName("jti") val jti: String,
+    @SerialName("jti") val jti: String? = null,
     /**
      * The client id of the application responsible for the issuance of this token
      */
@@ -122,7 +122,9 @@ data class JWTPayload(
     val phone_number_verified: JsonElement? = null,
 
     /** Identities representing used providers */
-    val identities: Set<Identity>? = null
+    val identities: Set<Identity>? = null,
+    /** Only setup for api key token */
+    val type: String? = null
 ) {
 
     /**
@@ -134,27 +136,29 @@ data class JWTPayload(
     /**
      * Current resource owner ID of the token
      */
-    val subjectId: String
-        get() = sub.split("|").last()
+    val subjectId: String?
+        get() = sub?.split("|")?.last()
 
     init {
-        require((1..3).contains(ver)) { "only versions 1 .. 3 are allowed" }
         //basic validations
-        require(sub.isNotEmpty() && sub.isNotBlank()) { "sub cannot be empty" }
-        require(jtt.isNotEmpty() && jtt.isNotBlank()) { "jtt cannot be empty" }
-        require(jti.isNotEmpty() && jti.isNotBlank()) { "jti cannot be empty" }
+        if (type == null || type != "api_v2") {
+            require(sub !== null && sub.isNotEmpty() && sub.isNotBlank()) { "sub cannot be empty" }
+            require(jtt !== null && jtt.isNotEmpty() && jtt.isNotBlank()) { "jtt cannot be empty" }
+            require(jti !== null && jti.isNotEmpty() && jti.isNotBlank()) { "jti cannot be empty" }
+            require((1..3).contains(ver)) { "only versions 1 .. 3 are allowed" }
+
+            if (ver == 1) {
+                require(dbs!!.isNotEmpty() && dbs.isNotBlank()) { "dbs cannot be empty" }
+                require(iss!!.isNotEmpty() && iss.isNotBlank()) { "iss cannot be empty" }
+                require(cid!!.isNotEmpty() && cid.isNotBlank()) { "cid cannot be empty" }
+            } else {
+                // v2
+                require(org!!.isNotEmpty() && org.isNotBlank()) { "org cannot be empty" }
+                require(env!!.isNotEmpty() && env.isNotBlank()) { "env cannot be empty" }
+            }
+        }
         require(exp > 0 && Instant.ofEpochSecond(exp).isAfter(Instant.now())) { "exp should be in the future" }
         require(iat > 0 && Instant.ofEpochSecond(iat).isBefore(Instant.now())) { "iat should be in the past" }
 
-        // ver is only 1 or 2
-        if (ver == 1) {
-            require(dbs!!.isNotEmpty() && dbs.isNotBlank()) { "dbs cannot be empty" }
-            require(iss!!.isNotEmpty() && iss.isNotBlank()) { "iss cannot be empty" }
-            require(cid!!.isNotEmpty() && cid.isNotBlank()) { "cid cannot be empty" }
-        } else {
-            // v2
-            require(org!!.isNotEmpty() && org.isNotBlank()) { "org cannot be empty" }
-            require(env!!.isNotEmpty() && env.isNotBlank()) { "env cannot be empty" }
-        }
     }
 }
