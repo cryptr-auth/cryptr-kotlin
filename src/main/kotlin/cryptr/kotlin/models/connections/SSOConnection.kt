@@ -3,7 +3,6 @@ package cryptr.kotlin.models.connections
 import cryptr.kotlin.models.AdminOnboarding
 import cryptr.kotlin.models.CryptrResource
 import cryptr.kotlin.models.Organization
-import cryptr.kotlin.models.Redirection
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -36,10 +35,6 @@ data class SSOConnection(
      * Represent if the SSOConnection is enabled or not
      */
     @SerialName("active") val active: Boolean? = null,
-    /**
-     * The Default [Redirection] used after the end-user succeeded his SSO authnetication process
-     */
-    @SerialName("default_redirection") val defaultRedirection: Redirection? = null,
     /**
      * @suppress
      */
