@@ -134,7 +134,7 @@ data class JWTPayload(
         get() = sub.split("|").last()
 
     init {
-        require((1..2).contains(ver)) { "only versions 1 & 2 are allowed" }
+        require((1..3).contains(ver)) { "only versions 1 .. 3 are allowed" }
         //basic validations
         require(sub.isNotEmpty() && sub.isNotBlank()) { "sub cannot be empty" }
         require(jtt.isNotEmpty() && jtt.isNotBlank()) { "jtt cannot be empty" }
