@@ -2,7 +2,6 @@ package cryptr.kotlin
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.models.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -64,26 +63,6 @@ class CryptrTest {
         assertEquals(
             testToken, cryptr.retrieveApiKeyToken()
         )
-    }
-
-
-    @Test
-    fun mapToFormDataShouldProperlyEncodeApplication() {
-        val application = Application(
-            name = "My Application",
-            applicationType = ApplicationType.REGULAR_WEB,
-            allowedOriginsCors = setOf("https://www.example.com"),
-            allowedRedirectUrls = setOf("https://www.example.com/callback"),
-            allowedLogoutUrls = setOf("https://www.example.com/logout")
-        )
-
-        val formData = cryptr.mapToFormData(JSONObject(Json.encodeToString(application)).toMap())
-
-        assertContains(formData, "application_type=regular_web")
-        assertContains(formData, "name=My+Application")
-        assertContains(formData, "allowed_origins_cors[]=https%3A%2F%2Fwww.example.com")
-        assertContains(formData, "allowed_redirect_urls[]=https%3A%2F%2Fwww.example.com%2Fcallback")
-        assertContains(formData, "allowed_logout_urls[]=https%3A%2F%2Fwww.example.com%2Flogout")
     }
 
     @Test

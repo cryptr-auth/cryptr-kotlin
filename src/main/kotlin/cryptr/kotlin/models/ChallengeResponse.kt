@@ -36,7 +36,7 @@ data class ChallengeResponse(
      */
     @SerialName("resource_owner_id") val resourceOwnerId: String? = null,
     /**
-     * Unique identifier of the Client ([Application])
+     * Unique identifier of the Client
      */
     @SerialName("client_id") val clientId: String? = null,
     /**

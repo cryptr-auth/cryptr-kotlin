@@ -1,6 +1,5 @@
 package cryptr.kotlin.interfaces
 
-import cryptr.kotlin.models.Application
 import cryptr.kotlin.models.Organization
 import cryptr.kotlin.models.User
 import cryptr.kotlin.objects.Constants
@@ -92,13 +91,6 @@ interface URLable {
      */
     fun buildUserPath(orgDomain: String, resourceId: String? = null): String {
         return buildOrganizationResourcePath(orgDomain, User.apiResourceName, resourceId)
-    }
-
-    /**
-     * @suppress
-     */
-    fun buildApplicationPath(orgDomain: String, resourceId: String? = null): String {
-        return buildOrganizationResourcePath(orgDomain, Application.apiResourceName, resourceId)
     }
 
     /**

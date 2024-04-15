@@ -1,6 +1,5 @@
 package cryptr.kotlin
 
-import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
@@ -118,58 +117,6 @@ class CryptrSerializerTest {
         assertEquals(
             JSONObject(userJsonString).keySet().sorted(),
             JSONObject(format.encodeToString(CryptrSerializer, user)).keySet().sorted()
-        )
-    }
-
-    @Test
-    fun serializeApplication() {
-        val applicationJsonString = "{\n" +
-                "    \"__domain__\": \"acme-company\",\n" +
-                "    \"__environment__\": \"sandbox\",\n" +
-                "    \"__type__\": \"Application\",\n" +
-                "    \"allowed_logout_urls\": [\n" +
-                "        \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                "    ],\n" +
-                "    \"allowed_origins_cors\": [\n" +
-                "        \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                "    ],\n" +
-                "    \"allowed_redirect_urls\": [\n" +
-                "        \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                "    ],\n" +
-                "    \"application_type\": \"ruby_on_rails\",\n" +
-                "    \"client_id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
-                "    \"default_origin_cors\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                "    \"default_redirect_uri_after_login\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                "    \"default_redirect_uri_after_logout\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                "    \"description\": null,\n" +
-                "    \"id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
-                "    \"inserted_at\": \"2023-05-02T16:06:47\",\n" +
-                "    \"name\": \"Community App Communitiz Real QA App\",\n" +
-                "    \"updated_at\": \"2023-05-02T16:06:47\"\n" +
-                "}"
-
-        val application = format.decodeFromString<Application>(applicationJsonString)
-        assertEquals("Application", application.cryptrType)
-        assertEquals("sandbox", application.environment)
-        assertEquals("acme-company", application.resourceDomain)
-        assertEquals(setOf("https://communitiz-app-vuejs.onrender.com"), application.allowedLogoutUrls)
-        assertEquals(setOf("https://communitiz-app-vuejs.onrender.com"), application.allowedOriginsCors)
-        assertEquals(setOf("https://communitiz-app-vuejs.onrender.com"), application.allowedRedirectUrls)
-        assertEquals(ApplicationType.RUBY_ON_RAILS, application.applicationType)
-        assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", application.clientId)
-        assertEquals("https://communitiz-app-vuejs.onrender.com", application.defaultOriginCors)
-        assertEquals("https://communitiz-app-vuejs.onrender.com", application.defaultRedirectUriAfterLogin)
-        assertEquals("https://communitiz-app-vuejs.onrender.com", application.defaultRedirectUriAfterLogout)
-        assertNull(application.description)
-        assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", application.id)
-        assertNotNull(application.insertedAt)
-        assertNotNull(application.updatedAt)
-        assertEquals("Community App Communitiz Real QA App", application.name)
-
-
-        assertEquals(
-            JSONObject(applicationJsonString).keySet(),
-            JSONObject(format.encodeToString(CryptrSerializer, application)).keySet()
         )
     }
 

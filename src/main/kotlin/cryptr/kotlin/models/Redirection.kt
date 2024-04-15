@@ -19,10 +19,6 @@ data class Redirection(
      */
     @SerialName("id") val id: String? = null,
     /**
-     * Unique identifier of the [Application] where to redirect after login
-     */
-    @SerialName("app_id") val applicationId: String? = null,
-    /**
      * Unique identifier of the [SSOConnection]
      */
     @SerialName("idp_id") val idpId: String? = null,
@@ -31,11 +27,11 @@ data class Redirection(
      */
     @SerialName("sp_id") val spId: String? = null,
     /**
-     * URI where to redirect after login. MUST be allowed by [Application]
+     * URI where to redirect after login
      */
     @SerialName("uri") val uri: String? = null,
     /**
-     * Unique identifier owner of the Application where to redirect. Can be either your master tenant account or
+     * Unique identifier owner where to redirect. Can be either your master tenant account or
      * the Organization's
      */
     @SerialName("app_tenant_owner_id") val applicationTenantOwnerId: String? = null,

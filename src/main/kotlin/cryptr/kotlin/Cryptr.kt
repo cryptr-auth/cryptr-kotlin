@@ -10,7 +10,6 @@ import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
 import cryptr.kotlin.models.connections.PasswordConnection
 import cryptr.kotlin.models.connections.SSOConnection
-import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedOrganization
 import cryptr.kotlin.models.deleted.DeletedUser
 import cryptr.kotlin.models.jwt.JWTToken
@@ -719,100 +718,6 @@ class Cryptr(
         }
     }
 
-    /**
-     * List Organization [Application]s
-     *
-     * @param orgDomain Organization's domain
-     *
-     * @return [APIResult] the response
-     */
-    fun listApplications(
-        orgDomain: String,
-        perPage: Int? = 10,
-        currentPage: Int? = 1
-    ): APIResult<List<Application>, ErrorMessage> {
-        val path = buildApplicationPath(orgDomain)
-        val response =
-            makeListRequest(path, serviceUrl = serviceUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
-        return try {
-            APISuccess(format.decodeFromString<List<Application>>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    /**
-     * Retrieves an [Application] based on its Organization's domain and ID
-     *
-     * @param orgDomain The [Organization] domain
-     * @param applicationId The ID of the requested [Application]
-     *
-     * @return [Application]
-     */
-    fun retrieveApplication(orgDomain: String, applicationId: String): APIResult<Application, ErrorMessage> {
-        val response =
-            makeRequest(
-                buildApplicationPath(orgDomain, applicationId),
-                serviceUrl = serviceUrl,
-                apiKeyToken = retrieveApiKeyToken()
-            )
-        return try {
-            APISuccess(format.decodeFromString<Application>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    /**
-     * Creates an [Application] on your Cryptr service for [Organization provided]
-     *
-     * @param
-     */
-    fun createApplication(
-        orgDomain: String,
-        application: Application
-    ): APIResult<Application, ErrorMessage> {
-        val params = JSONObject(format.encodeToString(application)).toMap()
-        val response =
-            makeRequest(
-                buildApplicationPath(orgDomain),
-                serviceUrl = serviceUrl,
-                params = params,
-                apiKeyToken = retrieveApiKeyToken()
-            )
-        return try {
-            APISuccess(format.decodeFromString<Application>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-
-    /**
-     * Delete a given [Application]
-     *
-     * @param application The [Application] to delete
-     *
-     * @return the deleted [Application]
-     */
-    fun deleteApplication(application: Application): DeletedApplication? {
-        val response = makeDeleteRequest(
-            buildApplicationPath(application.resourceDomain.toString(), application.id),
-            serviceUrl = serviceUrl,
-            retrieveApiKeyToken()
-        )
-        return try {
-            format.decodeFromString<DeletedApplication>(response.toString())
-        } catch (e: Exception) {
-            logException(e)
-            return null
-//            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
     /** Creates a [SSOConnection]
      *
      */
@@ -1121,8 +1026,6 @@ class Cryptr(
      * @param emailTemplateId the desired email template to use to send the [AdminOnboarding] to the Admin. If not
      * provided, default one will be used
      * @param sendEmail If you would like to send the email to the IT admin after update
-     * @param applicationId the ClientID of the [Application] for the redirection
-     *
      * @return an [APIResult] with the updated [AdminOnboarding]
      */
     fun updateSsoAdminOnboarding(
