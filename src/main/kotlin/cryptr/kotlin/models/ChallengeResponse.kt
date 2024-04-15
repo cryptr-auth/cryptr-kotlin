@@ -19,6 +19,10 @@ data class ChallengeResponse(
      * The JWT ID Token of the authenticated end-user
      */
     @SerialName("id_token") val idToken: String? = null,
+    /**
+     * The Refresh Token of the authenticated end-user
+     */
+    @SerialName("refresh_token") val refreshToken: String? = null,
 
     @SerialName("refresh_retry") val refreshRetry: Int? = null,
     @SerialName("refresh_leeway") val refreshLeeway: Int? = null,

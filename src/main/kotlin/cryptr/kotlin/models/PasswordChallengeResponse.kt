@@ -18,6 +18,10 @@ data class PasswordChallengeResponse(
      * The JWT ID Token of the authenticated end-user
      */
     @SerialName("id_token") val idToken: String? = null,
+    /**
+     * The Refresh Token to rotate the session
+     */
+    @SerialName("refresh_token") val refreshToken: String? = null,
 
     /**
      * Authorized scope of these generated tokens
