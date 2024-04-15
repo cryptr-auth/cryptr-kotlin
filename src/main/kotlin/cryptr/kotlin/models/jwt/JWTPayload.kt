@@ -24,10 +24,10 @@ data class JWTPayload(
      * Represents the resource owner email to whom this token is attached to
      */
     @SerialName("email") val email: String? = null,
-    ///** (When generated from SSO) The SSO provider (ex: `okta`) */
-    //@SerialName("ips") val ips: String? = null,
-    ///** (When generated from SSO) The SSO Connection ID (ex: `nasa_1234`) */
-    //@SerialName("sci") val sci: String? = null,
+    /** [ver 1] (When generated from SSO) The SSO provider (ex: `okta`) */
+    @SerialName("ips") val ips: String? = null,
+    /** [ver 1] (When generated from SSO) The SSO Connection ID (ex: `nasa_1234`) */
+    @SerialName("sci") val sci: String? = null,
     /**
      * Represents the resource owner unique ID to whom this token is attached to
      */
@@ -105,8 +105,8 @@ data class JWTPayload(
      * Current profile (openid v2)
      */
     @SerialName("profile") val profile: Map<String, JsonElement>? = null,
-    ///** (Openid) Authorized party */
-    //@SerialName("azp") val azp: String? = null,
+    /** [ver 1] (Openid) Authorized party */
+    @SerialName("azp") val azp: String? = null,
     /**
      * The client id of the application responsible for the issuance of this token
      */
