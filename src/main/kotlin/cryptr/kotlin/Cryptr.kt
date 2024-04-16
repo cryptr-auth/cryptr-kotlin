@@ -204,8 +204,7 @@ class Cryptr(
             return try {
                 APISuccess(format.decodeFromString<SSOChallenge>(response.toString()))
             } catch (e: Exception) {
-                logException(e)
-                APIError(ErrorMessage(response.toString()))
+                APIError(handleAPIException(e, response))
             }
         } else {
             throw Exception("requires either orgDomain or endUser value")
@@ -242,7 +241,7 @@ class Cryptr(
             APISuccess(format.decodeFromString<PasswordChallenge>(response.toString()))
         } catch (e: Exception) {
             logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -275,8 +274,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<MagicLinkChallenge>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -288,7 +286,7 @@ class Cryptr(
      */
     fun getPasswordChallengeTokens(passwordCode: String? = null): APIResult<PasswordChallengeResponse, ErrorMessage> {
         if (passwordCode.isNullOrEmpty()) {
-            return APIError(ErrorMessage("password challenge code missing"))
+            return APIError(ErrorMessage.build("password challenge code missing"))
         }
         val params = mapOf(
             "grant_type" to "authorization_code",
@@ -303,8 +301,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<PasswordChallengeResponse>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -337,8 +334,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -368,7 +364,7 @@ class Cryptr(
             APISuccess(format.decodeFromString<Password>(response.toString()))
         } catch (e: Exception) {
             logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -400,7 +396,7 @@ class Cryptr(
             APISuccess(format.decodeFromString<Password>(response.toString()))
         } catch (e: Exception) {
             logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -429,7 +425,7 @@ class Cryptr(
             APISuccess(format.decodeFromString<Password>(response.toString()))
         } catch (e: Exception) {
             logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -455,12 +451,10 @@ class Cryptr(
             return try {
                 APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
             } catch (e: Exception) {
-                logException(e)
-                println(e.localizedMessage)
-                APIError(ErrorMessage(response.toString()))
+                APIError(handleAPIException(e, response))
             }
         } else {
-            return APIError(ErrorMessage("code is required"))
+            return APIError(ErrorMessage.build("code is required"))
         }
     }
 
@@ -479,11 +473,10 @@ class Cryptr(
             return try {
                 APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
             } catch (e: Exception) {
-                logException(e)
-                APIError(ErrorMessage(response.toString()))
+                APIError(handleAPIException(e, response))
             }
         } else {
-            return APIError(ErrorMessage("code is required"))
+            return APIError(ErrorMessage.build("code is required"))
         }
     }
 
@@ -504,8 +497,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<List<Organization>>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -522,8 +514,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<Organization>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -561,8 +552,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<Organization>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -609,8 +599,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<List<User>>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -631,8 +620,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<User>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -667,8 +655,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<User>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -691,8 +678,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<User>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -743,8 +729,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -775,11 +760,10 @@ class Cryptr(
             if (createdPasswordConn.id !== null) {
                 APISuccess(createdPasswordConn)
             } else {
-                APIError(ErrorMessage(response.toString()))
+                APIError(ErrorMessage.build(response.toString()))
             }
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -804,8 +788,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<List<SSOConnection>>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -826,8 +809,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -852,8 +834,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -932,9 +913,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            logError({ e.message.toString() })
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -969,8 +948,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -1013,8 +991,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -1089,9 +1066,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            logError({ e.message.toString() })
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -1126,8 +1101,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
 
     }
@@ -1257,6 +1231,17 @@ class Cryptr(
             format.encodeToString(result)
         } catch (e: Exception) {
             e.message.toString();
+        }
+    }
+
+    private fun handleAPIException(e: Exception, response: JSONObject): ErrorMessage {
+        return try {
+            logException(e)
+            format.decodeFromString<ErrorMessage>(response.toString())
+        } catch (e1: Exception) {
+            logException(e1)
+            val errorContent = ErrorContent(message = response.toString())
+            ErrorMessage(error = errorContent)
         }
     }
 }

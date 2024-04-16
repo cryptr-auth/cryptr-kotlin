@@ -99,9 +99,12 @@ class CryptrTest {
 
     @Test
     fun toJSONStringShouldSerializeError() {
-        val error = ErrorMessage(message = "something went wrong")
+        val error = ErrorMessage.build(message = "something went wrong")
         val apiError = APIError<CryptrResource, ErrorMessage>(error)
         val jsonString = cryptr.toJSONString(apiError)
-        assertEquals("{\"message\":\"something went wrong\"}", jsonString)
+        assertEquals(
+            "{\"error\":{\"type\":\"unhandled_error\",\"message\":\"something went wrong\",\"docUrls\":[]}}",
+            jsonString
+        )
     }
 }

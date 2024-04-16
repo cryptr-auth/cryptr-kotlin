@@ -2,6 +2,7 @@ package cryptr.kotlin
 
 import cryptr.kotlin.models.CryptrResource
 import kotlinx.serialization.Polymorphic
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
@@ -32,6 +33,12 @@ data class APISuccess<CryptrResource, ErrorMessage>(@Polymorphic val value: Cryp
 data class APIError<CryptrResource, ErrorMessage>(@Polymorphic val error: ErrorMessage) :
     APIResult<CryptrResource, ErrorMessage>()
 
+@Serializable
+data class ErrorContent(
+    val type: String? = "unhandled_error",
+    val message: String,
+    @SerialName("doc_urls") val docUrls: Set<String>? = emptySet()
+)
 
 /**
  * Represents a Error message
@@ -39,6 +46,17 @@ data class APIError<CryptrResource, ErrorMessage>(@Polymorphic val error: ErrorM
  * @property message The [String] explanation of the error
  */
 @Serializable
-data class ErrorMessage(val message: String)
+data class ErrorMessage(val error: ErrorContent) {
+    companion object {
+        fun build(
+            message: String,
+            type: String? = "unhandled_error",
+            docUrls: Set<String>? = emptySet()
+        ): ErrorMessage {
+            val errorContent = ErrorContent(type = type, message = message, docUrls = docUrls)
+            return ErrorMessage(errorContent)
+        }
+    }
+}
 
 
