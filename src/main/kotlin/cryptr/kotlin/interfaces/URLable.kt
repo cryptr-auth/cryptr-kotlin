@@ -99,11 +99,4 @@ interface URLable {
     fun buildSsoConnectionPath(orgDomain: String, resourceId: String? = null): String {
         return buildOrganizationResourcePath(orgDomain, "sso-connections", resourceId)
     }
-
-    /**
-     * @suppress
-     */
-    fun buildAdminOnboardingUrl(orgDomain: String, onboardingType: String): String {
-        return buildOrganizationResourcePath(orgDomain, "admin-onboarding", onboardingType)
-    }
 }

@@ -915,7 +915,7 @@ class Cryptr(
     }
 
     /**
-     * Format the [CryptrResource] (User, AdminOnboarding, Organization...) to JSON String
+     * Format the [CryptrResource] (User, Organization...) to JSON String
      *
      * @param result the [CryptrResource] to format to JSON String
      *

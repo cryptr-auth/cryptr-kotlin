@@ -1,8 +1,10 @@
 package cryptr.kotlin
 
 import cryptr.kotlin.enums.EnvironmentStatus
-import cryptr.kotlin.models.*
+import cryptr.kotlin.models.CryptrResource
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.Organization
+import cryptr.kotlin.models.User
 import cryptr.kotlin.models.connections.SSOConnection
 import cryptr.kotlin.models.deleted.DeletedUser
 import kotlinx.serialization.decodeFromString
@@ -430,28 +432,6 @@ class CryptrSerializerTest {
 
         val decoded = cryptr.format.decodeFromString<SSOConnection>(body)
         assertIs<SSOConnection>(decoded)
-    }
-
-    @Test
-    fun serializeSSOOnboarding() {
-        val body = "{\n" +
-                "        \"__access__\": \"all_organizations_of:shark-academy\",\n" +
-                "        \"__domain__\": \"shark-academy\",\n" +
-                "        \"__environment__\": \"production\",\n" +
-                "        \"__managed_by__\": \"shark-academy\",\n" +
-                "        \"__type__\": \"EnterpriseConnectionOnboarding\",\n" +
-                "        \"email_template_id\": null,\n" +
-                "        \"id\": \"a6216afe-53ef-4a8e-bd62-07f49c7c825f\",\n" +
-                "        \"inserted_at\": \"2023-05-11T11:35:58\",\n" +
-                "        \"provider_type\": null,\n" +
-                "        \"it_admin_email\": \"thibaud@cryptr.co\",\n" +
-                "        \"state\": \"not_initialized\",\n" +
-                "        \"tutorial_step\": 0,\n" +
-                "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
-                "    }"
-
-        val decoded = cryptr.format.decodeFromString<AdminOnboarding>(body)
-        assertIs<AdminOnboarding>(decoded)
     }
 
     @Test
