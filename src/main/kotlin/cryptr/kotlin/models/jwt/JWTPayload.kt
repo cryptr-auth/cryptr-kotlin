@@ -1,6 +1,5 @@
 package cryptr.kotlin.models.jwt
 
-import cryptr.kotlin.models.Identity
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
@@ -122,7 +121,7 @@ data class JWTPayload(
     val phone_number_verified: JsonElement? = null,
 
     /** Identities representing used providers */
-    val identities: Set<Identity>? = null,
+    val identities: Set<JWTIdentity>? = null,
     /** Only setup for api key token */
     val type: String? = null
 ) {

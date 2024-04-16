@@ -26,7 +26,7 @@ data class User(
      */
     val id: String? = null,
     /** Identities representing used providers */
-    val identities: Set<Identity>? = null,
+    val identities: Set<UserIdentity>? = null,
     /**
      * The postal Address of the User. Can be null
      */

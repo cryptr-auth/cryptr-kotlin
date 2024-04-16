@@ -1,11 +1,11 @@
-package cryptr.kotlin.models
+package cryptr.kotlin.models.jwt
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonElement
 
 @Serializable
-data class Identity(
+data class JWTIdentity(
     @SerialName("idp_id") val idpId: String,
     @SerialName("authenticated_at") val authenticatedAt: Long,
     val provider: String,

@@ -1,5 +1,6 @@
 package cryptr.kotlin.models
 
+import cryptr.kotlin.models.jwt.JWTIdentity
 import cryptr.kotlin.models.jwt.JWTPayload
 import cryptr.kotlin.models.jwt.JWTToken
 import kotlinx.serialization.json.JsonElement
@@ -82,7 +83,12 @@ class ChallengeResponseTest {
 
         assertEquals(setOf("given_name", "family_name"), idClaims.profile?.keys)
         assertEquals(
-            Identity("muffun_2dGO7HYKXZjchhrCyLQmOLFKvlX", 1713256354, "saml.okta", mapOf<String, JsonElement>()),
+            JWTIdentity(
+                "muffun_2dGO7HYKXZjchhrCyLQmOLFKvlX",
+                1713256354,
+                "saml.okta",
+                mapOf<String, JsonElement>()
+            ),
             idClaims.identities?.first()
         )
 
