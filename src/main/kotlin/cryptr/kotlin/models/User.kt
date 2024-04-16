@@ -25,6 +25,8 @@ data class User(
      * Unique identifier of the User
      */
     val id: String? = null,
+    /** Identities representing used providers */
+    val identities: Set<Identity>? = null,
     /**
      * The postal Address of the User. Can be null
      */
@@ -37,9 +39,13 @@ data class User(
      */
     @SerialName("meta_data") val metadata: Set<MetaData> = setOf(),
     /**
-     * The phone number of the User
+     * The (default) phone number of the User
      */
     @SerialName("phone_number") val phoneNumber: String? = null,
+    /**
+     * All known phone numbers of the User
+     */
+    @SerialName("phone_numbers") val phoneNumbers: Set<String>? = null,
     /**
      * Is the phone number has been verified
      */
@@ -60,6 +66,10 @@ data class User(
      * Last date of update of the User
      */
     @SerialName("updated_at") val updatedAt: String? = null,
+    /**
+     * If [User] is active or not
+     */
+    val active: Boolean? = null,
 ) : CryptrResource() {
     companion object {
         const val apiResourceName: String = "users"

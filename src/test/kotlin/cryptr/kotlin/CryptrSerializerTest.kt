@@ -90,30 +90,40 @@ class CryptrSerializerTest {
     @Test
     fun serializeUser() {
         val userJsonString = "{\n" +
-                "    \"__domain__\": \"acme-company\",\n" +
-                "    \"__environment__\": \"sandbox\",\n" +
-                "    \"__type__\": \"User\",\n" +
-                "    \"address\": null,\n" +
-                "    \"email\": \"aryanna.stroman@gmail.com\",\n" +
-                "    \"email_verified\": false,\n" +
-                "    \"id\": \"9ef8cc11-40e0-432a-8816-6a3b5034519f\",\n" +
-                "    \"inserted_at\": \"2023-05-03T14:03:09\",\n" +
-                "    \"meta_data\": [],\n" +
-                "    \"phone_number\": null,\n" +
-                "    \"phone_number_verified\": false,\n" +
-                "    \"profile\": {\n" +
-                "        \"birthdate\": null,\n" +
-                "        \"family_name\": null,\n" +
-                "        \"gender\": null,\n" +
-                "        \"given_name\": \"Aryanna\",\n" +
-                "        \"locale\": null,\n" +
-                "        \"nickname\": null,\n" +
-                "        \"picture\": null,\n" +
-                "        \"preferred_username\": null,\n" +
-                "        \"website\": null,\n" +
-                "        \"zoneinfo\": null\n" +
-                "    },\n" +
-                "    \"updated_at\": \"2023-05-03T14:03:09\"\n" +
+                "  \"__domain__\": \"muffun\",\n" +
+                "  \"__environment__\": \"sandbox\",\n" +
+                "  \"__type__\": \"User\",\n" +
+                "  \"active\": true,\n" +
+                "  \"address\": null,\n" +
+                "  \"email\": \"aryanna.stroman@gmail.com\",\n" +
+                "  \"email_verified\": false,\n" +
+                "  \"id\": \"60950f87-40f2-48f6-b6d7-18b9b9625d19\",\n" +
+                "  \"identities\": [\n" +
+                "    {\n" +
+                "      \"idp_id\": \"muffun_2dGO7HYKXZjchhrCyLQmOLFKvlX\",\n" +
+                "      \"authenticated_at\": \"2024-04-16T12:19:14\",\n" +
+                "      \"provider\": \"saml.okta\",\n" +
+                "      \"data\": {}\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"inserted_at\": \"2024-04-05T09:57:16\",\n" +
+                "  \"meta_data\": [],\n" +
+                "  \"phone_number\": null,\n" +
+                "  \"phone_number_verified\": false,\n" +
+                "  \"phone_numbers\": [],\n" +
+                "  \"profile\": {\n" +
+                "    \"birthdate\": null,\n" +
+                "    \"family_name\": null,\n" +
+                "    \"gender\": null,\n" +
+                "    \"given_name\": \"Aryanna\",\n" +
+                "    \"locale\": null,\n" +
+                "    \"nickname\": null,\n" +
+                "    \"picture\": null,\n" +
+                "    \"preferred_username\": null,\n" +
+                "    \"website\": null,\n" +
+                "    \"zoneinfo\": null\n" +
+                "  },\n" +
+                "  \"updated_at\": \"2024-04-16T12:19:14\"\n" +
                 "}"
 
         val user = format.decodeFromString<User>(userJsonString)
