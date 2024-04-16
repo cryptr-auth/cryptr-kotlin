@@ -36,22 +36,37 @@ class CryptrSerializerTest {
     @Test
     fun serializeOrganization() {
         val organizationJsonString = "{\n" +
-                "    \"__type__\": \"Organization\",\n" +
-                "    \"domain\": \"thibaud-java\",\n" +
-                "    \"environments\": [\n" +
-                "        {\n" +
-                "            \"name\": \"production\",\n" +
-                "            \"status\": \"down\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"sandbox\",\n" +
-                "            \"status\": \"up\"\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"inserted_at\": \"2023-04-27T13:50:29\",\n" +
-                "    \"name\": \"thibaud-java\",\n" +
-                "    \"allowed_email_domains\": [],\n" +
-                "    \"updated_at\": \"2023-04-27T13:50:49\"\n" +
+                "  \"__type__\": \"Organization\",\n" +
+                "  \"allowed_email_domains\": [\n" +
+                "    \"cryptr.co\",\n" +
+                "    \"muffun.com\",\n" +
+                "    \"muffun.fr\"\n" +
+                "  ],\n" +
+                "  \"color\": \"green-400\",\n" +
+                "  \"domain\": \"thibaud-java\",\n" +
+                "  \"environments\": [\n" +
+                "    {\n" +
+                "      \"name\": \"sandbox\",\n" +
+                "      \"status\": \"up\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"production\",\n" +
+                "      \"status\": \"up\"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"icon_logo_url\": null,\n" +
+                "  \"inline_logo_url\": null,\n" +
+                "  \"inserted_at\": \"2024-03-05T09:21:47\",\n" +
+                "  \"locale\": null,\n" +
+                "  \"name\": \"thibaud-java\",\n" +
+                "  \"status\": {\n" +
+                "    \"errors\": [],\n" +
+                "    \"estimated_time_to_complete_in_seconds\": null,\n" +
+                "    \"progress_in_percentage\": null,\n" +
+                "    \"state\": \"terminated\"\n" +
+                "  },\n" +
+                "  \"timezone\": null,\n" +
+                "  \"updated_at\": \"2024-04-04T12:02:46\"\n" +
                 "}"
 
         val organization = format.decodeFromString<Organization>(organizationJsonString)
@@ -64,7 +79,7 @@ class CryptrSerializerTest {
         organization.environments.find { it.name == "sandbox" }
             ?.let { assertEquals(EnvironmentStatus.UP, it.status) }
         organization.environments.find { it.name == "production" }
-            ?.let { assertEquals(EnvironmentStatus.DOWN, it.status) }
+            ?.let { assertEquals(EnvironmentStatus.UP, it.status) }
 
         assertEquals(
             JSONObject(organizationJsonString).keySet().sorted(),
