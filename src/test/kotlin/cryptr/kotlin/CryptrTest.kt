@@ -103,7 +103,7 @@ class CryptrTest {
         val apiError = APIError<CryptrResource, ErrorMessage>(error)
         val jsonString = cryptr.toJSONString(apiError)
         assertEquals(
-            "{\"error\":{\"type\":\"unhandled_error\",\"message\":\"something went wrong\",\"docUrls\":[]}}",
+            "{\"error\":{\"type\":\"unhandled_error\",\"message\":\"something went wrong\",\"doc_urls\":[]}}",
             jsonString
         )
     }
