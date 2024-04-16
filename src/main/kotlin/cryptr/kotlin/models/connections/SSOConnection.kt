@@ -32,12 +32,19 @@ data class SSOConnection(
      */
     @SerialName("active") val active: Boolean? = null,
     /**
+     * If `false` , a successful test from IT Admin is required to let end users consume this SSO Connection
+     */
+    @SerialName("bypass_it_admin_test") val bypassItAdminTest: Boolean? = false,
+    /**
      * The provider type of the SSO Connection, ex: `okta`, `google`, `adfs` ...
      */
     @SerialName("provider_type") val providerType: String? = null,
+    /**
+     * How many users can connect
+     */
     @SerialName("number_user_provisioning_limit") val numberUserProvisioningLimit: Int? = null,
     /**
-     * @see userProviderType
+     * @see UserProvisioning
      */
     @SerialName("users_provisioning_on_first_login") val usersProvisioningOnFirstLogin: UserProvisioning? = null,
 
