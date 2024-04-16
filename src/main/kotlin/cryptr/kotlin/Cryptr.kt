@@ -528,13 +528,9 @@ class Cryptr(
      */
     fun createOrganization(
         name: String,
-        allowedEmailDomains: Set<String>? = null
+        allowedEmailDomains: Set<String>
     ): APIResult<Organization, ErrorMessage> {
-        return if (allowedEmailDomains.isNullOrEmpty()) {
-            createOrganization(Organization(name = name))
-        } else {
-            createOrganization(Organization(name = name, allowedEmailDomains = allowedEmailDomains))
-        }
+        return createOrganization(Organization(name = name, allowedEmailDomains = allowedEmailDomains))
     }
 
 
