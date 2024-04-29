@@ -8,7 +8,7 @@ enum class UserProvisioning {
     /**
      * Users can connect but they are not registered
      */
-    @SerialName("authorize_users_with_no_provision")
+    @SerialName("unregistered_users_allowed")
     AUTHORIZE_USERS_WITH_NO_PROVISION,
 
     /**
