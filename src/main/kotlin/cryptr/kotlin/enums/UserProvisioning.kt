@@ -9,7 +9,7 @@ enum class UserProvisioning {
      * Users can connect but they are not registered
      */
     @SerialName("unregistered_users_allowed")
-    AUTHORIZE_USERS_WITH_NO_PROVISION,
+    UNREGISTERED_USERS_ALLOWED,
 
     /**
      * Users coming from IDP has to be registered before logging
