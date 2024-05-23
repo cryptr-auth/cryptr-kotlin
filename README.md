@@ -47,19 +47,13 @@ import cryptr.kotlin.Cryptr
 // if you use system properties you call just init like this
 val cryptr = Cryptr()
 
-// If you prefer to define them manually
-val cryptr = Cryptr(
-    tenantDomain = "my-saas-company",
-    apiKeyClientId = "api-key-id",
-    apiKeyClientSecret = "api-key-secret"
-)
-
 // You can also specify your cryptr service url
 val cryptr = Cryptr(
-    tenantDomain = "my-saas-company",
-    baseUrl = "https://my-saas-company.authent.me",
+    accountDomain = "my-account-domain",
+    serviceUrl = "https://my-account-domain.authent.me",
     apiKeyClientId = "api-key-id",
     apiKeyClientSecret = "api-key-secret"
+    defaultRedirectUri = "https://my-redirect-ri"
 )
 ```
 
@@ -99,7 +93,7 @@ if (challengeValidation is APISuccess) {
 
 | key                              | Required | Default value          | sample value                      | purpose                                                      |
 |----------------------------------|----------|------------------------|-----------------------------------|--------------------------------------------------------------|
-| **CRYPTR_ACCOUNT_DOMAIN**        | true     | None                   | `your-tenant-domain`              | Your Account domain                                          |
+| **CRYPTR_ACCOUNT_DOMAIN**        | true     | None                   | `your-account-domain`              | Your Account domain                                          |
 | **CRYPTR_BASE_URL**              | false    | https://auth.cryptr.eu | `https://company.authent.me`      | Your Cryptr service URL                                      |
 | **CRYPTR_DEFAULT_REDIRECT_URL**  |          |                        | `https://localhost:8080/callback` | The URL where to redirect end-user after SSO authent process |
 | **CRYPTR_API_KEY_CLIENT_ID**     | true     | None                   | `xxx`                             | Your API Key client ID                                       |
