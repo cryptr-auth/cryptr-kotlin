@@ -2,7 +2,6 @@ package cryptr.kotlin
 
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.junit5.WireMockTest
-import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.models.*
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -66,26 +65,6 @@ class CryptrTest {
         )
     }
 
-
-    @Test
-    fun mapToFormDataShouldProperlyEncodeApplication() {
-        val application = Application(
-            name = "My Application",
-            applicationType = ApplicationType.REGULAR_WEB,
-            allowedOriginsCors = setOf("https://www.example.com"),
-            allowedRedirectUrls = setOf("https://www.example.com/callback"),
-            allowedLogoutUrls = setOf("https://www.example.com/logout")
-        )
-
-        val formData = cryptr.mapToFormData(JSONObject(Json.encodeToString(application)).toMap())
-
-        assertContains(formData, "application_type=regular_web")
-        assertContains(formData, "name=My+Application")
-        assertContains(formData, "allowed_origins_cors[]=https%3A%2F%2Fwww.example.com")
-        assertContains(formData, "allowed_redirect_urls[]=https%3A%2F%2Fwww.example.com%2Fcallback")
-        assertContains(formData, "allowed_logout_urls[]=https%3A%2F%2Fwww.example.com%2Flogout")
-    }
-
     @Test
     fun mapToFormDataShouldProperlyEncodeUser() {
         val user = User(
@@ -112,17 +91,19 @@ class CryptrTest {
         val apiSuccess = APISuccess<CryptrResource, ErrorMessage>(resource)
         val jsonString = cryptr.toJSONString(apiSuccess)
         assertEquals(
-            "{\"__type__\":\"Organization\",\"domain\":\"my-domain\"," +
-                    "\"updated_at\":null,\"name\":\"my Domain\",\"inserted_at\":null,\"environments\":[],\"allowed_email_domains\":[]}",
+            "{\"__type__\":\"Organization\",\"domain\":\"my-domain\",\"color\":null,\"updated_at\":null,\"name\":\"my Domain\",\"inserted_at\":null,\"environments\":[],\"allowed_email_domains\":[],\"icon_logo_url\":null,\"inline_logo_url\":null,\"locale\":null,\"timezone\":null,\"status\":null}",
             jsonString
         )
     }
 
     @Test
     fun toJSONStringShouldSerializeError() {
-        val error = ErrorMessage(message = "something went wrong")
+        val error = ErrorMessage.build(message = "something went wrong")
         val apiError = APIError<CryptrResource, ErrorMessage>(error)
         val jsonString = cryptr.toJSONString(apiError)
-        assertEquals("{\"message\":\"something went wrong\"}", jsonString)
+        assertEquals(
+            "{\"error\":{\"type\":\"unhandled_error\",\"message\":\"something went wrong\",\"doc_urls\":[]}}",
+            jsonString
+        )
     }
 }

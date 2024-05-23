@@ -1,17 +1,25 @@
 package cryptr.kotlin.models
 
+import cryptr.kotlin.models.jwt.JWTIdentity
 import cryptr.kotlin.models.jwt.JWTPayload
 import cryptr.kotlin.models.jwt.JWTToken
+import kotlinx.serialization.json.JsonElement
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import kotlin.test.*
 
 class ChallengeResponseTest {
 
-    private var serviceUrl = "https://cleeck-umbrella-develop.onrender.com"
+    @BeforeEach
+    fun init() {
+        System.setProperty("CRYPTR_JWT_ALG", "RS256")
+    }
+
+    private var serviceUrl = "https://communitiz-app.cryptr.dev"
     private var v2AccessToken =
-        "eyJhbGciOiJSUzI1NiIsImlzcyI6Imh0dHBzOi8vY2xlZWNrLXVtYnJlbGxhLWRldmVsb3Aub25yZW5kZXIuY29tL3QvY3JlYXRlZ3JhbSIsImtpZCI6IjljYWQ5ZjAyLWNkN2EtNGQ5OC05ZWFiLTcyNDA2MjE4ZjAwYyIsInR5cCI6IkpXVCJ9.eyJhcHBsaWNhdGlvbl9tZXRhZGF0YSI6e30sImF1ZCI6WyJodHRwOi8vbG9jYWxob3N0OjgwODAvY2FsbGJhY2siXSwiYXpwIjoiYTUyOGMxYjEtZTM3Zi00MGIyLWJhZTYtNjJhNmFkOTUwZWZiIiwiY2lkIjoiYTUyOGMxYjEtZTM3Zi00MGIyLWJhZTYtNjJhNmFkOTUwZWZiIiwiY2xpZW50X2lkIjoiYTUyOGMxYjEtZTM3Zi00MGIyLWJhZTYtNjJhNmFkOTUwZWZiIiwiZW1haWwiOiJqYW5lLmRvZUBjcnlwdHIuY28iLCJlbnYiOiJzYW5kYm94IiwiZXhwIjoxNjk4MTc1NTE4LCJpYXQiOjE2OTgxMzk1MTgsImlwcyI6Im9rdGEiLCJqdGkiOiJjNjY1N2E0Yi0zZWE5LTQ4NmEtYTNiNS0wZjc0YTc1ZGY0ZTIiLCJqdHQiOiJhY2Nlc3MiLCJvcmciOiJjcmVhdGVncmFtIiwic2NpIjoiY3JlYXRlZ3JhbV85Z0pTVWVXV21ES0xWRlJWNVZ1YXZoIiwic2NvcGUiOlsib3BlbmlkIiwiZW1haWwiLCJwcm9maWxlIl0sInN1YiI6ImNyeXB0cnxiMjcyNzEyNy01Mjg1LTRlNzYtYThhZS00MWJkZDA2MmRlYWYiLCJ2ZXIiOjJ9.BpVvSLtHvCDl4O_k3zBJPrSFTysmLMCg8G0rRu-43U5hVkHFAHlAKYvosMRe5JqQS2-Z_KEfd6J3FgP0ju8yX_BfYwXAg60u89AVoV9n4DPlAgsLW1nBs5nDfqD-lM7JfEwZj7Ri7gBKzxljoGK6Di15ufEFbXbELyr1brbar9VCYCLEB2IL_-tupkRxytSYftXkRxzQ9Ep2wNWbxr05man9-51GoMJ6pJYhTzc5u4R7C5oNkVgy482SK04bWghb35VtCnfUsVm4CghgwFTr35D1CXgJOxXSfP_3seKnETHESUH6i_I5XM_Iy9XQJxRMQHVkbQSVzdILBRjtj16Sq3ZY7HENSnCojAkyEH0b7r8pnwjwnLkyyHUs9CBw2ZJVw2NvV4-KodLAOABsaGLYs25FgSbtxG1rhU_QkiNFO_5XJSgYgQBNz6APzuPxW_ff3CrHcVfrq5cpQ4UZeKpTHMHEUUyeZ4LwJ5oGLH8v0NqgzOyeIqmfoplT-btMc8RTKV6N6ZhOKTHLcPxjWWt_o49sEdEv486jNDNRtJxB9hxUBSXQ0l2L8nfM_wpmU-h6ngyveaMPyLSDvT1jkfyTYVmDwDFxFoy4xN1Eju7aH72Amur1FwjTn_D7xrNQCrNuwmZ3aOzBbQMEdIuJgN4BPJqSnUu0I6jZwFzsLpMJdyQ"
+        "eyJhbGciOiJSUzI1NiIsImlzcyI6Imh0dHBzOi8vY29tbXVuaXRpei1hcHAuY3J5cHRyLmRldi90L211ZmZ1biIsImtpZCI6ImUyYWJjMDkzLWRkZGUtNDMyOC1hM2VlLTQ2MDEzNDg5YWYwMyIsInR5cCI6IkpXVCJ9.eyJhdWQiOltdLCJjbGllbnRfaWQiOiJlNjg5ODlhNS1iZDg3LTQ1Y2EtOGQwZS1kNWY5MWYyODU4NDkiLCJlbWFpbCI6InRoaWJhdWRAY3J5cHRyLmNvIiwiZW52Ijoic2FuZGJveCIsImV4cCI6MjAyOTc1NDk1NywiaWF0IjoxNzE0Mzk1MDA1LCJqdGkiOiIwZDQ5OWI3MS1lNDNmLTQ5OGEtYjY0Mi1mMzhjNTQwNDI1ZmQiLCJqdHQiOiJhY2Nlc3MiLCJvcmciOiJtdWZmdW4iLCJzY29wZSI6WyJvcGVuaWQiLCJlbWFpbCIsInByb2ZpbGUiXSwic3ViIjoib2t0YXw2MDk1MGY4Ny00MGYyLTQ4ZjYtYjZkNy0xOGI5Yjk2MjVkMTkiLCJ2ZXIiOjN9.YFwXeioYvxLvB368R9T4ioOGm9bcnh8UDqcJJHXyD8jQ64Ext945oaGxfLv_mYLtTVXWNVbrgmN6SHoxaZxwuZa8qBZsu-5TU9QispEeZDAleoca9teRu3SzViL3p96Ctwd8ugH4k81KXYY2wzRrnaNFHyOTaWEbvtFuu6rtQ2Lt2-IDzcnc5hAQUEY-39aX-NoYwby-tHEG-F0swtbbrUzwMGFxsxRwbsZ1_ruhzXBLMSVm7zrnZ5TBsyzlMomikuGbucNDSYyTWe8uzp8S87Zavd93eZi4Tz1dPcV9L9mqCrQXxAEyZdeOJj4t-1KyFy3leiLCpsV8CYwPS23i54DrEAd7Sp-MvuTiULftf4MpiPJ-DfJB8Z58GhmPivxE0lrioKZrocniQmQwE0uwppYxAjYaUeIO-pabHz5llW_MPyFoGaCPyLlFuXJXhcOEA_Rb85Ahu08RScGnXHPeheKw3drKIVqjBc6jAuc4IMj5LcdLhuimY5GoJiIqtjLU1zPHfqquxsf0oweLEUWA3-vEiPuOfiAIYJiGVPl8IFjFKEuJnkAs1Srfns1Q6xobklOIdLPV4S6MmqZslSAeLaTIvMXy2JyXNnjy-9tJ3MFoGnQwsvGIrUoKrfSt4kOaRQEM3YtoXw4dPNKaW11VJgaG7J_C8hQ9NvpihUCwwGw"
     private var v2IdToken =
-        "eyJhbGciOiJSUzI1NiIsImlzcyI6Imh0dHBzOi8vY2xlZWNrLXVtYnJlbGxhLWRldmVsb3Aub25yZW5kZXIuY29tL3QvY3JlYXRlZ3JhbSIsImtpZCI6IjljYWQ5ZjAyLWNkN2EtNGQ5OC05ZWFiLTcyNDA2MjE4ZjAwYyIsInR5cCI6IkpXVCJ9.eyJhcHBsaWNhdGlvbl9tZXRhZGF0YSI6e30sImF0X2hhc2giOiJWVTVwMUs5anFFdzFheEoxMnNBaW93IiwiYXVkIjoiYTUyOGMxYjEtZTM3Zi00MGIyLWJhZTYtNjJhNmFkOTUwZWZiIiwiY19oYXNoIjoiQi0yYUhjb1ZsemJDU1FrcnpsQW5mdyIsImVtYWlsIjoiamFuZS5kb2VAY3J5cHRyLmNvIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJlbnYiOiJzYW5kYm94IiwiZXhwIjoxNjk4MTc1NTE4LCJpYXQiOjE2OTgxMzk1MTgsImlwcyI6Im9rdGEiLCJqdGkiOiJhOGNjYzIxYy00YTBhLTRiMTgtOTUwZS0xZGFiYWNhMTAwODkiLCJqdHQiOiJvcGVuaWQiLCJtZXRhX2RhdGEiOnsiZW1haWwiOiJqYW5lLmRvZUBjcnlwdHIuY28iLCJmaXJzdF9uYW1lIjoiSmFuZSIsImxhc3RfbmFtZSI6IkRvZSIsIm9yZ19kb21haW4iOiJjcmVhdGVncmFtIiwic2FtbF9uYW1laWQiOiJqYW5lLmRvZUBjcnlwdHIuY28iLCJzYW1sX3N1YmplY3QiOiJqYW5lLmRvZUBjcnlwdHIuY28iLCJ1aWQiOiJqYW5lLmRvZUBjcnlwdHIuY28ifSwib3JnIjoiY3JlYXRlZ3JhbSIsInBob25lX251bWJlcl92ZXJpZmllZCI6ZmFsc2UsInByb2ZpbGUiOnsiZmFtaWx5X25hbWUiOiJEb2UiLCJnaXZlbl9uYW1lIjoiSmFuZSJ9LCJzY2kiOiJjcmVhdGVncmFtXzlnSlNVZVdXbURLTFZGUlY1VnVhdmgiLCJzdWIiOiJjcnlwdHJ8YjI3MjcxMjctNTI4NS00ZTc2LWE4YWUtNDFiZGQwNjJkZWFmIiwidmVyIjoyfQ.N1Jx7TwpkgC4kTyJe2JQHCT3lBCnxs0IkDMUTeI1qxYimBj9eEJkAKZmG5BR9MOATEY8RiclvC2h_OZ8iFxxMbYwdUt_q7nH7sxFxvyWdn1cHIySeXNHTZoo7_7qP7DEE4Sx9QQtNyAqnvRn3EKvGPAHHrCxzEjpyDrKyakRjR2yAMXRTWfQ4ywX2D2sWyidsgSvzTcregcYkIHqGgNwMaB_Rq9h8_APn-5Uw3jA17T9DK63anwJVXJ58TBdK9BegBFHyf1JUZLLa_QwFHmOvmN50a9foW_Ly_fwY2BVfzwuBkp6Uy2JK5Pw1xGLbjdseuBsOFM8RsCwenZ5pTkiEf0WP3wj54BeuFfuY5TcvrP0vsqHlfils_zSsyLihVA4wixN-q8asPK7yuoxNhEwdQvFxKJyLgnLj6mW5SbdkuWSjGhjX-Au3Fze1iV-sVC1BYT0oRYNN4C_3tGHNFTx6RlE9cRvtosK84U7LHpPDKsGbzmpDYya1M85qfq3OQ6WcUgV45eSQzFqd6GLtyp0dfbhbdben8QmOH4IkSN4i3hgm_fhnJxs5hFpFxvWxZeb1ivZ-W2YpZvV3EaZRVgCw_sM_ptdakCVvoaGnr6s-cOsjSdVTjViA_VAJa3YRJbGWwQg6VyWpmA4z7-hXa3QrNqlKl7Sja6N-bKUfn-alVI"
+        "eyJhbGciOiJSUzI1NiIsImlzcyI6Imh0dHBzOi8vY29tbXVuaXRpei1hcHAuY3J5cHRyLmRldi90L211ZmZ1biIsImtpZCI6ImUyYWJjMDkzLWRkZGUtNDMyOC1hM2VlLTQ2MDEzNDg5YWYwMyIsInR5cCI6IkpXVCJ9.eyJhdF9oYXNoIjoiN2t5Ri1lQTJVZTNVNUV6dDdlZ21wUSIsImF1ZCI6ImU2ODk4OWE1LWJkODctNDVjYS04ZDBlLWQ1ZjkxZjI4NTg0OSIsImNfaGFzaCI6InMzaWFpYjRuY0hpckVEUXo1YUpRbEEiLCJlbWFpbCI6InRoaWJhdWRAY3J5cHRyLmNvIiwiZW1haWxfdmVyaWZpZWQiOmZhbHNlLCJlbnYiOiJzYW5kYm94IiwiZXhwIjoyMDI5NzU0OTU3LCJpYXQiOjE3MTQzOTUwMDUsImlkZW50aXRpZXMiOlt7ImlkcF9pZCI6Im11ZmZ1bl8yZEdPN0hZS1haamNoaHJDeUxRbU9MRkt2bFgiLCJhdXRoZW50aWNhdGVkX2F0IjoxNzEzNTEzNzM0LCJwcm92aWRlciI6InNhbWwub2t0YSIsImRhdGEiOnt9fV0sImp0aSI6ImQwYTA5ZWM0LTA0NmItNGM3ZC1iN2NmLTdhYjA4YWVkMWY5YyIsImp0dCI6Im9wZW5pZCIsIm1ldGFfZGF0YSI6e30sIm9yZyI6Im11ZmZ1biIsInBob25lX251bWJlcl92ZXJpZmllZCI6ZmFsc2UsInByb2ZpbGUiOnsiZmFtaWx5X25hbWUiOiJSZW5hdXgiLCJnaXZlbl9uYW1lIjoiVGhpYmF1ZCJ9LCJzdWIiOiJva3RhfDYwOTUwZjg3LTQwZjItNDhmNi1iNmQ3LTE4YjliOTYyNWQxOSIsInZlciI6M30.BwQGJy4phmOCJNsZ_WRGS1wLxsMwUIAK6yXAFZMI9VqlNra6j-a2Vo_4mKhtohPJJmWpKT217ptSYb2ZHX3dj1FLvbkhoORw2PLa1_aSTW2O6ucXoZsDPgDV0AQxsxfdPtYBLRLMNc4FBq_d2X9_UgjgeQ_Z49syygCNKv-dmkHn7Hh_mQFOKrYeDimuLBsdYMCJ77nd1ITVV2USOEeAWmgKHiB5MRd6OCAaTNFnS3WOKPH9KhsvTVjivYSkBwgUCqwamM1oIW7v1cd4HqWJB-p3iV8ZcdzOOJmwFgpw8zUg_KJPd10dp1-S-pnNGs8Al7MK32xUYxC2rB_c3swZBeCqlP2JiR-H_HOllKh9-HzAcEbvSqfZNkA_UpjehOwYJoKeg31ds0IuwfEGJ-QinJyQqLnjggCyzR-qrBcUyxgon4hvaHK6NzLSLJKKEdV24t4c75gBlIeJCCGHYqp77zfDbd9Dtum-VtDSrWiWkI-bvlvy9Jx2PsFQsQPxEwqJ65RykLt-yKfUESgg-cq2Ur4oGfuyFTNlNy5qaoa49PoC_YRN0SdJYws-5ucBk-l4ctGE8QCwZcEMh8o0y8HQattHumpSXSOoFtLJ3h8MMOp6RiujRccZd4J9ObGaSK2S9pO91Ep1yvHdNEHkue4oF6uEokoTpEkRjGKyFd15Kpo"
 
     @Test
     fun shouldFailIfEmptyChallengeResponse() {
@@ -26,7 +34,7 @@ class ChallengeResponseTest {
         val accessToken = challengeResponse.getAccessToken(serviceUrl)
         assertNotNull(idToken)
         assertNotNull(accessToken)
-        assertTrue(idToken?.validIss!!)
+        assertTrue(idToken.validIss)
         assertIs<JWTToken>(idToken)
         assertIs<JWTToken>(accessToken)
         assertTrue(accessToken.validIss)
@@ -37,46 +45,52 @@ class ChallengeResponseTest {
         assertIs<JWTPayload>(idClaims)
 
         assertEquals("[\"openid\",\"email\",\"profile\"]", accessClaims.scope.toString())
-        assertEquals("[\"http://localhost:8080/callback\"]", accessClaims.aud.toString())
-        assertEquals("jane.doe@cryptr.co", accessClaims.email)
-        assertEquals("okta", accessClaims.ips)
-        assertEquals("creategram_9gJSUeWWmDKLVFRV5Vuavh", accessClaims.sci)
-        assertEquals("cryptr|b2727127-5285-4e76-a8ae-41bdd062deaf", accessClaims.sub)
-        assertEquals(2, accessClaims.ver)
+        assertEquals("[]", accessClaims.aud.toString())
+        assertEquals("thibaud@cryptr.co", accessClaims.email)
+        //assertEquals("okta", accessClaims.ips)
+        //assertEquals("muffun_2dGO7HYKXZjchhrCyLQmOLFKvlX", accessClaims.sci)
+        assertEquals("okta|60950f87-40f2-48f6-b6d7-18b9b9625d19", accessClaims.sub)
+        assertEquals(3, accessClaims.ver)
         assertEquals("access", accessClaims.jtt)
-        assertEquals(1698175518, accessClaims.exp)
-        assertEquals(1698139518, accessClaims.iat)
-        assertEquals("c6657a4b-3ea9-486a-a3b5-0f74a75df4e2", accessClaims.jti)
-        assertEquals("a528c1b1-e37f-40b2-bae6-62a6ad950efb", accessClaims.cid)
+        assertEquals(2029754957, accessClaims.exp)
+        assertEquals(1714395005, accessClaims.iat)
+        assertEquals("0d499b71-e43f-498a-b642-f38c540425fd", accessClaims.jti)
+        //assertEquals("a528c1b1-e37f-40b2-bae6-62a6ad950efb", accessClaims.cid)
         assertEquals("sandbox", accessClaims.env)
-        assertEquals("creategram", accessClaims.org)
-        assertEquals("a528c1b1-e37f-40b2-bae6-62a6ad950efb", accessClaims.azp)
-        assertEquals("a528c1b1-e37f-40b2-bae6-62a6ad950efb", accessClaims.clientId)
+        assertEquals("muffun", accessClaims.org)
+        //assertEquals("a528c1b1-e37f-40b2-bae6-62a6ad950efb", accessClaims.azp)
+        assertEquals("e68989a5-bd87-45ca-8d0e-d5f91f285849", accessClaims.clientId)
 
         assertNull(idClaims.scope)
-        assertEquals("\"a528c1b1-e37f-40b2-bae6-62a6ad950efb\"", idClaims.aud.toString())
-        assertEquals("jane.doe@cryptr.co", idClaims.email)
-        assertEquals("okta", idClaims.ips)
-        assertEquals("creategram_9gJSUeWWmDKLVFRV5Vuavh", idClaims.sci)
-        assertEquals("cryptr|b2727127-5285-4e76-a8ae-41bdd062deaf", idClaims.sub)
-        assertEquals(2, idClaims.ver)
+        assertEquals("\"e68989a5-bd87-45ca-8d0e-d5f91f285849\"", idClaims.aud.toString())
+        assertEquals("thibaud@cryptr.co", idClaims.email)
+        //assertEquals("okta", idClaims.ips)
+        //assertEquals("creategram_9gJSUeWWmDKLVFRV5Vuavh", idClaims.sci)
+        assertEquals("okta|60950f87-40f2-48f6-b6d7-18b9b9625d19", idClaims.sub)
+        assertEquals(3, idClaims.ver)
         assertEquals("openid", idClaims.jtt)
-        assertEquals(1698175518, idClaims.exp)
-        assertEquals(1698139518, idClaims.iat)
-        assertEquals("a8ccc21c-4a0a-4b18-950e-1dabaca10089", idClaims.jti)
-        assertEquals(0, idClaims.applicationMetadata?.keys?.size)
-        assertNull(idClaims.cid)
+        assertEquals(2029754957, idClaims.exp)
+        assertEquals(1714395005, idClaims.iat)
+        assertEquals("d0a09ec4-046b-4c7d-b7cf-7ab08aed1f9c", idClaims.jti)
+        assertNull(idClaims.applicationMetadata)
+        //assertNull(idClaims.cid)
         assertEquals("sandbox", idClaims.env)
-        assertEquals("creategram", idClaims.org)
-        assertNull(idClaims.azp)
+        assertEquals("muffun", idClaims.org)
+        //assertNull(idClaims.azp)
         assertNull(idClaims.clientId)
 
-        assertEquals(
-            setOf("org_domain", "uid", "saml_subject", "last_name", "saml_nameid", "first_name", "email"),
-            idClaims.metaData?.keys
-        )
+        assertEquals(setOf(), idClaims.metaData?.keys)
 
         assertEquals(setOf("given_name", "family_name"), idClaims.profile?.keys)
+        assertEquals(
+            JWTIdentity(
+                "muffun_2dGO7HYKXZjchhrCyLQmOLFKvlX",
+                1713513734,
+                "saml.okta",
+                mapOf<String, JsonElement>()
+            ),
+            idClaims.identities?.first()
+        )
 
         assertEquals("false", idClaims.email_verified.toString())
         assertEquals("false", idClaims.phone_number_verified.toString())

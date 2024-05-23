@@ -178,7 +178,7 @@ class CryptrHeadlessTest {
         val challengeResponse = cryptr.createSsoSamlChallenge(orgDomain = "azerty")
         if (challengeResponse is APIError) {
             val error = challengeResponse.error
-            assertEquals("{\"error\":\"Not Found\"}", error.message)
+            assertEquals("{\"error\":\"Not Found\"}", error.error.message)
         }
     }
 
@@ -207,13 +207,13 @@ class CryptrHeadlessTest {
         val response1 = cryptr.validateSsoChallenge()
         assertIs<APIError<*, ErrorMessage>>(response1)
         if (response1 is APIError) {
-            assertEquals("code is required", response1.error.message)
+            assertEquals("code is required", response1.error.error.message)
         }
 
         val response2 = cryptr.validateSsoChallenge("")
         assertIs<APIError<*, ErrorMessage>>(response2)
         if (response2 is APIError) {
-            assertEquals("code is required", response2.error.message)
+            assertEquals("code is required", response2.error.error.message)
         }
 
     }
