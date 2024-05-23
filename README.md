@@ -94,7 +94,7 @@ if (challengeValidation is APISuccess) {
 | key                              | Required | Default value          | sample value                      | purpose                                                      |
 |----------------------------------|----------|------------------------|-----------------------------------|--------------------------------------------------------------|
 | **CRYPTR_ACCOUNT_DOMAIN**        | true     | None                   | `your-account-domain`              | Your Account domain                                          |
-| **CRYPTR_BASE_URL**              | false    | https://auth.cryptr.eu | `https://company.authent.me`      | Your Cryptr service URL                                      |
+| **CRYPTR_SERVICE_URL**              | false    | https://auth.cryptr.eu | `https://company.authent.me`      | Your Cryptr service URL                                      |
 | **CRYPTR_DEFAULT_REDIRECT_URL**  |          |                        | `https://localhost:8080/callback` | The URL where to redirect end-user after SSO authent process |
 | **CRYPTR_API_KEY_CLIENT_ID**     | true     | None                   | `xxx`                             | Your API Key client ID                                       |
 | **CRYPTR_API_KEY_CLIENT_SECRET** | true     | None                   | `xxx`                             | Your API Key client Secret                                   |

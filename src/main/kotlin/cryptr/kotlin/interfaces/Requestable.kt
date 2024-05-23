@@ -34,7 +34,7 @@ interface Requestable : URLable, Loggable {
     fun makeListRequest(
         path: String,
         serviceUrl: String = System.getProperty(
-            CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+            CryptrEnvironment.CRYPTR_SERVICE_URL.toString(),
             Constants.DEFAULT_BASE_URL
         ),
         apiKeyToken: String? = "",
@@ -55,7 +55,7 @@ interface Requestable : URLable, Loggable {
     fun makeDeleteRequest(
         path: String,
         serviceUrl: String = System.getProperty(
-            CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+            CryptrEnvironment.CRYPTR_SERVICE_URL.toString(),
             Constants.DEFAULT_BASE_URL
         ),
         apiKeyToken: String? = ""
@@ -69,7 +69,7 @@ interface Requestable : URLable, Loggable {
     fun makeUpdateRequest(
         path: String,
         serviceUrl: String = System.getProperty(
-            CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+            CryptrEnvironment.CRYPTR_SERVICE_URL.toString(),
             Constants.DEFAULT_BASE_URL
         ),
         params: Map<String, Any?>? = null,
@@ -84,7 +84,7 @@ interface Requestable : URLable, Loggable {
     fun makeRequest(
         path: String,
         serviceUrl: String = System.getProperty(
-            CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+            CryptrEnvironment.CRYPTR_SERVICE_URL.toString(),
             Constants.DEFAULT_BASE_URL
         ),
         params: Map<String, Any?>? = null,
