@@ -15,7 +15,7 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 <dependency>
     <groupId>co.cryptr</groupId>
     <artifactId>cryptr-kotlin</artifactId>
-    <version>0.1.3</version>
+    <version>1.0.0</version>
 </dependency>
 
 ```
@@ -25,7 +25,7 @@ See the [Cryptr API Reference](https://docs.cryptr.co)
 ```groovy
 
 dependencies {
-    implementation 'co.cryptr:cryptr-kotlin:0.1.3'
+    implementation 'co.cryptr:cryptr-kotlin:1.0.0'
 }
 
 ```
@@ -34,7 +34,7 @@ dependencies {
 
 ```kotlin
 dependencies {
-    implementation("co.cryptr:cryptr-kotlin:0.1.3")
+    implementation("co.cryptr:cryptr-kotlin:1.0.0")
 }
 ```
 
