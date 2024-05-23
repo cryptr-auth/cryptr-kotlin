@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
  * Represents a successful response of (SSO) Challenge Headless Authenticatino process
  */
 @Serializable
-data class PasswordChallengeResponse(
+data class HeadlessChallengeResponse(
     /**
      * The JWT Access Token of the authenticated end-user
      */

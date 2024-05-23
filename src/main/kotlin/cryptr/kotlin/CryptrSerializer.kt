@@ -32,7 +32,6 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
     private fun listItemSerializer(itemType: String?): KSerializer<out CryptrResource> {
         return when (itemType) {
             "Address" -> Address.serializer()
-            "Application" -> Application.serializer()
             "Organization" -> Organization.serializer()
             "Profile" -> Profile.serializer()
             "User" -> User.serializer()
@@ -42,6 +41,7 @@ object CryptrSerializer : JsonContentPolymorphicSerializer<CryptrResource>(Crypt
             "PasswordRequest" -> PasswordRequest.serializer()
             "PasswordChallenge" -> PasswordChallenge.serializer()
             "PasswordConnection" -> PasswordConnection.serializer()
+            "MagicLinkChallenge" -> MagicLinkChallenge.serializer()
             else -> throw Exception("Error serializer not found for $itemType")
         }
     }

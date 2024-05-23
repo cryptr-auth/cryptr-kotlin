@@ -11,15 +11,15 @@ class APIErrorTest {
 
     @Test
     fun getError() {
-        val errorMessage = ErrorMessage("some error message")
+        val errorMessage = ErrorMessage.build("some error message")
         val apiError = APIError<CryptrResource, ErrorMessage>(error = errorMessage)
-        assertEquals("some error message", apiError.error.message)
+        assertEquals("some error message", apiError.error.error.message)
     }
 
     @Test
     @Ignore
     fun apiErrorSerialization() {
-        val errorMessage = ErrorMessage("some error message")
+        val errorMessage = ErrorMessage.build("some error message")
         val apiError = APIError<CryptrResource, ErrorMessage>(error = errorMessage)
         val serialized = Json.encodeToString<APIError<CryptrResource, ErrorMessage>>(value = apiError)
         assertEquals("", serialized)

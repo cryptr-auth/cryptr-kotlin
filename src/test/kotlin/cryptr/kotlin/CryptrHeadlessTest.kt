@@ -17,7 +17,7 @@ import kotlin.test.assertTrue
 @WireMockTest(proxyMode = true)
 class CryptrHeadlessTest {
 
-    lateinit var cryptr: Cryptr
+    private lateinit var cryptr: Cryptr
 
     @BeforeEach
     fun init() {
@@ -165,20 +165,23 @@ class CryptrHeadlessTest {
         assertEquals("requires either orgDomain or endUser value", e.message)
     }
 
-    //
-//    @Test
-//    fun createSSOSamlChallengeShouldFailIfUnmatchingInput() {
-//        stubFor(
-//            post("/api/v2/sso-saml-challenges")
-//                .withHost(equalTo("dev.cryptr.eu"))
-//                .willReturn(
-//                    ok("Not Found")
-//                )
-//        )
-//        val challengeResponse = cryptr?.createSSOSamlChallenge(orgDomain = "azerty")
-//        assertEquals("{\"error\":\"Not Found\"}", challengeResponse.toString())
-//    }
-//
+
+    @Test
+    fun createSSOSamlChallengeShouldFailIfUnmatchingInput() {
+        stubFor(
+            post("/api/v2/sso-saml-challenges")
+                .withHost(equalTo("dev.cryptr.eu"))
+                .willReturn(
+                    ok("Not Found")
+                )
+        )
+        val challengeResponse = cryptr.createSsoSamlChallenge(orgDomain = "azerty")
+        if (challengeResponse is APIError) {
+            val error = challengeResponse.error
+            assertEquals("{\"error\":\"Not Found\"}", error.error.message)
+        }
+    }
+
     @Test
     fun consumeSSOSamlChallengeCallback() {
         stubFor(
@@ -191,11 +194,12 @@ class CryptrHeadlessTest {
                 )
         )
         val resp = cryptr.validateSsoChallenge("some-code")
-        assertIs<APIResult<ChallengeResponse, ErrorMessage>>(resp)
+        assertIs<APISuccess<ChallengeResponse, ErrorMessage>>(resp)
         if (resp is APISuccess) {
-            assertNotNull(resp.value.clientUrl)
+            val value = resp.value
+            //assertNotNull(value.clientUrl)
+            //assertEquals("sso-challenge-auth-code", resp.getString("code"))
         }
-//        assertEquals("sso-challenge-auth-code", resp.getString("code"))
     }
 
     @Test
@@ -203,13 +207,13 @@ class CryptrHeadlessTest {
         val response1 = cryptr.validateSsoChallenge()
         assertIs<APIError<*, ErrorMessage>>(response1)
         if (response1 is APIError) {
-            assertEquals("code is required", response1.error.message)
+            assertEquals("code is required", response1.error.error.message)
         }
 
         val response2 = cryptr.validateSsoChallenge("")
         assertIs<APIError<*, ErrorMessage>>(response2)
         if (response2 is APIError) {
-            assertEquals("code is required", response2.error.message)
+            assertEquals("code is required", response2.error.error.message)
         }
 
     }

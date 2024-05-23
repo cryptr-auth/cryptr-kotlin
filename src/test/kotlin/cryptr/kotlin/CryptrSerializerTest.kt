@@ -1,9 +1,10 @@
 package cryptr.kotlin
 
-import cryptr.kotlin.enums.ApplicationType
 import cryptr.kotlin.enums.EnvironmentStatus
-import cryptr.kotlin.models.*
+import cryptr.kotlin.models.CryptrResource
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.Organization
+import cryptr.kotlin.models.User
 import cryptr.kotlin.models.connections.SSOConnection
 import cryptr.kotlin.models.deleted.DeletedUser
 import kotlinx.serialization.decodeFromString
@@ -35,22 +36,37 @@ class CryptrSerializerTest {
     @Test
     fun serializeOrganization() {
         val organizationJsonString = "{\n" +
-                "    \"__type__\": \"Organization\",\n" +
-                "    \"domain\": \"thibaud-java\",\n" +
-                "    \"environments\": [\n" +
-                "        {\n" +
-                "            \"name\": \"production\",\n" +
-                "            \"status\": \"down\"\n" +
-                "        },\n" +
-                "        {\n" +
-                "            \"name\": \"sandbox\",\n" +
-                "            \"status\": \"up\"\n" +
-                "        }\n" +
-                "    ],\n" +
-                "    \"inserted_at\": \"2023-04-27T13:50:29\",\n" +
-                "    \"name\": \"thibaud-java\",\n" +
-                "    \"allowed_email_domains\": [],\n" +
-                "    \"updated_at\": \"2023-04-27T13:50:49\"\n" +
+                "  \"__type__\": \"Organization\",\n" +
+                "  \"allowed_email_domains\": [\n" +
+                "    \"cryptr.co\",\n" +
+                "    \"muffun.com\",\n" +
+                "    \"muffun.fr\"\n" +
+                "  ],\n" +
+                "  \"color\": \"green-400\",\n" +
+                "  \"domain\": \"thibaud-java\",\n" +
+                "  \"environments\": [\n" +
+                "    {\n" +
+                "      \"name\": \"sandbox\",\n" +
+                "      \"status\": \"up\"\n" +
+                "    },\n" +
+                "    {\n" +
+                "      \"name\": \"production\",\n" +
+                "      \"status\": \"up\"\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"icon_logo_url\": null,\n" +
+                "  \"inline_logo_url\": null,\n" +
+                "  \"inserted_at\": \"2024-03-05T09:21:47\",\n" +
+                "  \"locale\": null,\n" +
+                "  \"name\": \"thibaud-java\",\n" +
+                "  \"status\": {\n" +
+                "    \"errors\": [],\n" +
+                "    \"estimated_time_to_complete_in_seconds\": null,\n" +
+                "    \"progress_in_percentage\": null,\n" +
+                "    \"state\": \"terminated\"\n" +
+                "  },\n" +
+                "  \"timezone\": null,\n" +
+                "  \"updated_at\": \"2024-04-04T12:02:46\"\n" +
                 "}"
 
         val organization = format.decodeFromString<Organization>(organizationJsonString)
@@ -63,7 +79,7 @@ class CryptrSerializerTest {
         organization.environments.find { it.name == "sandbox" }
             ?.let { assertEquals(EnvironmentStatus.UP, it.status) }
         organization.environments.find { it.name == "production" }
-            ?.let { assertEquals(EnvironmentStatus.DOWN, it.status) }
+            ?.let { assertEquals(EnvironmentStatus.UP, it.status) }
 
         assertEquals(
             JSONObject(organizationJsonString).keySet().sorted(),
@@ -74,30 +90,40 @@ class CryptrSerializerTest {
     @Test
     fun serializeUser() {
         val userJsonString = "{\n" +
-                "    \"__domain__\": \"acme-company\",\n" +
-                "    \"__environment__\": \"sandbox\",\n" +
-                "    \"__type__\": \"User\",\n" +
-                "    \"address\": null,\n" +
-                "    \"email\": \"aryanna.stroman@gmail.com\",\n" +
-                "    \"email_verified\": false,\n" +
-                "    \"id\": \"9ef8cc11-40e0-432a-8816-6a3b5034519f\",\n" +
-                "    \"inserted_at\": \"2023-05-03T14:03:09\",\n" +
-                "    \"meta_data\": [],\n" +
-                "    \"phone_number\": null,\n" +
-                "    \"phone_number_verified\": false,\n" +
-                "    \"profile\": {\n" +
-                "        \"birthdate\": null,\n" +
-                "        \"family_name\": null,\n" +
-                "        \"gender\": null,\n" +
-                "        \"given_name\": \"Aryanna\",\n" +
-                "        \"locale\": null,\n" +
-                "        \"nickname\": null,\n" +
-                "        \"picture\": null,\n" +
-                "        \"preferred_username\": null,\n" +
-                "        \"website\": null,\n" +
-                "        \"zoneinfo\": null\n" +
-                "    },\n" +
-                "    \"updated_at\": \"2023-05-03T14:03:09\"\n" +
+                "  \"__domain__\": \"muffun\",\n" +
+                "  \"__environment__\": \"sandbox\",\n" +
+                "  \"__type__\": \"User\",\n" +
+                "  \"active\": true,\n" +
+                "  \"address\": null,\n" +
+                "  \"email\": \"aryanna.stroman@gmail.com\",\n" +
+                "  \"email_verified\": false,\n" +
+                "  \"id\": \"60950f87-40f2-48f6-b6d7-18b9b9625d19\",\n" +
+                "  \"identities\": [\n" +
+                "    {\n" +
+                "      \"idp_id\": \"muffun_2dGO7HYKXZjchhrCyLQmOLFKvlX\",\n" +
+                "      \"authenticated_at\": \"2024-04-16T12:19:14\",\n" +
+                "      \"provider\": \"saml.okta\",\n" +
+                "      \"data\": {}\n" +
+                "    }\n" +
+                "  ],\n" +
+                "  \"inserted_at\": \"2024-04-05T09:57:16\",\n" +
+                "  \"meta_data\": [],\n" +
+                "  \"phone_number\": null,\n" +
+                "  \"phone_number_verified\": false,\n" +
+                "  \"phone_numbers\": [],\n" +
+                "  \"profile\": {\n" +
+                "    \"birthdate\": null,\n" +
+                "    \"family_name\": null,\n" +
+                "    \"gender\": null,\n" +
+                "    \"given_name\": \"Aryanna\",\n" +
+                "    \"locale\": null,\n" +
+                "    \"nickname\": null,\n" +
+                "    \"picture\": null,\n" +
+                "    \"preferred_username\": null,\n" +
+                "    \"website\": null,\n" +
+                "    \"zoneinfo\": null\n" +
+                "  },\n" +
+                "  \"updated_at\": \"2024-04-16T12:19:14\"\n" +
                 "}"
 
         val user = format.decodeFromString<User>(userJsonString)
@@ -118,58 +144,6 @@ class CryptrSerializerTest {
         assertEquals(
             JSONObject(userJsonString).keySet().sorted(),
             JSONObject(format.encodeToString(CryptrSerializer, user)).keySet().sorted()
-        )
-    }
-
-    @Test
-    fun serializeApplication() {
-        val applicationJsonString = "{\n" +
-                "    \"__domain__\": \"acme-company\",\n" +
-                "    \"__environment__\": \"sandbox\",\n" +
-                "    \"__type__\": \"Application\",\n" +
-                "    \"allowed_logout_urls\": [\n" +
-                "        \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                "    ],\n" +
-                "    \"allowed_origins_cors\": [\n" +
-                "        \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                "    ],\n" +
-                "    \"allowed_redirect_urls\": [\n" +
-                "        \"https://communitiz-app-vuejs.onrender.com\"\n" +
-                "    ],\n" +
-                "    \"application_type\": \"ruby_on_rails\",\n" +
-                "    \"client_id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
-                "    \"default_origin_cors\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                "    \"default_redirect_uri_after_login\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                "    \"default_redirect_uri_after_logout\": \"https://communitiz-app-vuejs.onrender.com\",\n" +
-                "    \"description\": null,\n" +
-                "    \"id\": \"bc3583eb-59e3-4edf-83c4-96bd308430cc\",\n" +
-                "    \"inserted_at\": \"2023-05-02T16:06:47\",\n" +
-                "    \"name\": \"Community App Communitiz Real QA App\",\n" +
-                "    \"updated_at\": \"2023-05-02T16:06:47\"\n" +
-                "}"
-
-        val application = format.decodeFromString<Application>(applicationJsonString)
-        assertEquals("Application", application.cryptrType)
-        assertEquals("sandbox", application.environment)
-        assertEquals("acme-company", application.resourceDomain)
-        assertEquals(setOf("https://communitiz-app-vuejs.onrender.com"), application.allowedLogoutUrls)
-        assertEquals(setOf("https://communitiz-app-vuejs.onrender.com"), application.allowedOriginsCors)
-        assertEquals(setOf("https://communitiz-app-vuejs.onrender.com"), application.allowedRedirectUrls)
-        assertEquals(ApplicationType.RUBY_ON_RAILS, application.applicationType)
-        assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", application.clientId)
-        assertEquals("https://communitiz-app-vuejs.onrender.com", application.defaultOriginCors)
-        assertEquals("https://communitiz-app-vuejs.onrender.com", application.defaultRedirectUriAfterLogin)
-        assertEquals("https://communitiz-app-vuejs.onrender.com", application.defaultRedirectUriAfterLogout)
-        assertNull(application.description)
-        assertEquals("bc3583eb-59e3-4edf-83c4-96bd308430cc", application.id)
-        assertNotNull(application.insertedAt)
-        assertNotNull(application.updatedAt)
-        assertEquals("Community App Communitiz Real QA App", application.name)
-
-
-        assertEquals(
-            JSONObject(applicationJsonString).keySet(),
-            JSONObject(format.encodeToString(CryptrSerializer, application)).keySet()
         )
     }
 
@@ -483,28 +457,6 @@ class CryptrSerializerTest {
 
         val decoded = cryptr.format.decodeFromString<SSOConnection>(body)
         assertIs<SSOConnection>(decoded)
-    }
-
-    @Test
-    fun serializeSSOOnboarding() {
-        val body = "{\n" +
-                "        \"__access__\": \"all_organizations_of:shark-academy\",\n" +
-                "        \"__domain__\": \"shark-academy\",\n" +
-                "        \"__environment__\": \"production\",\n" +
-                "        \"__managed_by__\": \"shark-academy\",\n" +
-                "        \"__type__\": \"EnterpriseConnectionOnboarding\",\n" +
-                "        \"email_template_id\": null,\n" +
-                "        \"id\": \"a6216afe-53ef-4a8e-bd62-07f49c7c825f\",\n" +
-                "        \"inserted_at\": \"2023-05-11T11:35:58\",\n" +
-                "        \"provider_type\": null,\n" +
-                "        \"it_admin_email\": \"thibaud@cryptr.co\",\n" +
-                "        \"state\": \"not_initialized\",\n" +
-                "        \"tutorial_step\": 0,\n" +
-                "        \"updated_at\": \"2023-05-11T11:35:58\"\n" +
-                "    }"
-
-        val decoded = cryptr.format.decodeFromString<AdminOnboarding>(body)
-        assertIs<AdminOnboarding>(decoded)
     }
 
     @Test
