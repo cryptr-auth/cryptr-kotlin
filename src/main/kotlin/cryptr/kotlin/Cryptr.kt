@@ -35,7 +35,7 @@ import org.json.JSONObject
 class Cryptr(
     protected val accountDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_ACCOUNT_DOMAIN.toString()),
     protected val serviceUrl: String = System.getProperty(
-        CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+        CryptrEnvironment.CRYPTR_SERVICE_URL.toString(),
         DEFAULT_BASE_URL
     ),
     protected val defaultRedirectUri: String = System.getProperty(

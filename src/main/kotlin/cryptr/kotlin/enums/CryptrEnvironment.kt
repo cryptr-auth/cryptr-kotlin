@@ -18,7 +18,7 @@ enum class CryptrEnvironment {
     /**
      * Key to store Cryptr Service URL
      */
-    CRYPTR_BASE_URL,
+    CRYPTR_SERVICE_URL,
 
     /**
      * Key to store your JVM default Redirect URL
