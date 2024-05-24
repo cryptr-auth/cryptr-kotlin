@@ -14,7 +14,9 @@ data class JWTPayload(
     /**
      * Represents scopes allowed while using this JWT
      */
-    @JsonNames("scp") val scope: JsonElement? = null,
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    @JsonNames("scp")
+    val scope: JsonElement? = null,
     /**
      * Represents the audience where the token can be used from
      */
@@ -87,6 +89,7 @@ data class JWTPayload(
     /**
      * The metadata associated to the resource owner
      */
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
     @JsonNames("meta_data", "resource_owner_metadata")
     @SerialName("meta_data")
     val metaData: Map<String, JsonElement>? = null,
