@@ -8,8 +8,8 @@ import cryptr.kotlin.interfaces.Requestable
 import cryptr.kotlin.interfaces.Tokenable
 import cryptr.kotlin.models.*
 import cryptr.kotlin.models.List
+import cryptr.kotlin.models.connections.PasswordConnection
 import cryptr.kotlin.models.connections.SSOConnection
-import cryptr.kotlin.models.deleted.DeletedApplication
 import cryptr.kotlin.models.deleted.DeletedOrganization
 import cryptr.kotlin.models.deleted.DeletedUser
 import cryptr.kotlin.models.jwt.JWTToken
@@ -35,7 +35,7 @@ import org.json.JSONObject
 class Cryptr(
     protected val accountDomain: String = System.getProperty(CryptrEnvironment.CRYPTR_ACCOUNT_DOMAIN.toString()),
     protected val serviceUrl: String = System.getProperty(
-        CryptrEnvironment.CRYPTR_BASE_URL.toString(),
+        CryptrEnvironment.CRYPTR_SERVICE_URL.toString(),
         DEFAULT_BASE_URL
     ),
     protected val defaultRedirectUri: String = System.getProperty(
@@ -48,6 +48,9 @@ class Cryptr(
     /**
      * @suppress
      */
+    @OptIn(ExperimentalSerializationApi::class)
+    val formatNoNulNoDefaults = Json { ignoreUnknownKeys = true; explicitNulls = false; encodeDefaults = false }
+
     @OptIn(ExperimentalSerializationApi::class)
     val format = Json { ignoreUnknownKeys = true; explicitNulls = true; encodeDefaults = true }
     private val ignoreIssChecking = System.getProperty("CRYPTR_IGNORE_ISS_CHECKING", "true") == "true"
@@ -184,7 +187,7 @@ class Cryptr(
      * @param orgDomain Organization domain linked to the targeted SSO Connection
      * @param userEmail End-User email linked to the SSO Connection
      * @param authType (Optional, Default: SAML)
-     * @return a [SSOChallenge] with `authorization_url`that end-user has to open to do his authententication process
+     * @return a [SSOChallenge] with `authorization_url`that end-user has to open to do his authentication process
      */
     fun createSsoChallenge(
         redirectUri: String = defaultRedirectUri,
@@ -203,8 +206,7 @@ class Cryptr(
             return try {
                 APISuccess(format.decodeFromString<SSOChallenge>(response.toString()))
             } catch (e: Exception) {
-                logException(e)
-                APIError(ErrorMessage(response.toString()))
+                APIError(handleAPIException(e, response))
             }
         } else {
             throw Exception("requires either orgDomain or endUser value")
@@ -212,7 +214,234 @@ class Cryptr(
     }
 
     /**
-     * Consumes the code value to retrieve authnetication payload containing end-user JWTs
+     * Generate a Password Challenge and given parameters
+     * orgDomain and userEmail values are required
+     *
+     * @param orgDomain Organization's domain linked to the password connection
+     * @param userEmail End-User's email
+     * @param plaintText the plaint text to authenticate
+     *
+     * @return [APIResult] with the created [PasswordChallenge]
+     */
+    fun createPasswordChallenge(
+        orgDomain: String,
+        userEmail: String,
+        plaintText: String? = null,
+    ): APIResult<PasswordChallenge, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to userEmail,
+            "plain_text" to plaintText
+        )
+        val response = makeRequest(
+            path = "api/v2/password-challenge",
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<PasswordChallenge>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /**
+     * Generates a Magic Link Challenge from given parameters
+     * userEmail and redirectUri are required where orgDomain is optional
+     *
+     * @param userEmail End-user's email
+     * @param redirectUri The endpoint where you will consume after successfull authnetication
+     * @param orgDomain Organization's domain linked to the magioc link connection (useful when multiple orgs on same email domain)
+     *
+     * @return [ApiResult] with the created [MagicLinkChallenge]
+     */
+    fun createMagicLinkChallenge(
+        userEmail: String,
+        redirectUri: String,
+        orgDomain: String? = null
+    ): APIResult<MagicLinkChallenge, ErrorMessage> {
+        logDebug({ "createMagicLinkChallenge" })
+        val params = mapOf(
+            "user_email" to userEmail,
+            "redirect_uri" to redirectUri,
+            "org_domain" to orgDomain
+        )
+
+        val response = makeRequest(
+            path = "api/v2/magic-link-challenge",
+            serviceUrl, params, apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<MagicLinkChallenge>(response.toString()))
+        } catch (e: Exception) {
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /**
+     * Gets tokens from [PasswordChallenge]'s code
+     * @param passwordCode PasswordChallenge code after success
+     *
+     * @return [APIResult] of [PasswordChallengeResponse] containing generated tokens
+     */
+    fun getPasswordChallengeTokens(passwordCode: String? = null): APIResult<PasswordChallengeResponse, ErrorMessage> {
+        if (passwordCode.isNullOrEmpty()) {
+            return APIError(ErrorMessage.build("password challenge code missing"))
+        }
+        val params = mapOf(
+            "grant_type" to "authorization_code",
+            "code" to passwordCode
+        )
+        val response = makeRequest(
+            path = "/api/v2/oauth/token",
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString<PasswordChallengeResponse>(response.toString()))
+        } catch (e: Exception) {
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /**
+     * Creates a password request for the email end-user owner thats redirects to the desired redirect URI
+     *
+     * @param userEmail The end-user for whom you want to generate the password request
+     * @param redirectUri Where you want to redirect the user after his magic link click. Endpoint requires to handle
+     * the response
+     * @param orgDomain The domain of the [Organization] that owns the user
+     *
+     * @return an [APIResult] of the successful request
+     */
+    fun createPasswordRequest(
+        userEmail: String,
+        redirectUri: String,
+        orgDomain: String
+    ): APIResult<CryptrResource, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to userEmail,
+            "redirect_uri" to redirectUri
+        )
+        val response = makeRequest(
+            path = buildApiPath("password-request"),
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            APISuccess(format.decodeFromString(response.toString()))
+        } catch (e: Exception) {
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /**
+     * Creates a password for a given passwordCode and plainText
+     * @param passwordCode String given by Cryptr to allow the password update
+     * @param plaintText New password value
+     *
+     * @return an [APIResult] with the created [Password]
+     */
+    fun createPassword(
+        passwordCode: String,
+        plaintText: String
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "password_code" to passwordCode,
+            "plain_text" to plaintText
+        )
+        val response = makeRequest(
+            path = buildApiPath("password"),
+            serviceUrl,
+            params,
+            retrieveApiKeyToken()
+        )
+
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /**
+     * Creates a password depending on given parameters
+     * @param userEmail End-user's email
+     * @param plaintText Password string value
+     * @param passwordCode String to allow password creation
+     * @param orgDomain Domain of [Organization] that owns the user
+     *
+     * @return an [APIResult] with the created [Password]
+     *
+     */
+    fun createPassword(
+        userEmail: String,
+        plaintText: String,
+        passwordCode: String,
+        orgDomain: String
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "org_domain" to orgDomain,
+            "user_email" to userEmail,
+            "plain_text" to plaintText,
+            "password_code" to passwordCode
+        )
+
+        val response = makeRequest(path = buildApiPath("password"), serviceUrl, params, retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /**
+     * Creates a Password without using the email verification process. CAUTION  this process is not recommended
+     *
+     * @param userEmail email address of end-user
+     * @param plaintText password string value
+     * @param orgDomain domain of [Organization] that owns the end-user
+     *
+     * @return [APIResult] with created [Password]
+     *
+     */
+    fun createPasswordWithoutEmailVerification(
+        userEmail: String,
+        plaintText: String,
+        orgDomain: String,
+    ): APIResult<Password, ErrorMessage> {
+        val params = mapOf(
+            "user_email" to userEmail,
+            "plain_text" to plaintText,
+            "org_domain" to orgDomain,
+        )
+        val response = makeRequest(path = buildApiPath("password"), serviceUrl, params, retrieveApiKeyToken())
+        return try {
+            APISuccess(format.decodeFromString<Password>(response.toString()))
+        } catch (e: Exception) {
+            logException(e)
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /**
+     * Gets tokens from [PasswordChallenge]
+     * @param passwordChallenge PasswordChallenge
+     */
+    fun getPasswordChallengeTokens(passwordChallenge: PasswordChallenge): APIResult<PasswordChallengeResponse, ErrorMessage> {
+        return getPasswordChallengeTokens(passwordChallenge.code)
+    }
+
+
+    /**
+     * Consumes the code value to retrieve authentication payload containing end-user JWTs
      *
      * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
      * @return JSONObject containing end-user session JWTs
@@ -224,11 +453,32 @@ class Cryptr(
             return try {
                 APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
             } catch (e: Exception) {
-                logException(e)
-                APIError(ErrorMessage(response.toString()))
+                APIError(handleAPIException(e, response))
             }
         } else {
-            return APIError(ErrorMessage("code is required"))
+            return APIError(ErrorMessage.build("code is required"))
+        }
+    }
+
+
+    /**
+     * Consumes the code value to retrieve authentication payload containing end-user JWTs
+     *
+     * @param code the query param received on your callback endpoint(redirectUri from create challenge fun)
+     * @return [ChallengeResponse] containing end-user session JWTs
+     */
+    fun validateChallenge(code: String? = null): APIResult<ChallengeResponse, ErrorMessage> {
+        if (code !== null && code.isNotEmpty() && code.isNotBlank()) {
+            val params = mapOf("code" to code, "grant_type" to "authorization_code")
+            val response =
+                makeRequest(path = "api/v2/oauth/token", serviceUrl, params, apiKeyToken = retrieveApiKeyToken())
+            return try {
+                APISuccess(format.decodeFromString<ChallengeResponse>(response.toString()))
+            } catch (e: Exception) {
+                APIError(handleAPIException(e, response))
+            }
+        } else {
+            return APIError(ErrorMessage.build("code is required"))
         }
     }
 
@@ -249,8 +499,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<List<Organization>>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -267,8 +516,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<Organization>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -282,13 +530,9 @@ class Cryptr(
      */
     fun createOrganization(
         name: String,
-        allowedEmailDomains: Set<String>? = null
+        allowedEmailDomains: Set<String>
     ): APIResult<Organization, ErrorMessage> {
-        return if (allowedEmailDomains.isNullOrEmpty()) {
-            createOrganization(Organization(name = name))
-        } else {
-            createOrganization(Organization(name = name, allowedEmailDomains = allowedEmailDomains))
-        }
+        return createOrganization(Organization(name = name, allowedEmailDomains = allowedEmailDomains))
     }
 
 
@@ -306,8 +550,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<Organization>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -354,8 +597,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<List<User>>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -376,8 +618,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<User>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -412,8 +653,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<User>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -436,8 +676,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<User>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -460,100 +699,6 @@ class Cryptr(
         } catch (e: Exception) {
             logException(e)
             return null
-        }
-    }
-
-    /**
-     * List Organization [Application]s
-     *
-     * @param orgDomain Organization's domain
-     *
-     * @return [APIResult] the response
-     */
-    fun listApplications(
-        orgDomain: String,
-        perPage: Int? = 10,
-        currentPage: Int? = 1
-    ): APIResult<List<Application>, ErrorMessage> {
-        val path = buildApplicationPath(orgDomain)
-        val response =
-            makeListRequest(path, serviceUrl = serviceUrl, apiKeyToken = retrieveApiKeyToken(), perPage, currentPage)
-        return try {
-            APISuccess(format.decodeFromString<List<Application>>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    /**
-     * Retrieves an [Application] based on its Organization's domain and ID
-     *
-     * @param orgDomain The [Organization] domain
-     * @param applicationId The ID of the requested [Application]
-     *
-     * @return [Application]
-     */
-    fun retrieveApplication(orgDomain: String, applicationId: String): APIResult<Application, ErrorMessage> {
-        val response =
-            makeRequest(
-                buildApplicationPath(orgDomain, applicationId),
-                serviceUrl = serviceUrl,
-                apiKeyToken = retrieveApiKeyToken()
-            )
-        return try {
-            APISuccess(format.decodeFromString<Application>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    /**
-     * Creates an [Application] on your Cryptr service for [Organization provided]
-     *
-     * @param
-     */
-    fun createApplication(
-        orgDomain: String,
-        application: Application
-    ): APIResult<Application, ErrorMessage> {
-        val params = JSONObject(format.encodeToString(application)).toMap()
-        val response =
-            makeRequest(
-                buildApplicationPath(orgDomain),
-                serviceUrl = serviceUrl,
-                params = params,
-                apiKeyToken = retrieveApiKeyToken()
-            )
-        return try {
-            APISuccess(format.decodeFromString<Application>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-
-    /**
-     * Delete a given [Application]
-     *
-     * @param application The [Application] to delete
-     *
-     * @return the deleted [Application]
-     */
-    fun deleteApplication(application: Application): DeletedApplication? {
-        val response = makeDeleteRequest(
-            buildApplicationPath(application.resourceDomain.toString(), application.id),
-            serviceUrl = serviceUrl,
-            retrieveApiKeyToken()
-        )
-        return try {
-            format.decodeFromString<DeletedApplication>(response.toString())
-        } catch (e: Exception) {
-            logException(e)
-            return null
-//            APIError(ErrorMessage(response.toString()))
         }
     }
 
@@ -582,8 +727,41 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
+        }
+    }
+
+    /** Creates a [PasswordConnection]
+     * @param orgDomain REQUIRED domain of the organization
+     */
+    fun createPasswordConnection(
+        orgDomain: String,
+        plainTextMinLength: Int? = null,
+        plainTextMaxLength: Int? = null,
+        forgotPasswordTemplateId: String? = null,
+        pepperRotationPeriod: Int? = null,
+    ): APIResult<PasswordConnection, ErrorMessage> {
+        val params = mapOf(
+            "plain_text_min_length" to plainTextMinLength,
+            "plain_text_max_length" to plainTextMaxLength,
+            "forgot_password_template_id" to forgotPasswordTemplateId,
+            "pepper_rotation_period" to pepperRotationPeriod,
+        ).filterValues { it != null }
+        val response = makeRequest(
+            buildOrganizationResourcePath(orgDomain, resourceName = "password-connection"),
+            serviceUrl = serviceUrl,
+            params = params,
+            apiKeyToken = retrieveApiKeyToken()
+        )
+        return try {
+            val createdPasswordConn = format.decodeFromString<PasswordConnection>(response.toString())
+            if (createdPasswordConn.id !== null) {
+                APISuccess(createdPasswordConn)
+            } else {
+                APIError(ErrorMessage.build(response.toString()))
+            }
+        } catch (e: Exception) {
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -608,8 +786,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<List<SSOConnection>>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -630,8 +807,7 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
     }
 
@@ -656,263 +832,8 @@ class Cryptr(
         return try {
             APISuccess(format.decodeFromString<SSOConnection>(response.toString()))
         } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
+            APIError(handleAPIException(e, response))
         }
-    }
-
-    /**
-     * Creates [APIResult]  of [AdminOnboarding] type `sso-connection`
-     *
-     * @param orgDomain The domain of the targeted [Organization]
-     * @param itAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
-     * @param providerType (Optional) [String] provider type for the SSO to setup (ex : Okta, ADFS...)
-     * @param emailTemplateId (Optional) [String] ID of the email template to use for email send to IT Admin
-     * @param sendEmail (Optional) [Boolean] to send immediately email to IT Admin or not (default: true)
-     * @param applicationId (Optional) [String] ID of the frontend CLient application to redirect end-user to after SSO
-     * authentication
-     *
-     * @return [APIResult] of the creation result
-     */
-    fun createSsoAdminOnboarding(
-        orgDomain: String,
-        itAdminEmail: String,
-        providerType: String? = null,
-        emailTemplateId: String? = null,
-        sendEmail: Boolean? = true,
-        applicationId: String? = null,
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        val customParams = mapOf(
-            "provider_type" to providerType,
-            "application_id" to applicationId
-        )
-        return createAdminOnboarding(
-            orgDomain, "sso-connection", itAdminEmail, emailTemplateId, sendEmail, customParams
-        )
-    }
-
-    /**
-     * Creates [APIResult]  of [AdminOnboarding] according to provided params
-     *
-     * @param orgDomain The domain of the targeted [Organization]
-     * @param onboardingType [String] representing type of onboarding (ex: `sso-connection`)
-     * @param itAdminEmail (Optional) [String] email for the Organization's IT Admin able to configure SSO
-     * @param emailTemplateId (Optional) [String] ID of the email template to use for email send to IT Admin
-     * @param sendEmail (Optional) [Boolean] to send immediately email to IT Admin or not (default: true)
-     * @param customParams (Optional) [Map] of custom attributes related to onboardingType
-     *
-     * @return [APIResult] of the creation result
-     */
-    fun createAdminOnboarding(
-        orgDomain: String,
-        onboardingType: String,
-        itAdminEmail: String? = null,
-        emailTemplateId: String? = null,
-        sendEmail: Boolean? = true,
-        customParams: Map<String, Any?>? = mapOf<String, Any?>()
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        val path = buildAdminOnboardingUrl(orgDomain, onboardingType)
-        var basicParams: Map<String, Any?> = mapOf(
-            "it_admin_email" to itAdminEmail,
-            "email_template_id" to emailTemplateId,
-            "send_email" to sendEmail,
-            "onboarding_type" to onboardingType
-        )
-        val params = basicParams.toMutableMap()
-        try {
-            customParams?.map { params.put(it.key, it.value) }
-        } catch (pe: Exception) {
-            logException(pe)
-            logError({ pe.message })
-        }
-        logDebug({ params.toString() })
-        val response = makeRequest(
-            path,
-            serviceUrl = serviceUrl,
-            params = params,
-            apiKeyToken = retrieveApiKeyToken(),
-            requestMethod = "POST"
-        )
-        return try {
-            APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            logError({ e.message.toString() })
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    /**
-     * Retrieve an [APIResult] of type [AdminOnboarding] for `sso-connection` onboarding type
-     *
-     * @param orgDomain [String] of Organization's domain
-     *
-     * @see Cryptr.retrieveAdminOnboarding(orgDomain, "sso-connection")
-     *
-     * @return [APIResult] of type [AdminOnboarding]
-     */
-    fun retrieveSsoAdminOnboarding(orgDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
-        return retrieveAdminOnboarding(orgDomain, "sso-connection")
-    }
-
-
-    /**
-     * Retrieve an Admin onboarding based on given parameters
-     *
-     * @param orgDomain [String] targeted Organization's domain
-     * @param onboardingType [String] targeted onboarding type (ex: `sso-connection`)
-     *
-     * @return [APIResult] of type [AdminOnboarding]
-     */
-    fun retrieveAdminOnboarding(
-        orgDomain: String,
-        onboardingType: String
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        val path = buildAdminOnboardingUrl(orgDomain, onboardingType)
-        val response = makeRequest(path, apiKeyToken = retrieveApiKeyToken(), requestMethod = "GET")
-        return try {
-            APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    /**
-     * Invite IT Admin by email for the related [Organization] SsoAdminOnboarding
-     *
-     *  @param orgDomain [String] of the targeted Organization's domain
-     *  @param itAdminEmail (Optional) [String] of the (new) IT admin email
-     *
-     *  @return [APIResult] of [AdminOnboarding]
-     */
-
-    fun inviteSsoAdminOnboarding(
-        orgDomain: String,
-        itAdminEmail: String? = null
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        return inviteAdminOnboarding(orgDomain, "sso-connection", itAdminEmail)
-    }
-
-    /**
-     * Invite IT Admin by email for the related [Organization] AdminOnboarding
-     *
-     *  @param orgDomain [String] of the targeted Organization's domain
-     *  @param onboardingType The type of targeted AdminOnboarding (ex: 'sso-connection')
-     *  @param itAdminEmail (Optional) [String] of the (new) IT admin email
-     *
-     *  @return [APIResult] of [AdminOnboarding]
-     */
-    fun inviteAdminOnboarding(
-        orgDomain: String,
-        onboardingType: String,
-        itAdminEmail: String? = null,
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        val path = buildAdminOnboardingUrl(orgDomain, onboardingType) + "/invite"
-        val params =
-            if (itAdminEmail.isNullOrBlank()) mapOf<String, Any?>() else mapOf("it_admin_email" to itAdminEmail)
-
-        val response = makeRequest(path, apiKeyToken = retrieveApiKeyToken(), requestMethod = "POST", params = params)
-
-        return try {
-            APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    fun updateSsoAdminOnboarding(
-        orgDomain: String,
-        itAdminEmail: String? = null,
-        providerType: String? = null,
-        emailTemplateId: String? = null,
-        sendEmail: Boolean? = true,
-        applicationId: String? = null,
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        val customParams = mapOf(
-            "provider_type" to providerType,
-            "application_id" to applicationId
-        )
-        return updateAdminOnboarding(
-            orgDomain, "sso-connection", itAdminEmail, emailTemplateId, sendEmail, customParams
-        )
-    }
-
-    fun updateAdminOnboarding(
-        orgDomain: String,
-        onboardingType: String,
-        itAdminEmail: String? = null,
-        emailTemplateId: String? = null,
-        sendEmail: Boolean? = true,
-        customParams: Map<String, Any?>? = mapOf<String, Any?>()
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        val path = buildAdminOnboardingUrl(orgDomain, onboardingType)
-        var basicParams: Map<String, Any?> = mapOf(
-            "it_admin_email" to itAdminEmail,
-            "email_template_id" to emailTemplateId,
-            "send_email" to sendEmail,
-            "onboarding_type" to onboardingType
-        )
-        val params = basicParams.toMutableMap()
-        try {
-            customParams?.map { params.put(it.key, it.value) }
-        } catch (pe: Exception) {
-            logException(pe)
-            logError({ pe.message })
-        }
-        logDebug({ params.toString() })
-        val response = makeRequest(
-            path,
-            serviceUrl = serviceUrl,
-            params = params,
-            apiKeyToken = retrieveApiKeyToken(),
-            requestMethod = "PUT"
-        )
-        return try {
-            APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            logError({ e.message.toString() })
-            APIError(ErrorMessage(response.toString()))
-        }
-    }
-
-    /**
-     * Reset SSO [AdminOnboarding] for the related [Organization]
-     *
-     *  @param orgDomain [String] of the targeted Organization's domain
-     *
-     *  @return [APIResult] of resetted [AdminOnboarding]
-     */
-    fun resetSsoAdminOnboarding(orgDomain: String): APIResult<AdminOnboarding, ErrorMessage> {
-        return resetAdminOnboarding(orgDomain, "sso-connection")
-    }
-
-    /**
-     * Reset [AdminOnboarding] for the related [Organization]
-     *
-     *  @param orgDomain [String] of the targeted Organization's domain
-     *  @param onobardingType The type of AdminOnboarding to reset (ex: 'sso-connection')
-     *
-     *  @return [APIResult] of resetted [AdminOnboarding]
-     */
-    fun resetAdminOnboarding(
-        orgDomain: String,
-        onboardingType: String
-    ): APIResult<AdminOnboarding, ErrorMessage> {
-        val path = buildAdminOnboardingUrl(orgDomain, onboardingType) + "/reset"
-        logDebug({ "resetAdminOnboarding" })
-        val requestMethod = "PUT"
-        logDebug({ requestMethod.toString() })
-        val response = makeRequest(path, apiKeyToken = retrieveApiKeyToken(), requestMethod = requestMethod)
-        return try {
-            APISuccess(format.decodeFromString<AdminOnboarding>(response.toString()))
-        } catch (e: Exception) {
-            logException(e)
-            APIError(ErrorMessage(response.toString()))
-        }
-
     }
 
     /**
@@ -996,7 +917,7 @@ class Cryptr(
     }
 
     /**
-     * Format the [CryptrResource] (User, AdminOnboarding, Organization...) to JSON String
+     * Format the [CryptrResource] (User, Organization...) to JSON String
      *
      * @param result the [CryptrResource] to format to JSON String
      *
@@ -1026,6 +947,31 @@ class Cryptr(
         } catch (e: Exception) {
             logException(e)
             e.message.toString()
+        }
+    }
+
+    /**
+     * Formats the [PasswordChallengeResponse] to JSON string
+     * @param result the [PasswordChallengeResponse] to format to JSON string
+     *
+     * @return JSON [String] encode of provided [PasswordChallengeResponse]
+     */
+    fun toJSONString(result: PasswordChallengeResponse): String {
+        return try {
+            format.encodeToString(result)
+        } catch (e: Exception) {
+            e.message.toString();
+        }
+    }
+
+    private fun handleAPIException(e: Exception, response: JSONObject): ErrorMessage {
+        return try {
+            logException(e)
+            format.decodeFromString<ErrorMessage>(response.toString())
+        } catch (e1: Exception) {
+            logException(e1)
+            val errorContent = ErrorContent(message = response.toString())
+            ErrorMessage(error = errorContent)
         }
     }
 }

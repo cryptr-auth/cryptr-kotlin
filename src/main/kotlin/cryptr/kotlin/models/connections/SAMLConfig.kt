@@ -33,5 +33,8 @@ data class SAMLConfig(
      * SSO Provider Metadata
      */
     @SerialName("sso_provider_metadata") val ssoProviderMetadata: String? = null,
-
-    )
+    /**
+     * Version of umbrella used when configured (0, or 1)
+     */
+    @SerialName("version") val version: Int? = null,
+)

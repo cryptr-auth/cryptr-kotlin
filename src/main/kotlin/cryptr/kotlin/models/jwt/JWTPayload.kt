@@ -2,6 +2,8 @@ package cryptr.kotlin.models.jwt
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonNames
 import java.time.Instant
 
 /**
@@ -12,38 +14,42 @@ data class JWTPayload(
     /**
      * Represents scopes allowed while using this JWT
      */
-    @SerialName("scp") val scp: Set<String>,
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    @JsonNames("scp")
+    val scope: JsonElement? = null,
     /**
      * Represents the audience where the token can be used from
      */
-    @SerialName("aud") val aud: String? = null,
+    @SerialName("aud") val aud: JsonElement? = null,
     /**
      * Represents the resource owner email to whom this token is attached to
      */
     @SerialName("email") val email: String? = null,
+    /** [ver 1] (When generated from SSO) The SSO provider (ex: `okta`) */
     @SerialName("ips") val ips: String? = null,
+    /** [ver 1] (When generated from SSO) The SSO Connection ID (ex: `nasa_1234`) */
     @SerialName("sci") val sci: String? = null,
     /**
      * Represents the resource owner unique ID to whom this token is attached to
      */
-    @SerialName("sub") val sub: String,
+    @SerialName("sub") val sub: String? = null,
     /**
      * Version of the current token.
-     * SHOULD equals to `1`
+     * SHOULD be superior or equals to `1`
      */
-    @SerialName("ver") val ver: Int,
+    @SerialName("ver") val ver: Int? = null,
     /**
      * The resource owner database
      */
-    @SerialName("dbs") val dbs: String,
+    val dbs: String? = null,
     /**
      * The issuer that generated the token
      */
-    @SerialName("iss") val iss: String,
+    @SerialName("iss") val iss: String? = null,
     /**
      * The Type of token. Should be `JWT`
      */
-    @SerialName("jtt") val jtt: String,
+    @SerialName("jtt") val jtt: String? = null,
     /**
      * The nonce of token. Should be an UUID
      */
@@ -51,7 +57,7 @@ data class JWTPayload(
     /**
      * The Organization that owns the resource owner
      */
-    @SerialName("tnt") val tnt: String,
+    @SerialName("tnt") val tnt: String? = null,
     /**
      * The Expiration date of the token
      */
@@ -63,11 +69,11 @@ data class JWTPayload(
     /**
      * The token unique identifier
      */
-    @SerialName("jti") val jti: String,
+    @SerialName("jti") val jti: String? = null,
     /**
      * The client id of the application responsible for the issuance of this token
      */
-    @SerialName("cid") val cid: String,
+    @SerialName("cid") val cid: String? = null,
     /**
      * The Resource owner family name
      */
@@ -79,23 +85,82 @@ data class JWTPayload(
     /**
      * The metadata associated to the application
      */
-    @SerialName("application_metadata") val applicationMetadata: Map<String, String>? = mapOf(),
+    @SerialName("application_metadata") val applicationMetadata: Map<String, JsonElement>? = null,
     /**
      * The metadata associated to the resource owner
      */
-    @SerialName("resource_owner_metadata") val resourceOwnerMetadata: Map<String, String>? = mapOf(),
+    @OptIn(kotlinx.serialization.ExperimentalSerializationApi::class)
+    @JsonNames("meta_data", "resource_owner_metadata")
+    @SerialName("meta_data")
+    val metaData: Map<String, JsonElement>? = null,
+
+    //V2
+    /**
+     * Current environment (v2)
+     */
+    @SerialName("env") val env: String? = null,
+    /**
+     * Current organization (v2)
+     */
+    @SerialName("org") val org: String? = null,
+    /**
+     * Current profile (openid v2)
+     */
+    @SerialName("profile") val profile: Map<String, JsonElement>? = null,
+    /** [ver 1] (Openid) Authorized party */
+    @SerialName("azp") val azp: String? = null,
+    /**
+     * The client id of the application responsible for the issuance of this token
+     */
+    @SerialName("client_id") val clientId: String? = null,
+    //val scopes: JsonElement? = scp ?: scope,
+    /** (When `openid`) For validating Access token */
+    val at_hash: String? = null,
+    /** (When `openid`) For validatio */
+    val c_hash: String? = null,
+    /** Is the email has been verified */
+    val email_verified: JsonElement? = null,
+    /** Is the phone number has been verified */
+    val phone_number_verified: JsonElement? = null,
+
+    /** Identities representing used providers */
+    val identities: Set<JWTIdentity>? = null,
+    /** Only setup for api key token */
+    val type: String? = null
 ) {
 
+    /**
+     * domain of the organization handle the resource_owner
+     */
+    val domain: String
+        get() = (org ?: tnt)!!
+
+    /**
+     * Current resource owner ID of the token
+     */
+    val subjectId: String?
+        get() = sub?.split("|")?.last()
+
     init {
-        require(ver == 1) { "only version '1' allowed" }
-        require(scp.isNotEmpty()) { "scp cannot be empty" }
-        require(sub.isNotEmpty() && sub.isNotBlank()) { "sub cannot be empty" }
-        require(dbs.isNotEmpty() && dbs.isNotBlank()) { "dbs cannot be empty" }
-        require(iss.isNotEmpty() && iss.isNotBlank()) { "iss cannot be empty" }
-        require(jtt.isNotEmpty() && jtt.isNotBlank()) { "jtt cannot be empty" }
-        require(jti.isNotEmpty() && jti.isNotBlank()) { "jti cannot be empty" }
-        require(cid.isNotEmpty() && cid.isNotBlank()) { "cid cannot be empty" }
+        //basic validations
+        if (type == null || type != "api_v2") {
+            require(sub !== null && sub.isNotEmpty() && sub.isNotBlank()) { "sub cannot be empty" }
+            require(jtt !== null && jtt.isNotEmpty() && jtt.isNotBlank()) { "jtt cannot be empty" }
+            require(jti !== null && jti.isNotEmpty() && jti.isNotBlank()) { "jti cannot be empty" }
+            require((1..3).contains(ver)) { "only versions 1 .. 3 are allowed" }
+
+            if (ver == 1) {
+                require(dbs!!.isNotEmpty() && dbs.isNotBlank()) { "dbs cannot be empty" }
+                require(iss!!.isNotEmpty() && iss.isNotBlank()) { "iss cannot be empty" }
+                require(cid!!.isNotEmpty() && cid.isNotBlank()) { "cid cannot be empty" }
+            } else {
+                // v2
+                require(org!!.isNotEmpty() && org.isNotBlank()) { "org cannot be empty" }
+                require(env!!.isNotEmpty() && env.isNotBlank()) { "env cannot be empty" }
+            }
+        }
         require(exp > 0 && Instant.ofEpochSecond(exp).isAfter(Instant.now())) { "exp should be in the future" }
         require(iat > 0 && Instant.ofEpochSecond(iat).isBefore(Instant.now())) { "iat should be in the past" }
+
     }
 }

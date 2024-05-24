@@ -1,16 +1,15 @@
 package cryptr.kotlin.models
 
 import cryptr.kotlin.interfaces.Tokenable
-import cryptr.kotlin.models.jwt.JWTPayload
 import cryptr.kotlin.models.jwt.JWTToken
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 /**
- * Represents a successful response of (SSO) Challenge Headless Authentication process
+ * Represents a successful response of (SSO) Challenge Headless Authenticatino process
  */
 @Serializable
-data class ChallengeResponse(
+data class HeadlessChallengeResponse(
     /**
      * The JWT Access Token of the authenticated end-user
      */
@@ -20,7 +19,7 @@ data class ChallengeResponse(
      */
     @SerialName("id_token") val idToken: String? = null,
     /**
-     * The Refresh Token of the authenticated end-user
+     * The Refresh Token to rotate the session
      */
     @SerialName("refresh_token") val refreshToken: String? = null,
 
@@ -28,28 +27,21 @@ data class ChallengeResponse(
      * Authorized scope of these generated tokens
      */
     @SerialName("scope") val scope: Set<String>? = setOf(),
-    /**
-     * Type of token
-     */
-    @SerialName("token_type") val tokenType: String? = null,
+    @SerialName("token_type") val tokenType: String? = "Bearer",
 
     /**
-     * Expiration in  duration as [Long] seconds
+     * Expiration date as [String]
      */
-    @SerialName("expires_in") val expiresIn: Long? = null,
+    @SerialName("expires_in") val expiresIn: Int? = null,
 ) : Tokenable {
     /**
      * Decode ID Token and retrieve its [JWTToken] if its valid
      *
      * @see idToken
      */
-    fun getIdToken(serviceUrl: String): JWTToken? {
+    fun getIdClaims(serviceUrl: String): JWTToken? {
         val token: String = idToken.toString()
-        return verify(serviceUrl, token, false)
-    }
-
-    fun getIdClaims(serviceUrl: String): JWTPayload? {
-        return getIdToken(serviceUrl)?.claims()
+        return verify(serviceUrl, token)
     }
 
     /**
@@ -57,12 +49,8 @@ data class ChallengeResponse(
      *
      * @see accessToken
      */
-    fun getAccessToken(serviceUrl: String): JWTToken? {
+    fun getAccessClaims(serviceUrl: String): JWTToken? {
         val token: String = accessToken.toString()
         return verify(serviceUrl, token)
-    }
-
-    fun getAccessClaims(serviceUrl: String): JWTPayload? {
-        return getAccessToken(serviceUrl)?.claims()
     }
 }
